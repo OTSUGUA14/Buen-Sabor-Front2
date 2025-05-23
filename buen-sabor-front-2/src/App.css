@@ -1,1 +1,11 @@
-@import "tailwindcss";
+@import "tailwindcss/preflight";
+/* reemplaza @tailwind base */
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* Estilos globales */
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
