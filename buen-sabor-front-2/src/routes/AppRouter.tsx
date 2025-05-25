@@ -4,7 +4,7 @@ import Home from "../screens/Home";
 import Menu from "../screens/Menu";
 
 import Login from "../screens/Login";
-import SignUp from "../screens/SignUp";
+import SignUp from "../screens/RegisterPage";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 

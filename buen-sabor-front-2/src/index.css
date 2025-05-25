@@ -1,0 +1,11 @@
+/* Estilos opciones */
+.hide {
+    display: none;
+}
+
+.warning {
+    color: red;
+    font-size: 12px;
+    margin: 2px 0 10px;
+}
+
