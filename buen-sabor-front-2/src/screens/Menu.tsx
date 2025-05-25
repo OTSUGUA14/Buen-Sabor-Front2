@@ -1,12 +1,88 @@
+import React, { useState } from 'react'; // Importa useState
 import styles from '../styles/Menu.module.css';
+import ProductModal from '../components/ProductModal'; // Importa el nuevo componente modal
 
 export default function Menu() {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<any>(null);
+
+    const handleProductClick = (productData: any) => { 
+        setSelectedProduct(productData);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedProduct(null); 
+    };
+
+    const hamburguesas = [
+        {
+            id: 1,
+            name: "CLÁSICA DE LA CASA",
+            description: "Una hamburguesa clásica con carne super jugosa y sabor incomparable.",
+            ingredients: "pan de papa, doble carne jugosa, queso cheddar, lechuga, tomate, pepino, salsa de la casa",
+            price: 5600,
+            image: "https://images.rappi.cl/products/2091982356-1621649860361.png"
+        },
+        {
+            id: 2,
+            name: "BACON Y HUEVO",
+            description: "La perfecta combinación de carne, bacon crocante y huevo frito.",
+            ingredients: "pan brioche, carne de res, bacon, huevo, queso, cebolla caramelizada, salsa BBQ",
+            price: 12000,
+            image: "/productos/hamburguesa2.png"
+        },
+        {
+            id: 3,
+            name: "CEBOLLA Y BACON",
+            description: "Sabor intenso con cebolla caramelizada y crujiente bacon.",
+            ingredients: "pan de masa madre, carne, cebolla caramelizada, bacon, queso, pepinillos, aderezo",
+            price: 9700,
+            image: "/productos/hamburguesa3.png"
+        },
+        {
+            id: 4,
+            name: "POLLO CRISPY SIMPLE",
+            description: "Pechuga de pollo crocante con un toque fresco.",
+            ingredients: "pan de brioche, pollo frito, lechuga, tomate, mayonesa casera",
+            price: 8000,
+            image: "/productos/hamburguesa4.png"
+        },
+        {
+            id: 5,
+            name: "POLLO CEBOLLA Y BACON",
+            description: "Variante de pollo con cebolla y bacon.",
+            ingredients: "pan rústico, pollo a la plancha, cebolla morada, bacon, queso provolone, rúcula, alioli",
+            price: 9500,
+            image: "/productos/hamburguesa5.png"
+        },
+        {
+            id: 6,
+            name: "VEGANA SIMPLE",
+            description: "Una opción saludable y deliciosa para todos.",
+            ingredients: "pan integral, medallón de lentejas, espinaca, tomate, aguacate, aderezo de tahini",
+            price: 8400,
+            image: "/productos/hamburguesa6.png"
+        },
+    ];
+
+    const pizzas = [
+        {
+            id: 7,
+            name: "MUZZARELLA",
+            description: "La clásica pizza de muzzarella con base de tomate y orégano.",
+            ingredients: "masa de pizza, salsa de tomate, mozzarella, orégano, aceite de oliva",
+            price: 6000,
+            image: "/productos/pizza1.png"
+        }
+    ];
+
     return (
         <main className={styles.menuContainer}>
             {/* Categorías */}
             <aside className={styles.sidebar}>
                 <ul className={styles.categoryList}>
-                    {/* Envuelve el img y el button en un li individual para controlar el espaciado */}
                     <li className={styles.categoryListItem}>
                         <img src="/icons/burger.svg" alt="Hamburguesas" />
                         <button className={styles.categoryButton}>HAMBURGUESAS</button>
@@ -50,96 +126,32 @@ export default function Menu() {
                 <div className={styles.productSection}>
                     <h2>HAMBURGUESAS</h2>
                     <div className={styles.productGrid}>
-                        <div className={styles.productCard}>
-                            <img src="/productos/hamburguesa1.png" alt="Clasica" />
-                            <p>CLÁSICA DE LA CASA</p>
-                            <span>$8.000</span>
-                        </div>
-                        <div className={styles.productCard}>
-                            <img src="/productos/hamburguesa2.png" alt="Bacon" />
-                            <p>BACON Y HUEVO</p>
-                            <span>$12.000</span>
-                        </div>
-                        <div className={styles.productCard}>
-                            <img src="/productos/hamburguesa3.png" alt="Cebolla y Bacon" />
-                            <p>CEBOLLA Y BACON</p>
-                            <span>$9.700</span>
-                        </div>
-                        <div className={styles.productCard}>
-                            <img src="/productos/hamburguesa4.png" alt="Pollo Crispy Simple" />
-                            <p>POLLO CRISPY SIMPLE</p>
-                            <span>$8.000</span>
-                        </div>
-                        <div className={styles.productCard}>
-                            <img src="/productos/hamburguesa5.png" alt="Pollo Cebolla y Bacon" />
-                            <p>POLLO CEBOLLA Y BACON</p>
-                            <span>$9.500</span>
-                        </div>
-                        <div className={styles.productCard}>
-                            <img src="/productos/hamburguesa6.png" alt="Vegana Simple" />
-                            <p>VEGANA SIMPLE</p>
-                            <span>$8.400</span>
-                        </div>
+                        {hamburguesas.map(product => (
+                            <div
+                                key={product.id}
+                                className={styles.productCard}
+                                onClick={() => handleProductClick(product)} // Agregamos el onClick aquí
+                            >
+                                <img src={product.image} alt={product.name} />
+                                <p>{product.name}</p>
+                                <span>${product.price.toLocaleString('es-AR')}</span>
+                            </div>
+                        ))}
                     </div>
 
                     <h2>PIZZAS</h2>
                     <div className={styles.productGrid}>
-                        <div className={styles.productCard}>
-                            <img src="/productos/pizza1.png" alt="Muzzarella" />
-                            <p>MUZZARELLA</p>
-                            <span>$6.000</span>
-                        </div>
-                        {/* Agrega más pizzas aquí si tienes imágenes */}
-                    </div>
-
-                    <h2>EMPANADAS</h2>
-                    <div className={styles.productGrid}>
-                        <div className={styles.productCard}>
-                            <img src="/productos/empanada1.png" alt="Carne" />
-                            <p>CARNE</p>
-                            <span>$1.200</span>
-                        </div>
-                        {/* Agrega más empanadas aquí */}
-                    </div>
-
-                    <h2>ENSALADAS</h2>
-                    <div className={styles.productGrid}>
-                        <div className={styles.productCard}>
-                            <img src="/productos/ensalada1.png" alt="Caesar" />
-                            <p>CAESAR</p>
-                            <span>$7.500</span>
-                        </div>
-                        {/* Agrega más ensaladas aquí */}
-                    </div>
-
-                    <h2>ACOMPAÑAMIENTOS</h2>
-                    <div className={styles.productGrid}>
-                        <div className={styles.productCard}>
-                            <img src="/productos/acompanamiento1.png" alt="Papas Fritas" />
-                            <p>PAPAS FRITAS</p>
-                            <span>$3.000</span>
-                        </div>
-                        {/* Agrega más acompañamientos aquí */}
-                    </div>
-
-                    <h2>POSTRES</h2>
-                    <div className={styles.productGrid}>
-                        <div className={styles.productCard}>
-                            <img src="/productos/postre1.png" alt="Helado" />
-                            <p>HELADO</p>
-                            <span>$2.500</span>
-                        </div>
-                        {/* Agrega más postres aquí */}
-                    </div>
-
-                    <h2>BEBIDAS</h2>
-                    <div className={styles.productGrid}>
-                        <div className={styles.productCard}>
-                            <img src="/productos/bebida1.png" alt="Gaseosa" />
-                            <p>GASEOSA</p>
-                            <span>$1.800</span>
-                        </div>
-                        {/* Agrega más bebidas aquí */}
+                        {pizzas.map(product => (
+                            <div
+                                key={product.id}
+                                className={styles.productCard}
+                                onClick={() => handleProductClick(product)}
+                            >
+                                <img src={product.image} alt={product.name} />
+                                <p>{product.name}</p>
+                                <span>${product.price.toLocaleString('es-AR')}</span>
+                            </div>
+                        ))}
                     </div>
 
                 </div>
@@ -153,6 +165,13 @@ export default function Menu() {
                     <p>Tu carrito está vacío</p>
                 </div>
             </aside>
+
+            {/* Renderiza el modal */}
+            <ProductModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                product={selectedProduct}
+            />
         </main>
     );
 }
