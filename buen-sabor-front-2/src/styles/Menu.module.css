@@ -1,0 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@400;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Lato';
+}
+
+/* Contenedor principal del menú */
+.menuContainer {
+    display: flex;
+    padding: 2rem 0;
+    margin-top: 2.4rem;
+    gap: 2rem;
+    background-color: #fff;
+    position: relative; 
+}
+
+/* Sidebar izquierdo */
+.sidebar {
+    width: 220px;
+    border-radius: 0.6rem;
+    position: sticky;
+    top: 4.3rem;
+    align-self: flex-start; 
+    height: fit-content; 
+    z-index: 10; 
+}
+
+.categoryList {
+    list-style: none;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.categoryListItem {
+    display: flex;
+    align-items: center;
+    padding-left: 1rem;
+    justify-content: space-around;
+}
+
+.categoryListItem img {
+    width: 24px;
+    height: 24px;
+    filter: invert(77%) sepia(85%) saturate(1919%) hue-rotate(359deg) brightness(102%) contrast(107%);
+    flex-shrink: 0;
+}
+
+.categoryButton {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #FFA101;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    min-width: 140px;
+    max-width: 160px;
+    text-wrap: nowrap;
+}
+
+.categoryButton:hover {
+    background-color: #ffad20;
+    color: #333;
+    transform: translateY(-2px);
+}
+
+/* Contenido principal */
+.mainSection {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 1rem; /* Espacio a los lados */
+}
+
+/* Buscador */
+.searchBarContainer {
+    margin: auto;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 2.5rem;
+    padding-bottom: 0.8rem;
+    width: 50%; 
+    position: relative;
+}
+
+.searchInput {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 1rem;
+    padding: 0.4rem 0;
+    color: #555;
+}
+
+.searchInput::placeholder {
+    color: #aaa;
+}
+
+.searchIcon {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 0;
+    cursor: pointer;
+    filter: invert(50%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(50%) contrast(100%);
+}
+
+/* Secciones de productos */
+.productSection h2 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.productGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+    gap: 1.8rem;
+    justify-items: center;
+    margin-bottom: 3rem;
+}
+
+.productCard {
+    background-color: #fff;
+    border: 1px solid #aaa;
+    border-radius: 0.8rem;
+    padding: 1.2rem;
+    text-align: center;
+    width: 100%;
+    max-width: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+
+.productCard img {
+    width: 100%;
+    height: 120px; 
+    object-fit: cover; 
+    margin-bottom: 1rem;
+    border-radius: 0.4rem;
+}
+
+.productCard p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+.productCard span {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #FFA101; 
+}
+
+/* Carrito */
+.cartSidebar {
+    width: 280px; 
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.6rem;
+    padding: 1.5rem;
+    text-align: center;
+    height: fit-content;
+    position: sticky;
+    top: 4.3rem;
+    align-self: flex-start;
+    z-index: 10;
+}
+
+.cartSidebar h3 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.emptyCart {
+    color: #888;
+    font-size: 0.9rem;
+    margin: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.emptyCart img {
+    width: 60px;
+    height: 60px;
+    opacity: 0.6;
+}

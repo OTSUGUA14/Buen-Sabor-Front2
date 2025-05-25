@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+.homeSection {
+  height: 100vh;
+  display: flex;
+}
+
+.leftContent {
+  font-family: 'Lato';
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 5rem;
+  z-index: 10;
+}
+
+.mainTitle {
+  font-size: 3.4rem;
+  font-weight: 900;
+  color: #333;
+  margin-bottom: 0;
+}
+
+.orangeText {
+  color: #ffa101;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #474747;
+  font-weight: bolder;
+}
+
+.menuButton {
+  width: 30%;
+  border: none;
+  background-color: #ffa101;
+  color: #333;
+  padding: 0.8rem 1.5rem;
+  font-weight: 700;
+  border-radius: 0.4rem;
+  transition: background-color 0.3s;
+}
+
+.menuButton:hover {
+    color: #414141;
+    background-color: #ffaf26;
+}
+
+.rightContent {
+  width: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.fondoNaranja {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  position: absolute;
+}
+
+.pala {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-49%, -36%) rotate(35deg);
+  max-width:  700px;
+  max-height: 700px;
+  z-index: 5;
+}
+
+.pizza {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-64%, -40%);
+  max-width:  450px;
+  max-height: 450px;
+  z-index: 6;
+}
+
+.mainContent {
+  margin: 10rem 10rem 0 10rem;
+}
+
+.section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4rem;
+}
+
+.sectionText {
+  width: 50%;
+  text-align: left;
+}
+
+.sectionTitle {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 1.85rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.sectionParagraph {
+  font-family: 'Montserrat';
+  font-size: 1.15rem;
+  color: #2f3237;
+}
+
+.sectionImage {
+  width: 24rem;
+  object-fit: contain;
+}
+
+.aboutImage {
+  width:  20rem;
+  height: 20rem;
+  object-fit: cover;
+  border-radius: 9999px;
+  border: 10px solid #ffa101;
+}

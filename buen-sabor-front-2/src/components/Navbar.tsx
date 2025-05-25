@@ -1,38 +1,38 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import styles from '../styles/Navbar.module.css'
 
 export default function Navbar() {
     const [open, setOpen] = useState(false);
 
     return (
-        <header className="fixed top-0 w-full z-10 bg-[#FFD284] flex justify-between items-center px-6 py-4 rounded-t-lg shadow">
+        <header className={styles.header}>
             {/* Logo */}
-            <div className="text-2xl font-bold">
-                Buen<span className="text-amber-500">SABOR</span>
+            <div className={styles.logo}>
+                Buen<span className={styles.logoAccent}>SABOR</span>
             </div>
 
             {/* Navegación */}
             <nav>
-                <ul className="flex items-center space-x-6 font-semibold">
-                    <li><Link to="/" className="hover:text-amber-50">Inicio</Link></li>
-                    <li><Link to="/menu" className="hover:text-amber-50">MENÚ</Link></li>
-                    <li className="relative">
+                <ul className={styles.navList}>
+                    <li><Link to="/" className={styles.navLink}>Inicio</Link></li>
+                    <li><Link to="/menu" className={styles.navLink}>MENÚ</Link></li>
+                    <li className={styles.profileWrapper}>
                         {/* Botón Perfil */}
                         <div
                             onClick={() => setOpen(!open)}
-                            className="cursor-pointer px-4 py-1 border-2 border-amber-500 rounded-xl hover:bg-amber-100"
+                            className={styles.profileButton}
                         >
                             Perfil
                         </div>
 
-                        {/* Menú desplegable */}
                         {open && (
-                            <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-md p-2 z-10">
-                                <ul className="space-y-2">
+                            <div className={styles.dropdown}>
+                                <ul className={styles.dropdownList}>
                                     <li>
                                         <Link
                                             to="/perfil"
-                                            className="block px-4 py-2 hover:bg-amber-100 rounded"
+                                            className={styles.dropdownItem}
                                             onClick={() => setOpen(false)}
                                         >
                                             Mi Perfil
@@ -40,7 +40,7 @@ export default function Navbar() {
                                     </li>
                                     <li>
                                         <button
-                                            className="block w-full text-left px-4 py-2 hover:bg-amber-100 rounded"
+                                            className={styles.dropdownItem}
                                             onClick={() => setOpen(false)}
                                         >
                                             Cerrar Sesión
