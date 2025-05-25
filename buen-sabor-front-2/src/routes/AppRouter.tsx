@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import Home from "../screens/Home";
 import Menu from "../screens/Menu";
 
-import Perfil from "../screens/Perfil";
+import Login from "../screens/Login";
 import SignUp from "../screens/SignUp";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -17,7 +17,7 @@ export function AppRouter() {
                 <Route path="/home" element={<Home />} />
                 <Route path="/menu" element={<Menu />} />
                 <Route path="/registro" element={<SignUp />} />
-                <Route path="/perfil" element={<Perfil />} />
+                <Route path="/login" element={<Login />} /> 
             </Routes>
             <Footer></Footer>
         </>

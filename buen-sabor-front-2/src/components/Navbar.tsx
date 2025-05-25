@@ -31,11 +31,11 @@ export default function Navbar() {
                                 <ul className={styles.dropdownList}>
                                     <li>
                                         <Link
-                                            to="/perfil"
+                                            to="/login"
                                             className={styles.dropdownItem}
                                             onClick={() => setOpen(false)}
                                         >
-                                            Mi Perfil
+                                            INGRESAR
                                         </Link>
                                     </li>
                                     <li>
