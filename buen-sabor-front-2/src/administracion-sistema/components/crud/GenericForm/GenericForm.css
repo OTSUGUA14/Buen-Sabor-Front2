@@ -1,0 +1,86 @@
+/* src/administracion-sistema/components/crud/GenericForm/GenericForm.css */
+
+.generic-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    /* Espacio entre grupos de formulario */
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    font-weight: bold;
+    color: #333;
+    font-size: 15px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="date"],
+.form-group textarea,
+.form-group select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%;
+    /* Ocupa todo el ancho disponible */
+    box-sizing: border-box;
+    /* Incluye padding y borde en el ancho */
+}
+
+.form-group textarea {
+    resize: vertical;
+    /* Permite redimensionar verticalmente */
+    min-height: 80px;
+}
+
+.form-group input[type="checkbox"] {
+    width: auto;
+    /* Para que el checkbox no ocupe todo el ancho */
+    margin-right: 8px;
+    /* Espacio entre checkbox y label si es inline */
+}
+
+.form-group .input-error {
+    border-color: #dc3545;
+    /* Borde rojo para campos con error */
+}
+
+.error-message-field {
+    color: #dc3545;
+    /* Texto rojo para el mensaje de error */
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.generic-form .btn {
+    margin-top: 20px;
+    align-self: flex-start;
+    /* Alinea el botón a la izquierda */
+    min-width: 120px;
+    /* Ancho mínimo para el botón */
+}
+
+/* Puedes añadir más estilos para focus, disabled, etc. */
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-group input:read-only,
+.form-group textarea:read-only,
+.form-group select:disabled {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+}

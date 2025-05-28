@@ -1,0 +1,82 @@
+/* src/administracion-sistema/components/common/FormModal/FormModal.css */
+
+.form-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    /* Fondo más oscuro para el modal */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    overflow-y: auto;
+    /* Permite scroll si el contenido es grande */
+}
+
+.form-modal-content {
+    background-color: white;
+    padding: 25px 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 600px;
+    /* Ancho máximo para el formulario */
+    position: relative;
+    max-height: 90vh;
+    /* Altura máxima para el modal, permite scroll */
+    overflow-y: auto;
+}
+
+.form-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.form-modal-title {
+    margin: 0;
+    font-size: 26px;
+    color: #333;
+}
+
+.form-modal-close-button {
+    background: none;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+    color: #888;
+    padding: 0;
+    line-height: 1;
+    /* Para que la "x" se vea bien */
+}
+
+.form-modal-close-button:hover {
+    color: #333;
+}
+
+.form-modal-body {
+    /* Puedes añadir padding o estilos específicos para el contenido del formulario aquí */
+}
+
+/* Responsividad básica */
+@media (max-width: 600px) {
+    .form-modal-content {
+        padding: 20px 20px;
+        max-width: 95%;
+        /* Ocupar más ancho en pantallas pequeñas */
+    }
+
+    .form-modal-title {
+        font-size: 22px;
+    }
+
+    .form-modal-close-button {
+        font-size: 26px;
+    }
+}

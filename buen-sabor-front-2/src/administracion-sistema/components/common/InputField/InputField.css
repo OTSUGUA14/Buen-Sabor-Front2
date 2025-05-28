@@ -1,0 +1,52 @@
+/* src/administracion-sistema/components/common/InputField/InputField.css */
+
+.input-field-container {
+    margin-bottom: 15px;
+}
+
+.input-field-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+    font-size: 14px;
+}
+
+.input-field-container input[type="text"],
+.input-field-container input[type="number"],
+.input-field-container input[type="email"],
+.input-field-container input[type="password"],
+.input-field-container input[type="search"] {
+    /* Añadimos search para el buscador */
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+    /* Para que padding no aumente el ancho total */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-field-container input:focus {
+    outline: none;
+    border-color: var(--color-primary, #007bff);
+    /* Usa variable de color si está definida */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.input-field-container input.input-error {
+    border-color: var(--color-danger, #dc3545);
+}
+
+.input-field-container .error-message {
+    color: var(--color-danger, #dc3545);
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+}
+
+.input-field-container input:disabled {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+}

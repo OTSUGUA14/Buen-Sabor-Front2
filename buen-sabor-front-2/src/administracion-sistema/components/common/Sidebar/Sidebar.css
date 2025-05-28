@@ -1,0 +1,111 @@
+/* src/administracion-sistema/components/sidebar/Sidebar.css */
+
+.sidebar {
+    width: 250px;
+    background-color: #fff;
+    padding: 4rem 0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.nav-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-menu li {
+    margin-bottom: 5px;
+}
+
+.nav-menu a {
+    display: block;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    transition: background-color 0.2s ease, color 0.2s ease, border-left-color 0.2s ease;
+}
+
+.nav-menu a:hover {
+    background-color: #ddd;
+    border-left-color: #3498db;
+}
+
+.nav-menu a.active {
+    background-color: #666;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 10px 0;
+        flex-direction: row;
+        /* En pantallas pequeñas, el sidebar se vuelve horizontal */
+        justify-content: center;
+        overflow-x: auto;
+        /* Permite scroll horizontal si hay muchos ítems */
+        -webkit-overflow-scrolling: touch;
+        /* Suaviza el scroll en iOS */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        /* Sombra inferior */
+        position: sticky;
+        top: 0;
+        z-index: 999;
+    }
+
+    .nav-menu ul {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+    }
+
+    .nav-menu li {
+        flex-shrink: 0;
+        margin: 0 5px;
+    }
+
+    .nav-menu a {
+        padding: 8px 12px;
+        font-size: 14px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .nav-menu a:hover,
+    .nav-menu a.active {
+        border-left-color: transparent;
+        border-bottom-color: #3498db;
+        background-color: transparent;
+        color: #ffffff;
+    }
+}
+
+@media (min-width: 769px) {
+    .sidebar {
+        align-items: center;
+    }
+
+    .nav-menu {
+        width: 100%;
+    }
+
+    .nav-menu ul {
+        width: 100%;
+    }
+
+    .nav-menu li {
+        width: 100%;
+    }
+
+    .nav-menu a {
+        text-align: left;
+        padding-left: 30px;
+    }
+}
