@@ -35,11 +35,14 @@ Este repositorio contiene la **parte frontend** del proyecto _El Buen Sabor_, un
 1. Cloná el repositorio:
 ```bash
 git clone https://github.com/tu-usuario/el-buen-sabor-frontend.git
-
+```
 2. Instalá las dependencias:
+```bash
 npm install
-
-3.Iniciá el servidor de desarrollo:
+```
+3. Iniciá el servidor de desarrollo:
+```bash
 npm run dev
+```
 
 
