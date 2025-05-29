@@ -5,7 +5,7 @@ Este repositorio contiene la **parte frontend** del proyecto _El Buen Sabor_, un
 ## 🚀 Tecnologías utilizadas
 
 - **React** (Vite)
-- **JavaScript**
+- **Typescript**
 - **HTML & CSS**
 - **Axios** (para conexión con la API)
 - **React Router** (navegación entre páginas)
@@ -33,8 +33,7 @@ Este repositorio contiene la **parte frontend** del proyecto _El Buen Sabor_, un
 ## 🛠️ Instalación y uso
 
 1. Cloná el repositorio:
-
-
+```bash
 git clone https://github.com/tu-usuario/el-buen-sabor-frontend.git
 
 2. Instalá las dependencias:
