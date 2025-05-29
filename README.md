@@ -9,7 +9,7 @@ Este repositorio contiene la **parte frontend** del proyecto _El Buen Sabor_, un
 - **HTML & CSS**
 - **Axios** (para conexión con la API)
 - **React Router** (navegación entre páginas)
-- **LocalStorage** (para manejo de sesión)
+
 
 ## 🧩 Funcionalidades
 
