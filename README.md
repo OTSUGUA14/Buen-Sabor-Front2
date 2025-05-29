@@ -1,54 +1,46 @@
-# React + TypeScript + Vite
+# 🍽️ El Buen Sabor - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este repositorio contiene la **parte frontend** del proyecto _El Buen Sabor_, una **tienda virtual ficticia de comida** desarrollada como trabajo práctico para la facultad. El objetivo del proyecto es simular una plataforma moderna y funcional donde los usuarios puedan explorar platos, realizar pedidos y gestionar su cuenta.
 
-Currently, two official plugins are available:
+## 🚀 Tecnologías utilizadas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React** (Vite)
+- **JavaScript**
+- **HTML & CSS**
+- **Axios** (para conexión con la API)
+- **React Router** (navegación entre páginas)
+- **LocalStorage** (para manejo de sesión)
 
-## Expanding the ESLint configuration
+## 🧩 Funcionalidades
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- 📋 Visualización de menú de platos
+- 🛒 Carrito de compras funcional
+- 🔐 Registro e inicio de sesión de usuarios
+- 🌐 Navegación entre secciones del sitio
+- 🧑‍💼 Sección para el administrador (gestión de productos/pedidos)
+- 📦 Simulación de proceso de compra
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## 📁 Estructura del proyecto
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+/src
+├── assets # Imágenes, íconos, etc.
+├── components # Componentes reutilizables
+├── pages # Vistas principales (Inicio, Menú, Carrito, etc.)
+├── services # Conexión con API (Axios)
+└── App.jsx # Componente principal con enrutamiento
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## 🛠️ Instalación y uso
+
+1. Cloná el repositorio:
+
+```bash
+git clone https://github.com/tu-usuario/el-buen-sabor-frontend.git
+
+2. Instalá las dependencias:
+npm install
+
+3.Iniciá el servidor de desarrollo:
+npm run dev
+
+
