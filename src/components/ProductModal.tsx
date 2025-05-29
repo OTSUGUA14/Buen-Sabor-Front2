@@ -6,15 +6,17 @@ interface ProductModalProps {
     isOpen: boolean;
     onClose: () => void;
     product: {
+        id: number;
         name: string;
         description: string;
         ingredients: string;
         price: number;
         image: string;
-    } | null; // Puede ser null si no hay producto seleccionado
+    } | null;
+    onAddToCart: (product: any, quantity: number) => void;
 }
 
-const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product }) => {
+const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product ,onAddToCart}) => {
     // Si el modal no está abierto o no hay producto, no renderizamos nada
     if (!isOpen || !product) {
         return null;
@@ -69,7 +71,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product })
                     </div>
                 </div>
 
-                <button className={styles.addToCartButton}>
+                <button className={styles.addToCartButton} onClick={() => onAddToCart(product, quantity)}>
                     AGREGAR AL CARRITO
                 </button>
             </div>

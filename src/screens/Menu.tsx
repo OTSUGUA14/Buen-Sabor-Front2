@@ -6,16 +6,32 @@ export default function Menu() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
-    const handleProductClick = (productData: any) => { 
+    const handleProductClick = (productData: any) => {
         setSelectedProduct(productData);
         setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
-        setSelectedProduct(null); 
+        setSelectedProduct(null);
     };
+    const [cart, setCart] = useState<any[]>([]);
 
+    const handleAddToCart = (product: any, quantity: number) => {
+        setCart(prevCart => {
+            const existingItem = prevCart.find(item => item.id === product.id);
+            if (existingItem) {
+                return prevCart.map(item =>
+                    item.id === product.id
+                        ? { ...item, quantity: item.quantity + quantity }
+                        : item
+                );
+            } else {
+                return [...prevCart, { ...product, quantity }];
+            }
+        });
+        handleCloseModal(); // cerrar el modal luego de agregar
+    };
     const hamburguesas = [
         {
             id: 1,
@@ -160,18 +176,40 @@ export default function Menu() {
             {/* Carrito */}
             <aside className={styles.cartSidebar}>
                 <h3>TU PEDIDO</h3>
-                <div className={styles.emptyCart}>
-                    <img src="/icons/empty-cart.svg" alt="carrito vacío" />
-                    <p>Tu carrito está vacío</p>
-                </div>
+
+                {cart.length === 0 ? (
+                    <div className={styles.emptyCart}>
+                        <img src="/icons/empty-cart.svg" alt="carrito vacío" />
+                        <p>Tu carrito está vacío</p>
+                    </div>
+                ) : (
+                    <div className={styles.cartItems}>
+                        <ul>
+                            {cart.map(item => (
+                                <li key={item.id} className={styles.cartItem}>
+                                    <p>{item.name}</p>
+                                    <span>{item.quantity} x ${item.price.toLocaleString('es-AR')}</span>
+                                    <span>Total: ${(item.quantity * item.price).toLocaleString('es-AR')}</span>
+                                </li>
+                            ))}
+                        </ul>
+                        <hr />
+                        <p className={styles.cartTotal}>
+                            Total: ${cart.reduce((acc, item) => acc + item.price * item.quantity, 0).toLocaleString('es-AR')}
+                        </p>
+                    </div>
+                )}
             </aside>
+
 
             {/* Renderiza el modal */}
             <ProductModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 product={selectedProduct}
+                onAddToCart={handleAddToCart}
             />
+
         </main>
     );
 }
