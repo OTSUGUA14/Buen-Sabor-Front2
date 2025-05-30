@@ -1,14 +1,13 @@
-// src/administracion-sistema/api/types/IEmployee.ts
 
 /**
  * @interface IEmployee
- * @description Interfaz que define la estructura de un empleado en el sistema.
+ * @description 
  */
 export interface IEmployee {
     id: number;
     nombre: string;
     correo: string;
     direccion: string;
-    estado: 'Activo' | 'Inactivo'; // Estado del empleado: 'Activo' o 'Inactivo'
-    rol: 'Cajero' | 'Cocinero' | 'Repartidor' | 'Admin'; // Rol del empleado
+    estado: 'Activo' | 'Inactivo'; 
+    rol: 'Cajero' | 'Cocinero' | 'Repartidor' | 'Admin'; 
 }

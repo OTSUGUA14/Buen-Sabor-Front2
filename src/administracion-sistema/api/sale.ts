@@ -1,16 +1,14 @@
 // src/administracion-sistema/api/sale.ts
 
 import type { ISale } from './types/ISale';
-import type { IProduct } from './types/IProduct'; // Asegúrate de que esta interfaz ya tenga la 'descripcion' y la estructura completa de tu IProduct
+import type { IProduct } from './types/IProduct';
 
-// AHORA ESTOS mockProducts COINCIDEN CON LA ESTRUCTURA DE TU product.ts
-// Y CONTIENEN LA DESCRIPCION.
 const mockProducts: IProduct[] = [
     {
         id: 1000,
         nombre: 'Clásica de la casa',
         descripcion: 'La hamburguesa clásica con lechuga, tomate y cebolla morada.',
-        rubro: 'Hamburguesa',
+        rubro: 'Hamburguesa', // Rubro como literal
         ingredientes: [
             { id: 1, nombre: 'Pan de papa' },
             { id: 2, nombre: 'Medallon de carne' },
@@ -18,7 +16,7 @@ const mockProducts: IProduct[] = [
             { id: 4, nombre: 'Tomate' },
             { id: 5, nombre: 'Cebolla morada' }
         ],
-        precioVenta: 7500, // Usando el precio de tu product.ts
+        precioVenta: 7500,
         ofertaPorcentaje: 10,
         stock: 123,
         estado: 'Activo',
@@ -34,7 +32,7 @@ const mockProducts: IProduct[] = [
             { id: 6, nombre: 'Bacon' },
             { id: 7, nombre: 'Huevo' }
         ],
-        precioVenta: 8500, // Usando el precio de tu product.ts
+        precioVenta: 8500,
         ofertaPorcentaje: 0,
         stock: 2,
         estado: 'Activo',
@@ -50,7 +48,7 @@ const mockProducts: IProduct[] = [
             { id: 6, nombre: 'Bacon' },
             { id: 8, nombre: 'Cebolla caramelizada' }
         ],
-        precioVenta: 9000, // Usando el precio de tu product.ts
+        precioVenta: 9000,
         ofertaPorcentaje: 0,
         stock: 76,
         estado: 'Activo',
@@ -59,7 +57,7 @@ const mockProducts: IProduct[] = [
         id: 1003,
         nombre: 'Pizza 4 quesos',
         descripcion: 'Deliciosa pizza con la mezcla de cuatro quesos gourmet.',
-        rubro: 'Pizza',
+        rubro: 'Pizza', // Rubro como literal
         ingredientes: [
             { id: 9, nombre: 'Harina 0000 (500grs)' },
             { id: 10, nombre: 'Muzzarella' },
@@ -67,17 +65,16 @@ const mockProducts: IProduct[] = [
             { id: 12, nombre: 'Roquefort' },
             { id: 13, nombre: 'Parmesano' }
         ],
-        precioVenta: 8000, // Usando el precio de tu product.ts
+        precioVenta: 8000,
         ofertaPorcentaje: 0,
         stock: 0,
         estado: 'Inactivo',
     },
-    // Añadir algunos productos adicionales si quieres más variedad en las ventas
     {
         id: 1004,
         nombre: 'Papas Fritas Grandes',
         descripcion: 'Porción extra grande de papas crujientes.',
-        rubro: 'Acompañamiento',
+        rubro: 'Ensalada', // Ajustado a los rubros literales de IProduct
         ingredientes: [],
         precioVenta: 4000,
         ofertaPorcentaje: 0,
@@ -88,7 +85,7 @@ const mockProducts: IProduct[] = [
         id: 1005,
         nombre: 'Agua Mineral 500ml',
         descripcion: 'Agua mineral sin gas, botella personal.',
-        rubro: 'Bebida',
+        rubro: 'Bebida', // Rubro como literal
         ingredientes: [],
         precioVenta: 1500,
         ofertaPorcentaje: 0,
@@ -97,7 +94,6 @@ const mockProducts: IProduct[] = [
     },
 ];
 
-// Datos de ventas mock - Precios actualizados para que coincidan con mockProducts
 let salesData: ISale[] = [
     { id: 1, productId: 1000, productName: 'Clásica de la casa', quantity: 2, unitPrice: 7500, saleDate: '2025-03-05' },
     { id: 2, productId: 1001, productName: 'Hamburguesa Bacon y Huevo', quantity: 3, unitPrice: 8500, saleDate: '2025-03-08' },
@@ -130,6 +126,9 @@ let salesData: ISale[] = [
     { id: 29, productId: 1005, productName: 'Agua Mineral 500ml', quantity: 15, unitPrice: 1500, saleDate: '2025-05-29' },
 ];
 
+const simulateNetworkLatency = (ms: number = 500) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+};
 
 export const saleApi = {
     getSalesByDateRange: async (startDate: string, endDate: string): Promise<ISale[]> => {

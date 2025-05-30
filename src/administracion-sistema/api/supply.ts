@@ -1,72 +1,120 @@
 // src/administracion-sistema/api/supply.ts
 
-import type { ISupply } from './types/ISupply'; // Asumimos que esta interfaz ha sido actualizada
+import type { ISupply } from './types/ISupply';
 
-// Datos mock para insumos - ACTUALIZADOS
 let suppliesMock: ISupply[] = [
     {
         id: 1,
-        nombre: 'Harina 0000',
-        unidadMedida: 'kg',
-        stockActual: 100,
-        stockMinimo: 10,
-        costo: 50.00,
-        categoria: 'Materia Prima', // Nuevo campo
-        subCategoria: 'Cereales y Legumbres', // Nuevo campo
-        estado: 'Activo', // Nuevo campo
-        // esInsumo: true, // ELIMINADO
-    },
-    {
-        id: 2,
-        nombre: 'Tomate Perita',
+        nombre: 'Pechuga de Pollo',
         unidadMedida: 'kg',
         stockActual: 50,
         stockMinimo: 5,
-        costo: 30.00,
-        categoria: 'Materia Prima',
-        subCategoria: 'Vegetales',
+        costo: 250.00,
+        categoria: 'Proteinas',
+        subCategoria: 'Carnes Blancas',
         estado: 'Activo',
-        // esInsumo: true, // ELIMINADO
+    },
+    {
+        id: 2,
+        nombre: 'Lechuga Morada',
+        unidadMedida: 'unidad',
+        stockActual: 30,
+        stockMinimo: 3,
+        costo: 40.00,
+        categoria: 'Vegetales',
+        subCategoria: 'Hojas Verdes',
+        estado: 'Activo',
     },
     {
         id: 3,
-        nombre: 'Queso Mozzarella',
-        unidadMedida: 'kg',
-        stockActual: 70,
-        stockMinimo: 8,
-        costo: 120.00,
-        categoria: 'Materia Prima',
-        subCategoria: 'Lácteos',
+        nombre: 'Leche Entera',
+        unidadMedida: 'litro',
+        stockActual: 80,
+        stockMinimo: 10,
+        costo: 90.00,
+        categoria: 'Lacteos',
+        subCategoria: 'Leches',
         estado: 'Activo',
-        // esInsumo: true, // ELIMINADO
     },
     {
         id: 4,
-        nombre: 'Cerveza Patagonia',
-        unidadMedida: 'litro',
+        nombre: 'Pan de Hamburguesa',
+        unidadMedida: 'unidad',
         stockActual: 200,
         stockMinimo: 20,
-        costo: 80.00,
-        categoria: 'Bebidas',
-        subCategoria: 'Cervezas',
+        costo: 25.00,
+        categoria: 'Panificados',
+        subCategoria: 'Panes',
         estado: 'Activo',
-        // esInsumo: false, // ELIMINADO
     },
     {
         id: 5,
-        nombre: 'Aceitunas Verdes',
+        nombre: 'Cebolla',
         unidadMedida: 'kg',
-        stockActual: 30,
-        stockMinimo: 3,
-        costo: 60.00,
-        categoria: 'Materia Prima',
-        subCategoria: 'Vegetales',
+        stockActual: 40,
+        stockMinimo: 4,
+        costo: 35.00,
+        categoria: 'Vegetales',
+        subCategoria: 'Tubérculos y Bulbos',
         estado: 'Activo',
-        // esInsumo: true, // ELIMINADO
+    },
+    {
+        id: 6,
+        nombre: 'Queso Cheddar',
+        unidadMedida: 'kg',
+        stockActual: 60,
+        stockMinimo: 7,
+        costo: 180.00,
+        categoria: 'Lacteos',
+        subCategoria: 'Quesos',
+        estado: 'Activo',
+    },
+    {
+        id: 7,
+        nombre: 'Lomo de Cerdo',
+        unidadMedida: 'kg',
+        stockActual: 25,
+        stockMinimo: 3,
+        costo: 300.00,
+        categoria: 'Proteinas',
+        subCategoria: 'Carnes Rojas',
+        estado: 'Activo',
+    },
+    {
+        id: 8,
+        nombre: 'Papas Fritas Congeladas',
+        unidadMedida: 'kg',
+        stockActual: 150,
+        stockMinimo: 15,
+        costo: 100.00,
+        categoria: 'Vegetales',
+        subCategoria: 'Congelados',
+        estado: 'Activo',
+    },
+    {
+        id: 9,
+        nombre: 'Harina de Trigo',
+        unidadMedida: 'kg',
+        stockActual: 90,
+        stockMinimo: 9,
+        costo: 45.00,
+        categoria: 'Panificados',
+        subCategoria: 'Harinas',
+        estado: 'Activo',
+    },
+    {
+        id: 10,
+        nombre: 'Huevo',
+        unidadMedida: 'docena',
+        stockActual: 15,
+        stockMinimo: 2,
+        costo: 70.00,
+        categoria: 'Proteinas',
+        subCategoria: 'Huevos',
+        estado: 'Activo',
     },
 ];
 
-// Función utilitaria para simular una latencia de red
 const simulateNetworkLatency = (ms: number = 500) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 };

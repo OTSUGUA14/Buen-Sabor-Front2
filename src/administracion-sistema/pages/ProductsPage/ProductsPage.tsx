@@ -10,11 +10,9 @@ import type { IProduct } from '../../api/types/IProduct';
 import { ConfirmationDialog } from '../../components/common/ConfirmationDialog/ConfirmationDialog';
 import { FormModal } from '../../components/common/FormModal/FormModal';
 import { GenericForm } from '../../components/crud/GenericForm/GenericForm';
-import type { IFormFieldConfig } from '../../components/crud/GenericForm/GenericForm.types';
+import type { IFormFieldConfig, ISelectOption } from '../../components/crud/GenericForm/GenericForm.types';
 import { InputField } from '../../components/common/InputField/InputField';
 import { SelectField } from '../../components/common/SelectField/SelectField';
-// ELIMINA: import './ProductsPage.css';
-import '../crud-pages.css'; // <--- NUEVA IMPORTACIÓN
 
 export const ProductsPage: React.FC = () => {
     const {
@@ -34,12 +32,28 @@ export const ProductsPage: React.FC = () => {
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('TODOS');
+    const [rubroFilter, setRubroFilter] = useState('TODOS');
 
-    const statusOptions = [
+    const statusOptions: ISelectOption[] = [
         { value: 'TODOS', label: 'TODOS' },
         { value: 'Activo', label: 'Activo' },
         { value: 'Inactivo', label: 'Inactivo' },
     ];
+
+    // Definición de las opciones de rubro directamente en ProductsPage, similar a roleOptions
+    const productRubrosValues: Array<IProduct['rubro']> = [
+        'Hamburguesa',
+        'Pizza',
+        'Empanadas',
+        'Postre ', // Nota el espacio aquí, asegúrate de que coincida exactamente con IProduct
+        'Bebida',
+        'Ensalada'
+    ];
+
+    const rubroOptions: ISelectOption[] = useMemo(() => [
+        { value: 'TODOS', label: 'TODOS' },
+        ...productRubrosValues.map(rubro => ({ value: rubro, label: rubro }))
+    ], []);
 
     const filteredProducts = useMemo(() => {
         return products.filter((product) => {
@@ -47,9 +61,10 @@ export const ProductsPage: React.FC = () => {
                 product.rubro.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 product.ingredientes.some(ing => ing.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
             const matchesStatus = statusFilter === 'TODOS' || product.estado === statusFilter;
-            return matchesSearch && matchesStatus;
+            const matchesRubro = rubroFilter === 'TODOS' || product.rubro === rubroFilter;
+            return matchesSearch && matchesStatus && matchesRubro;
         });
-    }, [products, searchTerm, statusFilter]);
+    }, [products, searchTerm, statusFilter, rubroFilter]);
 
     const productColumns: ITableColumn<IProduct>[] = [
         { id: 'id', label: '#', numeric: true },
@@ -82,15 +97,29 @@ export const ProductsPage: React.FC = () => {
 
     const productFormFields: IFormFieldConfig[] = [
         { name: 'nombre', label: 'Nombre', type: 'text', validation: { required: true, minLength: 3 } },
-        { name: 'rubro', label: 'Rubro', type: 'text', validation: { required: true } },
+        { 
+            name: 'rubro', 
+            label: 'Rubro', 
+            type: 'select', 
+            options: rubroOptions.filter(opt => opt.value !== 'TODOS'),
+            validation: { required: true } 
+        },
+        {
+            name: 'descripcion', 
+            label: 'Descripción', 
+            type: 'textarea',
+            validation: { required: true, minLength: 5 }, 
+            placeholder: 'Ej: Jugosa hamburguesa con lechuga, tomate y queso.',
+        },
         {
             name: 'ingredientes',
             label: 'Ingredientes (nombres separados por coma)',
             type: 'text',
             validation: { required: true },
             placeholder: 'Ej: Pan de papa, Medallon de carne, Lechuga',
-            transformInitialValue: (value: any) => Array.isArray(value) ? value.map((ing: { nombre: string }) => ing.nombre).join(', ') : value,
+            transformInitialValue: (value: any) => Array.isArray(value) ? value.map((ing: { nombre: string }) => ing.nombre).join(', ') : '',
         },
+        // ELIMINADAS LAS PROPIEDADES 'step', 'min', 'max' PARA COINCIDIR CON EmployeesPage
         { name: 'precioVenta', label: 'Precio Venta', type: 'number', validation: { required: true, min: 0 } },
         { name: 'ofertaPorcentaje', label: 'Oferta %', type: 'number', validation: { required: true, min: 0, max: 100 } },
         { name: 'stock', label: 'Stock', type: 'number', validation: { required: true, min: 0 } },
@@ -117,7 +146,7 @@ export const ProductsPage: React.FC = () => {
             await deleteItem(productToDeleteId);
             setIsConfirmDialogOpen(false);
             setProductToDeleteId(null);
-            fetchData(); // Agregado para recargar datos después de eliminar
+            fetchData(); 
         }
     };
 
@@ -134,24 +163,22 @@ export const ProductsPage: React.FC = () => {
                     id: productToEdit?.ingredientes?.[index]?.id || Date.now() + index,
                     nombre: name,
                 }));
+        } else if (productToEdit && !ingredientesRaw) {
+            ingredientesProcessed = [];
         }
 
         const submitData: IProduct = {
             id: productToEdit?.id || Math.floor(Math.random() * 1000000000),
-            ...formData,
+            nombre: formData.nombre!,
+            descripcion: formData.descripcion || '',
+            rubro: formData.rubro! as IProduct['rubro'],
             ingredientes: ingredientesProcessed,
             precioVenta: Number(formData.precioVenta),
             ofertaPorcentaje: Number(formData.ofertaPorcentaje),
             stock: Number(formData.stock),
             estado: formData.estado as 'Activo' | 'Inactivo',
-            nombre: formData.nombre!,
-            rubro: formData.rubro!
         };
-
-        if (!ingredientesRaw && productToEdit && productToEdit.ingredientes.length > 0) {
-            submitData.ingredientes = [];
-        }
-
+        
         if (productToEdit) {
             await updateItem(submitData);
         } else {
@@ -166,7 +193,7 @@ export const ProductsPage: React.FC = () => {
     if (error) return <p className="error-message">Error al cargar productos: {error}</p>;
 
     return (
-        <div className="crud-page-container"> {/* <--- CLASE CAMBIADA */}
+        <div className="crud-page-container">
             <div className="page-header">
                 <h2>Gestión de Productos</h2>
                 <Button variant="primary" onClick={handleCreate}>
@@ -178,7 +205,7 @@ export const ProductsPage: React.FC = () => {
                 <InputField
                     name="search"
                     type="search"
-                    placeholder="Buscar por nombre o rubro..."
+                    placeholder="Buscar por nombre, rubro o ingredientes..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"

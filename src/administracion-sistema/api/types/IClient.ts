@@ -1,6 +1,6 @@
 /**
  * @interface IClient
- * @description Interfaz que define la estructura de un cliente en el sistema.
+ * @description 
  */
 
 export interface IClient {
@@ -8,5 +8,5 @@ export interface IClient {
     nombre: string;
     correo: string;
     direccion: string;
-    estado: 'Activo' | 'Inactivo'; // Estado del cliente: 'Activo' o 'Inactivo'
+    estado: 'Activo' | 'Inactivo'; 
 }

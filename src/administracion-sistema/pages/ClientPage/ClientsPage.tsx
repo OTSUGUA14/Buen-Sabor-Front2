@@ -119,7 +119,7 @@ export const ClientsPage: React.FC = () => {
     if (error) return <p className="error-message">Error al cargar clientes: {error}</p>;
 
     return (
-        <div className="crud-page-container"> {/* Esta clase aplica los estilos comunes */}
+        <div className="crud-page-container"> 
             <div className="page-header">
                 <h2>Gestión de Clientes</h2>
                 

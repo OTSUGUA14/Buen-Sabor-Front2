@@ -32,7 +32,7 @@ export const employeeApi = {
         return new Promise((resolve) => {
             setTimeout(() => {
                 const newEmployee: IEmployee = {
-                    id: Math.floor(Math.random() * 1000000), // Genera un ID mock
+                    id: Math.floor(Math.random() * 1000000), 
                     ...item,
                 };
                 employeesData.push(newEmployee);

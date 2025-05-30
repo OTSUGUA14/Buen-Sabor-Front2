@@ -5,19 +5,17 @@ import { GenericTable } from '../../components/crud/GenericTable/GenericTable';
 import type { ITableColumn } from '../../components/crud/GenericTable/GenericTable.types';
 import { Button } from '../../components/common/Button/Button';
 import { useCrud } from '../../hooks/useCrud';
-import { supplyApi } from '../../api/supply'; // Importa la API de insumos
-import type { ISupply } from '../../api/types/ISupply'; // Importa la interfaz de insumos
+import { supplyApi } from '../../api/supply';
+import type { ISupply } from '../../api/types/ISupply';
 import { ConfirmationDialog } from '../../components/common/ConfirmationDialog/ConfirmationDialog';
 import { FormModal } from '../../components/common/FormModal/FormModal';
 import { GenericForm } from '../../components/crud/GenericForm/GenericForm';
 import type { IFormFieldConfig, ISelectOption } from '../../components/crud/GenericForm/GenericForm.types';
-import { InputField } from '../../components/common/InputField/InputField'; // Necesario para el buscador
-import { SelectField } from '../../components/common/SelectField/SelectField'; // Necesario para el filtro de estado
-// ELIMINA: import './SuppliesPage.css';
-import '../crud-pages.css'; // <--- NUEVA IMPORTACIÓN
+import { InputField } from '../../components/common/InputField/InputField';
+import { SelectField } from '../../components/common/SelectField/SelectField';
+import '../crud-pages.css';
 
 export const SuppliesPage: React.FC = () => {
-    // Usa el hook useCrud con la API de insumos y el tipo ISupply
     const {
         data: supplies,
         loading,
@@ -33,9 +31,9 @@ export const SuppliesPage: React.FC = () => {
     const [supplyToDeleteId, setSupplyToDeleteId] = useState<number | null>(null);
     const [supplyToEdit, setSupplyToEdit] = useState<ISupply | null>(null);
 
-    // --- Estados para el buscador y filtro ---
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('TODOS');
+    const [categoryFilter, setCategoryFilter] = useState('TODOS');
 
     const statusOptions: ISelectOption[] = [
         { value: 'TODOS', label: 'TODOS' },
@@ -43,28 +41,40 @@ export const SuppliesPage: React.FC = () => {
         { value: 'Inactivo', label: 'Inactivo' },
     ];
 
-    // --- Lógica de filtrado de insumos (similar a ProductsPage) ---
+    const supplyCategoryValues: Array<ISupply['categoria']> = [
+        'Proteinas',
+         'Vegetales',
+         'Lacteos',
+         'Panificados',
+    ];
+
+    const categoryOptions: ISelectOption[] = useMemo(() => [
+        { value: 'TODOS', label: 'TODOS' },
+        ...supplyCategoryValues.map(category => ({ value: category, label: category }))
+    ], []);
+
     const filteredSupplies = useMemo(() => {
         return supplies.filter((supply) => {
             const matchesSearch = supply.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                supply.unidadMedida.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 supply.categoria.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 supply.subCategoria.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesStatus = statusFilter === 'TODOS' || supply.estado === statusFilter;
-            return matchesSearch && matchesStatus;
+            const matchesCategory = categoryFilter === 'TODOS' || supply.categoria === categoryFilter;
+            return matchesSearch && matchesStatus && matchesCategory;
         });
-    }, [supplies, searchTerm, statusFilter]);
+    }, [supplies, searchTerm, statusFilter, categoryFilter]);
 
-    // Definición de las columnas para la tabla de insumos
     const supplyColumns: ITableColumn<ISupply>[] = [
-        { id: 'id', label: '#', numeric: true },
+        { id: 'id', label: '#' },
         { id: 'nombre', label: 'Nombre' },
         { id: 'unidadMedida', label: 'Unidad de Medida' },
-        { id: 'categoria', label: 'Categoría' }, // Añadido
-        { id: 'subCategoria', label: 'Subcategoría' }, // Añadido
         { id: 'stockActual', label: 'Stock Actual', numeric: true },
         { id: 'stockMinimo', label: 'Stock Mínimo', numeric: true },
         { id: 'costo', label: 'Costo', numeric: true, render: (item) => `$${item.costo.toFixed(2)}` },
-        { id: 'estado', label: 'Estado' }, // Añadido
+        { id: 'categoria', label: 'Categoría' },
+        { id: 'subCategoria', label: 'Subcategoría' },
+        { id: 'estado', label: 'Estado' },
         {
             id: 'acciones',
             label: 'Acciones',
@@ -81,20 +91,31 @@ export const SuppliesPage: React.FC = () => {
         },
     ];
 
-    // Configuración de los campos para el formulario de insumos
     const supplyFormFields: IFormFieldConfig[] = [
         { name: 'nombre', label: 'Nombre', type: 'text', validation: { required: true, minLength: 3 } },
-        { name: 'unidadMedida', label: 'Unidad de Medida', type: 'text', validation: { required: true } },
-        { name: 'categoria', label: 'Categoría', type: 'text', validation: { required: true } }, // Añadido
-        { name: 'subCategoria', label: 'Subcategoría', type: 'text', validation: { required: true } }, // Añadido
+        { name: 'unidadMedida', label: 'Unidad de Medida', type: 'text', validation: { required: true, minLength: 1 } },
         { name: 'stockActual', label: 'Stock Actual', type: 'number', validation: { required: true, min: 0 } },
         { name: 'stockMinimo', label: 'Stock Mínimo', type: 'number', validation: { required: true, min: 0 } },
         { name: 'costo', label: 'Costo', type: 'number', validation: { required: true, min: 0 } },
-        { name: 'estado', label: 'Estado', type: 'select', options: [{ value: 'Activo', label: 'Activo' }, { value: 'Inactivo', label: 'Inactivo' }], validation: { required: true } }, // Añadido
+        {
+            name: 'categoria',
+            label: 'Categoría',
+            type: 'select',
+            options: categoryOptions.filter(opt => opt.value !== 'TODOS'),
+            validation: { required: true }
+        },
+        { name: 'subCategoria', label: 'Subcategoría', type: 'text', validation: { required: true, minLength: 3 } },
+        {
+            name: 'estado',
+            label: 'Estado',
+            type: 'select',
+            options: [{ value: 'Activo', label: 'Activo' }, { value: 'Inactivo', label: 'Inactivo' }],
+            validation: { required: true }
+        },
     ];
 
     const handleCreate = () => {
-        setSupplyToEdit(null); // Para asegurar que el formulario esté vacío
+        setSupplyToEdit(null);
         setIsModalOpen(true);
     };
 
@@ -113,40 +134,38 @@ export const SuppliesPage: React.FC = () => {
             await deleteItem(supplyToDeleteId);
             setIsConfirmDialogOpen(false);
             setSupplyToDeleteId(null);
-            fetchData(); // Vuelve a cargar los datos después de eliminar
+            fetchData();
         }
     };
 
     const handleFormSubmit = async (formData: Partial<ISupply>) => {
         const submitData: ISupply = {
-            id: supplyToEdit?.id || Math.floor(Math.random() * 1000000000), // Genera ID para el mock si es nuevo
+            id: supplyToEdit?.id || Math.floor(Math.random() * 1000000000),
             nombre: formData.nombre!,
             unidadMedida: formData.unidadMedida!,
-            categoria: formData.categoria!, // Añadido
-            subCategoria: formData.subCategoria!, // Añadido
             stockActual: Number(formData.stockActual),
             stockMinimo: Number(formData.stockMinimo),
             costo: Number(formData.costo),
-            estado: formData.estado as 'Activo' | 'Inactivo', // Asegura el tipo correcto
+            categoria: formData.categoria! as ISupply['categoria'],
+            subCategoria: formData.subCategoria!,
+            estado: formData.estado as 'Activo' | 'Inactivo',
         };
 
         if (supplyToEdit) {
-            // Edición
             await updateItem(submitData);
         } else {
-            // Creación
             await createItem(submitData);
         }
         setIsModalOpen(false);
-        setSupplyToEdit(null); // Limpiar el estado de edición
-        fetchData(); // Recargar los datos después de crear/actualizar
+        setSupplyToEdit(null);
+        fetchData();
     };
 
     if (loading && supplies.length === 0) return <p>Cargando insumos...</p>;
     if (error) return <p className="error-message">Error al cargar insumos: {error}</p>;
 
     return (
-        <div className="crud-page-container"> {/* <--- CLASE CAMBIADA */}
+        <div className="crud-page-container">
             <div className="page-header">
                 <h2>Gestión de Insumos</h2>
                 <Button variant="primary" onClick={handleCreate}>
@@ -154,12 +173,11 @@ export const SuppliesPage: React.FC = () => {
                 </Button>
             </div>
 
-            {/* --- Controles de Filtro y Búsqueda (añadidos) --- */}
             <div className="filter-controls">
                 <InputField
                     name="search"
                     type="search"
-                    placeholder="Buscar por nombre, categoría o subcategoría..."
+                    placeholder="Buscar por nombre, unidad o categoría..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"
@@ -174,7 +192,7 @@ export const SuppliesPage: React.FC = () => {
             </div>
 
             <GenericTable
-                data={filteredSupplies} // Pasa los insumos filtrados
+                data={filteredSupplies}
                 columns={supplyColumns}
                 handleEdit={handleEdit}
                 handleDelete={handleDelete}
@@ -186,7 +204,7 @@ export const SuppliesPage: React.FC = () => {
                 title={supplyToEdit ? 'Editar Insumo' : 'Crear Insumo'}
             >
                 <GenericForm<ISupply>
-                    initialData={supplyToEdit || undefined} // Pasa los datos del insumo a editar
+                    initialData={supplyToEdit || undefined}
                     fieldsConfig={supplyFormFields}
                     onSubmit={handleFormSubmit}
                     submitButtonText={supplyToEdit ? 'Actualizar Insumo' : 'Crear Insumo'}

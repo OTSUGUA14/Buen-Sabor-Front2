@@ -141,7 +141,7 @@ export const EmployeesPage: React.FC = () => {
                 ...formData,
                 estado: formData.estado as 'Activo' | 'Inactivo',
                 rol: formData.rol as 'Cajero' | 'Cocinero' | 'Repartidor' | 'Admin',
-            } as Omit<IEmployee, 'id'>; // Casteo final para asegurar compatibilidad con createItem
+            } as Omit<IEmployee, 'id'>; 
             await createItem(submitData);
         }
         setIsModalOpen(false);
@@ -176,13 +176,6 @@ export const EmployeesPage: React.FC = () => {
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                     className="status-select"
-                />
-                <SelectField
-                    name="roleFilter"
-                    options={roleOptions}
-                    value={roleFilter}
-                    onChange={(e) => setRoleFilter(e.target.value)}
-                    className="status-select" 
                 />
             </div>
 

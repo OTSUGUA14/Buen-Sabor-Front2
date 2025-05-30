@@ -1,13 +1,11 @@
-// src/administracion-sistema/api/product.ts
 
-import type { IProduct } from './types/IProduct'; // Asegúrate de que esta ruta sea correcta
-// Si IIngrediente también está en el mismo archivo de IProduct, no necesitas importarlo por separado aquí.
+import type { IProduct } from './types/IProduct';
 
 let productsMock: IProduct[] = [
     {
         id: 1000,
         nombre: 'Clásica de la casa',
-        descripcion: 'La hamburguesa clásica con lechuga, tomate y cebolla morada.', // <-- DESCRIPCIÓN AÑADIDA
+        descripcion: 'La hamburguesa clásica con lechuga, tomate y cebolla morada.', 
         rubro: 'Hamburguesa',
         ingredientes: [
             { id: 1, nombre: 'Pan de papa' },
@@ -24,7 +22,7 @@ let productsMock: IProduct[] = [
     {
         id: 1001,
         nombre: 'Hamburguesa Bacon y Huevo',
-        descripcion: 'Jugosa hamburguesa con crujiente bacon y huevo frito.', // <-- DESCRIPCIÓN AÑADIDA
+        descripcion: 'Jugosa hamburguesa con crujiente bacon y huevo frito.', 
         rubro: 'Hamburguesa',
         ingredientes: [
             { id: 1, nombre: 'Pan de papa' },
@@ -40,7 +38,7 @@ let productsMock: IProduct[] = [
     {
         id: 1002,
         nombre: 'Hamburguesa Cebolla y Bacon',
-        descripcion: 'Combinación perfecta de cebolla caramelizada y bacon ahumado.', // <-- DESCRIPCIÓN AÑADIDA
+        descripcion: 'Combinación perfecta de cebolla caramelizada y bacon ahumado.', 
         rubro: 'Hamburguesa',
         ingredientes: [
             { id: 1, nombre: 'Pan de papa' },
@@ -56,7 +54,7 @@ let productsMock: IProduct[] = [
     {
         id: 1003,
         nombre: 'Pizza 4 quesos',
-        descripcion: 'Deliciosa pizza con la mezcla de cuatro quesos gourmet.', // <-- DESCRIPCIÓN AÑADIDA
+        descripcion: 'Deliciosa pizza con la mezcla de cuatro quesos gourmet.', 
         rubro: 'Pizza',
         ingredientes: [
             { id: 9, nombre: 'Harina 0000 (500grs)' },
@@ -72,7 +70,7 @@ let productsMock: IProduct[] = [
     },
     {
         id: 1004,
-        nombre: 'Gaseosa Cola 1.5L', // Nuevo producto para estadísticas
+        nombre: 'Gaseosa Cola 1.5L', 
         descripcion: 'Refresco clásico de cola en botella de 1.5 litros.',
         rubro: 'Bebida',
         ingredientes: [],
@@ -83,7 +81,7 @@ let productsMock: IProduct[] = [
     },
     {
         id: 1005,
-        nombre: 'Ensalada de Pollo Caesar', // Nuevo producto para estadísticas
+        nombre: 'Ensalada de Pollo Caesar', 
         descripcion: 'Fresca ensalada con pollo a la parrilla, lechuga y aderezo Caesar.',
         rubro: 'Ensalada',
         ingredientes: [],
@@ -96,7 +94,7 @@ let productsMock: IProduct[] = [
 
 export const productApi = {
     getAll: async (): Promise<IProduct[]> => {
-        return Promise.resolve([...productsMock]); // Devuelve una copia para evitar mutaciones directas
+        return Promise.resolve([...productsMock]); 
     },
 
     getById: async (id: number): Promise<IProduct | undefined> => {
@@ -123,7 +121,6 @@ export const productApi = {
             setTimeout(() => {
                 const index = productsMock.findIndex(p => p.id === item.id);
                 if (index > -1) {
-                    // Actualizar el producto existente en el array
                     productsMock[index] = item;
                     resolve(item);
                 } else {
