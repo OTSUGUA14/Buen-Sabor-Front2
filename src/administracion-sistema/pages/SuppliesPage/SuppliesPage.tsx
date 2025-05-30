@@ -14,12 +14,23 @@ import type { IFormFieldConfig, ISelectOption } from '../../components/crud/Gene
 import { InputField } from '../../components/common/InputField/InputField';
 import { SelectField } from '../../components/common/SelectField/SelectField';
 import '../crud-pages.css';
+import { getIngredientesAll } from '../../utils/Api';
+
+
 
 
 export const SuppliesPage: React.FC = () => {
-    // 🚀 CRUD Hook
+    // const [ingredientesAll, setIngredientesAll] = useState<Ingrediente[]>([]);
+    // // 🚀 CRUD Hook
+    // useEffect(() => {
+    //     const fetchIngredientes = async () => {
+    //         const ingredientes = await getIngredientesAll();
+    //         setIngredientesAll(ingredientes);
+    //     };
+    //     fetchIngredientes();
+    // }, []);
     const {
-        data: supplies,
+        data: ingredientesAll,
         loading,
         error,
         fetchData,
@@ -27,6 +38,9 @@ export const SuppliesPage: React.FC = () => {
         createItem,
         updateItem,
     } = useCrud<Ingrediente>(supplyApi);
+    useEffect(() => {
+        console.log("Ingredientes cargados:", ingredientesAll);
+    }, [ingredientesAll]);
 
     // 🔹 Estados UI
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,10 +74,10 @@ export const SuppliesPage: React.FC = () => {
     // 🔹 Filtrado de datos
     // 🔹 Filtrado de datos (versión segura)
     const filteredSupplies = useMemo(() => {
-        return supplies.filter(item => {
-            const nombre = item.nombre?.toLowerCase() ?? '';
-            const unidad = item.unidadMedicion?.unidad?.toLowerCase() ?? '';
-            const categoria = item.categoria?.nombreCategoria?.toLowerCase() ?? '';
+        return ingredientesAll.filter(item => {
+            const nombre = item.denomination?.toLowerCase() ?? '';
+            const unidad = item.measuringUnit?.unit?.toLowerCase() ?? '';
+            const categoria = item.category?.name?.toLowerCase() ?? '';
             const estado = (item.estado ?? '').toLowerCase();
             const search = searchTerm.toLowerCase();
 
@@ -82,31 +96,31 @@ export const SuppliesPage: React.FC = () => {
 
             return matchesSearch && matchesStatus && matchesCategory;
         });
-    }, [supplies, searchTerm, statusFilter, categoryFilter]);
+    }, [ingredientesAll, searchTerm, statusFilter, categoryFilter]);
 
 
     // 🔹 Columnas para la tabla
     const supplyColumns: ITableColumn<Ingrediente>[] = [
         { id: 'idArticulo', label: '#' },
-        { id: 'nombre', label: 'Nombre' },
+        { id: 'denomination', label: 'Nombre' },
         {
-            id: 'unidadMedicion',
+            id: 'measuringUnit',
             label: 'Unidad',
-            render: i => i.unidadMedicion?.unidad ?? ''
+            render: i => i.measuringUnit?.unit ?? ''
         },
 
-        { id: 'stockActual', label: 'Stock Actual', numeric: true },
-        { id: 'stockMaximo', label: 'Stock Máximo', numeric: true },
+        { id: 'currentStock', label: 'Stock Actual', numeric: true },
+        { id: 'maxStock', label: 'Stock Máximo', numeric: true },
         {
-            id: 'precioCompra',
+            id: 'buyingPrice',
             label: 'Precio Compra',
             numeric: true,
-            render: i => i.precioCompra != null ? `$${i.precioCompra.toFixed(2)}` : ''
+            render: i => i.buyingPrice != null ? `$${i.buyingPrice.toFixed(2)}` : ''
         },
         {
-            id: 'categoria',
+            id: 'category',
             label: 'Categoría',
-            render: i => i.categoria?.nombreCategoria ?? ''
+            render: i => i.category?.name ?? ''
         },
         { id: 'estado', label: 'Estado' },
         {
@@ -187,23 +201,23 @@ export const SuppliesPage: React.FC = () => {
         const id = supplyToEdit?.id || Math.floor(Math.random() * 1e9);
 
         // 2️⃣ Extrae la unidad y la categoría desde el formData (vienen como string):
-        const unidad = formData.unidadMedicion as unknown as string;
-        const categoriaNombre = formData.categoria as unknown as string;
+        const unit = formData.measuringUnit as unknown as string;
+        const categoriaNombre = formData.category as unknown as string;
 
         const submitData: Ingrediente = {
             id,                             // <--- aquí
             idArticulo: id,                 // mantenemos alias
-            nombre: formData.nombre!,
-            unidadMedicion: {
-                unidad,
-                idUnidadMedicion: 0,          // si tienes un ID real, colócalo aquí
+            denomination: formData.denomination!,
+            measuringUnit: {
+                unit,
+                idmeasuringUnit: 0,          // si tienes un ID real, colócalo aquí
             },
-            stockActual: Number(formData.stockActual),
-            stockMaximo: Number(formData.stockMaximo),
-            precioCompra: Number(formData.precioCompra),
-            categoria: {
-                nombreCategoria: categoriaNombre,
-                idCategoria: 0,               // si tienes un ID real, colócalo aquí
+            currentStock: Number(formData.currentStock),
+            maxStock: Number(formData.maxStock),
+            buyingPrice: Number(formData.buyingPrice),
+            category: {
+                name: categoriaNombre,
+                idcategory: 0,               // si tienes un ID real, colócalo aquí
             },
             estado: formData.estado as 'Activo' | 'Inactivo',
         };
@@ -219,7 +233,7 @@ export const SuppliesPage: React.FC = () => {
     };
 
     // 🔹 Render
-    if (loading && supplies.length === 0) return <p>Cargando insumos...</p>;
+    if (loading && ingredientesAll.length === 0) return <p>Cargando insumos...</p>;
     if (error) return <p className="error-message">Error al cargar insumos: {error}</p>;
 
     return (

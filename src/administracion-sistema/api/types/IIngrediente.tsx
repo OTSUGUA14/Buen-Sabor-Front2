@@ -1,11 +1,17 @@
 export interface Ingrediente {
-    id: number;           // <-- aquí
+    id: number; // Usa el mismo nombre de la API
     idArticulo: number;
-    nombre: string;
-    stockActual: number;
-    stockMaximo: number;
-    precioCompra: number;
-    unidadMedicion: { unidad: string; idUnidadMedicion: number };
-    categoria: { nombreCategoria: string; idCategoria: number };
+    denomination: string;
+    currentStock: number;
+    maxStock: number;
+    buyingPrice: number;
+    measuringUnit: {
+        unit: string;
+        idmeasuringUnit: number;
+    };
+    category: {
+        name: string;
+        idcategory: number;
+    };
     estado: 'Activo' | 'Inactivo';
 }
