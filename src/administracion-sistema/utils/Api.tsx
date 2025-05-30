@@ -1,6 +1,6 @@
-import type { Ingrediente } from "../api/types/ISupply";
+import type { Ingrediente } from "../api/types/IIngrediente";
 
-export const getInstrumentosAll = async (): Promise<Ingrediente[]> => {
+export const getIngredientesAll = async (): Promise<Ingrediente[]> => {
 	const urlServer = 'http://localhost:8080/article/getAll';
 	const response = await fetch(urlServer, {
 		method: 'GET',

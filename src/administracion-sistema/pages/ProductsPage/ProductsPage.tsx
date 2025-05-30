@@ -1,6 +1,7 @@
 // src/administracion-sistema/pages/ProductsPage/ProductsPage.tsx
 
-import React, { useState, useMemo } from 'react';
+
+import React, { useState, useMemo, useEffect } from 'react';
 import { GenericTable } from '../../components/crud/GenericTable/GenericTable';
 import type { ITableColumn } from '../../components/crud/GenericTable/GenericTable.types';
 import { Button } from '../../components/common/Button/Button';
@@ -13,9 +14,11 @@ import { GenericForm } from '../../components/crud/GenericForm/GenericForm';
 import type { IFormFieldConfig, ISelectOption } from '../../components/crud/GenericForm/GenericForm.types';
 import { InputField } from '../../components/common/InputField/InputField';
 import { SelectField } from '../../components/common/SelectField/SelectField';
-import { getInstrumentosAll } from '../../utils/Api';
-import type { Ingrediente } from '../../api/types/ISupply';
-export const  ProductsPage: React.FC =async () => {
+import { getIngredientesAll } from '../../utils/Api';
+import IngredienteDelProductoForm from '../../components/common/Producto/IngredienteDelProductoForm';
+import type { Ingrediente } from '../../api/types/IIngrediente';
+export const ProductsPage: React.FC = () => {
+
     const {
         data: products,
         loading,
@@ -30,6 +33,7 @@ export const  ProductsPage: React.FC =async () => {
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
     const [productToDeleteId, setProductToDeleteId] = useState<number | null>(null);
     const [productToEdit, setProductToEdit] = useState<IProduct | null>(null);
+    const [selectedIngredientes, setSelectedIngredientes] = useState<string[]>([]);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('TODOS');
@@ -40,6 +44,16 @@ export const  ProductsPage: React.FC =async () => {
         { value: 'Activo', label: 'Activo' },
         { value: 'Inactivo', label: 'Inactivo' },
     ];
+    const [ingredientesAll, setIngredientesAll] = useState<Ingrediente[]>([]);
+
+
+    useEffect(() => {
+        const fetchIngredientes = async () => {
+            const ingredientes = await getIngredientesAll();
+            setIngredientesAll(ingredientes);
+        };
+        fetchIngredientes();
+    }, []);
 
     // Definición de las opciones de rubro directamente en ProductsPage, similar a roleOptions
     const productRubrosValues: Array<IProduct['rubro']> = [
@@ -95,11 +109,12 @@ export const  ProductsPage: React.FC =async () => {
             ),
         },
     ];
-    const ingredientesAll: Ingrediente[] = await getInstrumentosAll();
-  
-    
 
-    const productFormFields: IFormFieldConfig[] = [
+
+
+
+    // Quitamos ingredientes del array productFormFields:
+    const productFormFields: IFormFieldConfig[] = useMemo(() => [
         { name: 'nombre', label: 'Nombre', type: 'text', validation: { required: true, minLength: 3 } },
         {
             name: 'rubro',
@@ -115,25 +130,21 @@ export const  ProductsPage: React.FC =async () => {
             validation: { required: true, minLength: 5 },
             placeholder: 'Ej: Jugosa hamburguesa con lechuga, tomate y queso.',
         },
-        {
-            name: 'ingredientes',
-            label: 'Ingredientes (nombres separados por coma)',
-            type: 'select',
-            options: ingredientesAll
-                .filter(ingrediente => ingrediente.denomination && ingrediente.denomination.trim() !== '')
-                .map(ingrediente => ({
-                    value: ingrediente.denomination,
-                    label: ingrediente.denomination
-                })),
-            validation: { required: true },
-        },
-
-        // ELIMINADAS LAS PROPIEDADES 'step', 'min', 'max' PARA COINCIDIR CON EmployeesPage
         { name: 'precioVenta', label: 'Precio Venta', type: 'number', validation: { required: true, min: 0 } },
         { name: 'ofertaPorcentaje', label: 'Oferta %', type: 'number', validation: { required: true, min: 0, max: 100 } },
         { name: 'stock', label: 'Stock', type: 'number', validation: { required: true, min: 0 } },
-        { name: 'estado', label: 'Estado', type: 'select', options: [{ value: 'Activo', label: 'Activo' }, { value: 'Inactivo', label: 'Inactivo' }], validation: { required: true } },
-    ];
+        {
+            name: 'estado',
+            label: 'Estado',
+            type: 'select',
+            options: [
+                { value: 'Activo', label: 'Activo' },
+                { value: 'Inactivo', label: 'Inactivo' }
+            ],
+            validation: { required: true }
+        },
+    ], [rubroOptions]);
+
 
     const handleCreate = () => {
         setProductToEdit(null);
@@ -160,11 +171,21 @@ export const  ProductsPage: React.FC =async () => {
     };
 
     const handleFormSubmit = async (formData: Partial<IProduct>) => {
-        let ingredientesProcessed: { id: number; nombre: string; }[] = [];
+        let ingredientesProcessed = selectedIngredientes.map((name, index) => ({
+            id: Date.now() + index, // o la lógica de id que uses
+            nombre: name
+        }));
 
-        const ingredientesRaw = formData.ingredientes as string | undefined;
+        const ingredientesRaw = formData.ingredientes as string[] | string | undefined;
 
-        if (ingredientesRaw && ingredientesRaw.trim() !== '') {
+        if (Array.isArray(ingredientesRaw) && ingredientesRaw.length > 0) {
+            // Si es un array (multi-select), mapearlo
+            ingredientesProcessed = ingredientesRaw.map((name: string, index: number) => ({
+                id: productToEdit?.ingredientes?.[index]?.id || Date.now() + index,
+                nombre: name,
+            }));
+        } else if (typeof ingredientesRaw === 'string' && ingredientesRaw.trim() !== '') {
+            // Por compatibilidad: si es un string (single-select o legacy), convertirlo a array
             ingredientesProcessed = ingredientesRaw.split(',')
                 .map((nameStr: string) => nameStr.trim())
                 .filter((name: string) => name !== '')
@@ -196,6 +217,19 @@ export const  ProductsPage: React.FC =async () => {
         setIsModalOpen(false);
         setProductToEdit(null);
         fetchData();
+    };
+    const handleFormSubmitWrapper = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        // Arma el objeto Partial<IProduct> desde el formulario:
+        const formData = new FormData(e.currentTarget);
+        const product: Partial<IProduct> = {
+            nombre: formData.get("name") as string,
+            precioVenta: Number(formData.get("price")),
+            // ...
+        };
+
+        await handleFormSubmit(product);
     };
 
     if (loading && products.length === 0) return <p>Cargando productos...</p>;
@@ -234,19 +268,36 @@ export const  ProductsPage: React.FC =async () => {
                 handleEdit={handleEdit}
                 handleDelete={handleDelete}
             />
-
             <FormModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title={productToEdit ? 'Editar Producto' : 'Crear Producto'}
             >
-                <GenericForm<IProduct>
-                    initialData={productToEdit || undefined}
-                    fieldsConfig={productFormFields}
-                    onSubmit={handleFormSubmit}
-                    submitButtonText={productToEdit ? 'Actualizar Producto' : 'Crear Producto'}
-                />
+                <form onSubmit={handleFormSubmitWrapper}>
+
+                    {/* tus campos */}
+                    {productFormFields.map(field => (
+                        <InputField
+                            key={field.name}
+                            label={field.label}
+                            name={field.name}
+                            type={field.type as any}
+                            placeholder={field.placeholder}
+                          
+                        />
+                    ))}
+
+            
+                    <IngredienteDelProductoForm
+                        ingredientesAll={ingredientesAll}
+                        onIngredientesChange={setSelectedIngredientes}
+                    />
+
+               
+                </form>
             </FormModal>
+
+
 
             <ConfirmationDialog
                 isOpen={isConfirmDialogOpen}

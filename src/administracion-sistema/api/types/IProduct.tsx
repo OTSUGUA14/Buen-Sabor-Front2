@@ -1,6 +1,7 @@
 export interface IIngrediente {
     id: number;
     nombre: string;
+    cantidad?: number; // opcional si no siempre existe
 }
 
 export interface IProduct {

@@ -9,7 +9,7 @@ export interface ISelectOption {
 export interface IFormFieldConfig {
     name: string;
     label: string;
-    type: 'text' | 'number' | 'email' | 'password' | 'date' | 'select' | 'textarea' | 'search' | 'checkbox';
+    type: 'text' | 'number' | 'email' | 'password' | 'date' | 'select' | 'textarea' | 'search' | 'checkbox' | 'array';
     validation?: {
         required?: boolean;
         minLength?: number;
@@ -22,9 +22,11 @@ export interface IFormFieldConfig {
     options?: ISelectOption[];
     placeholder?: string;
     className?: string;
-    readOnly?: boolean; // Añade readOnly si lo usas
-    // ¡¡¡ESTA LÍNEA ES CLAVE PARA EL ERROR DE 'transformInitialValue'!!!
+    readOnly?: boolean;
     transformInitialValue?: (value: any) => any;
+
+    // Esto es clave para los campos tipo 'array':
+    fields?: IFormFieldConfig[];
 }
 
 // Definición de FormData, típicamente Partial<T> es suficiente
