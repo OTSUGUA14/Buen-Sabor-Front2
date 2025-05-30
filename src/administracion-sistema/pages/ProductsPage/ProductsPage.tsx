@@ -6,14 +6,15 @@ import type { ITableColumn } from '../../components/crud/GenericTable/GenericTab
 import { Button } from '../../components/common/Button/Button';
 import { useCrud } from '../../hooks/useCrud';
 import { productApi } from '../../api/product';
-import type { IProduct } from '../../api/types/product';
+import type { IProduct } from '../../api/types/IProduct';
 import { ConfirmationDialog } from '../../components/common/ConfirmationDialog/ConfirmationDialog';
 import { FormModal } from '../../components/common/FormModal/FormModal';
 import { GenericForm } from '../../components/crud/GenericForm/GenericForm';
 import type { IFormFieldConfig } from '../../components/crud/GenericForm/GenericForm.types';
 import { InputField } from '../../components/common/InputField/InputField';
 import { SelectField } from '../../components/common/SelectField/SelectField';
-import './ProductsPage.css';
+// ELIMINA: import './ProductsPage.css';
+import '../crud-pages.css'; // <--- NUEVA IMPORTACIÓN
 
 export const ProductsPage: React.FC = () => {
     const {
@@ -44,7 +45,6 @@ export const ProductsPage: React.FC = () => {
         return products.filter((product) => {
             const matchesSearch = product.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 product.rubro.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                // También buscamos en los nombres de ingredientes
                 product.ingredientes.some(ing => ing.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
             const matchesStatus = statusFilter === 'TODOS' || product.estado === statusFilter;
             return matchesSearch && matchesStatus;
@@ -117,53 +117,45 @@ export const ProductsPage: React.FC = () => {
             await deleteItem(productToDeleteId);
             setIsConfirmDialogOpen(false);
             setProductToDeleteId(null);
+            fetchData(); // Agregado para recargar datos después de eliminar
         }
     };
 
     const handleFormSubmit = async (formData: Partial<IProduct>) => {
         let ingredientesProcessed: { id: number; nombre: string; }[] = [];
 
-        // Aseguramos que formData.ingredientes es un string antes de operar sobre él.
         const ingredientesRaw = formData.ingredientes as string | undefined;
 
         if (ingredientesRaw && ingredientesRaw.trim() !== '') {
             ingredientesProcessed = ingredientesRaw.split(',')
                 .map((nameStr: string) => nameStr.trim())
-                .filter((name: string) => name !== '') // Filtra cualquier cadena vacía resultante de split (ej. ",," o "ing1,,ing2")
+                .filter((name: string) => name !== '')
                 .map((name: string, index: number) => ({
                     id: productToEdit?.ingredientes?.[index]?.id || Date.now() + index,
                     nombre: name,
                 }));
         }
 
-        // Construye el objeto final para el envío
         const submitData: IProduct = {
-            // Si es edición, usa los datos existentes para preservar el ID y otros campos
-            // Usamos productToEdit?.id para el ID, o un ID temporal para nuevos productos
-            id: productToEdit?.id || Math.floor(Math.random() * 1000000000), // Genera un ID aleatorio para nuevos productos
-            ...formData, // Esto sobrescribe las propiedades con los valores del formulario
-            ingredientes: ingredientesProcessed, // Asegura que ingredientes sea el array procesado
-            // Conversiones explícitas a Number
+            id: productToEdit?.id || Math.floor(Math.random() * 1000000000),
+            ...formData,
+            ingredientes: ingredientesProcessed,
             precioVenta: Number(formData.precioVenta),
             ofertaPorcentaje: Number(formData.ofertaPorcentaje),
             stock: Number(formData.stock),
-            // Casteo del estado
             estado: formData.estado as 'Activo' | 'Inactivo',
-            nombre: formData.nombre!, // Asegura que nombre no sea undefined (requerido por IProduct)
-            rubro: formData.rubro!   // Asegura que rubro no sea undefined (requerido por IProduct)
+            nombre: formData.nombre!,
+            rubro: formData.rubro!
         };
 
-        // Si formData.ingredientes es una cadena vacía y productToEdit tenía ingredientes, los borramos
         if (!ingredientesRaw && productToEdit && productToEdit.ingredientes.length > 0) {
             submitData.ingredientes = [];
         }
 
-
         if (productToEdit) {
             await updateItem(submitData);
         } else {
-            // Al crear, el ID debería ser generado por la API, pero para el mock lo generamos aquí
-            await createItem(submitData); // El createItem del hook ahora acepta Omit<IProduct, 'id'>
+            await createItem(submitData);
         }
         setIsModalOpen(false);
         setProductToEdit(null);
@@ -174,7 +166,7 @@ export const ProductsPage: React.FC = () => {
     if (error) return <p className="error-message">Error al cargar productos: {error}</p>;
 
     return (
-        <div className="products-page">
+        <div className="crud-page-container"> {/* <--- CLASE CAMBIADA */}
             <div className="page-header">
                 <h2>Gestión de Productos</h2>
                 <Button variant="primary" onClick={handleCreate}>

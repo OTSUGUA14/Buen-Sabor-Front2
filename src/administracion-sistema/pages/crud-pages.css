@@ -1,0 +1,42 @@
+/* src/administracion-sistema/pages/crud-pages.css */
+
+.crud-page-container {
+    padding: 20px;
+}
+
+.crud-page-container .page-header {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.crud-page-container h2 {
+    font-size: 28px;
+    color: #333;
+    margin: 0;
+}
+
+.crud-page-container .filter-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    align-items: flex-end;
+    flex-wrap: wrap; 
+}
+
+.crud-page-container .filter-controls .search-input {
+    flex-grow: 0; 
+    max-width: 300px;
+    margin-left: auto; 
+}
+
+.crud-page-container .filter-controls .status-select {
+    width: 150px;
+    flex-shrink: 0; 
+}
+
+.crud-page-container .table-actions {
+    display: flex;
+    gap: 8px;
+}

@@ -41,8 +41,8 @@ export const Sidebar: React.FC<SidebarProps> = () => {
                     </li>
                     <li>
                         <Link
-                            to="/admin/personal"
-                            className={location.pathname === '/admin/personal' ? 'active' : ''}
+                            to="/admin/employees"
+                            className={location.pathname === '/admin/employees' ? 'active' : ''}
                         >
                             Personal
                         </Link>

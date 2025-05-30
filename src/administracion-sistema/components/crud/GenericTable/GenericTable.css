@@ -4,21 +4,15 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    /* Para apilar tabla y paginación */
     align-items: center;
     padding: 20px;
-    /* Un poco de padding general */
     box-sizing: border-box;
-    /* Para incluir padding en el ancho */
 }
 
 .generic-table-container {
-    width: 90%;
-    /* Ajusta el ancho según lo necesites */
+    width: 100%;
     overflow-x: auto;
-    /* Para tablas que excedan el ancho de la pantalla */
     max-height: 80vh;
-    /* Altura máxima con scroll si excede */
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -27,9 +21,7 @@
 .generic-table {
     width: 100%;
     border-collapse: collapse;
-    /* Para que los bordes de celdas se unan */
     margin: 0;
-    /* Asegurarse de que no tenga márgenes extras */
 }
 
 .generic-table th,
@@ -37,24 +29,18 @@
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #eee;
-    /* Borde inferior para cada celda */
 }
 
 .generic-table th {
     background-color: #f8f8f8;
-    /* Color de fondo para el encabezado */
     font-weight: bold;
     position: sticky;
-    /* Encabezado pegajoso al hacer scroll */
     top: 0;
-    /* Pegado en la parte superior del contenedor */
     z-index: 1;
-    /* Para que quede por encima del contenido al hacer scroll */
 }
 
 .generic-table tr:hover {
     background-color: #f5f5f5;
-    /* Efecto hover en filas */
 }
 
 .generic-table td.numeric {
@@ -64,12 +50,9 @@
 .actions-cell {
     display: flex;
     gap: 8px;
-    /* Espacio entre los botones de acción */
     justify-content: center;
-    /* Centrar los botones si la columna es amplia */
 }
 
-/* Estilos de paginación */
 .pagination-controls {
     display: flex;
     align-items: center;
@@ -92,23 +75,19 @@
     color: #555;
 }
 
-/* Media queries para responsividad (ejemplo básico) */
 @media (max-width: 768px) {
     .generic-table-container {
         width: 98%;
-        /* Ocupar más ancho en pantallas pequeñas */
     }
 
     .generic-table th,
     .generic-table td {
         padding: 8px 10px;
-        /* Menor padding en pantallas pequeñas */
         font-size: 12px;
     }
 
     .pagination-controls {
         flex-wrap: wrap;
-        /* Envolver elementos si no caben */
         justify-content: center;
     }
 }

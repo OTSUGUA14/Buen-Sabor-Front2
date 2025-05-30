@@ -2,18 +2,33 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-// Definición de la interfaz CrudApi para que TypeScript sepa qué esperar de tus APIs
-interface CrudApi<T extends { id: any }> {
+/**
+ * @interface CrudApi
+ * @description Interfaz genérica para las operaciones CRUD de una API.
+ * @template T El tipo de la entidad.
+ */
+export interface CrudApi<T extends { id: number }> {
     getAll: () => Promise<T[]>;
-    getById?: (id: T['id']) => Promise<T | undefined>; // Permite que getById retorne undefined si no lo encuentra
-    create: (item: Omit<T, 'id'>) => Promise<T>; // 'create' no requiere 'id'
-    update: (item: T) => Promise<T>; // 'update' sí requiere 'id'
-    delete: (id: T['id']) => Promise<void>;
+    getById: (id: number) => Promise<T | undefined | null>; // <-- AHORA ACEPTA null O undefined
+    create: (item: Omit<T, 'id'>) => Promise<T>;
+    update: (item: T) => Promise<T>;
+    delete: (id: number) => Promise<void>;
 }
 
-export const useCrud = <T extends { id: any }>(api: CrudApi<T>) => {
+/**
+ * @function useCrud
+ * @description Hook personalizado para gestionar operaciones CRUD (Crear, Leer, Actualizar, Eliminar).
+ * @template T El tipo de la entidad con la que trabaja el hook.
+ * @param {CrudApi<T>} api - Un objeto que implementa la interfaz CrudApi para la entidad T.
+ * @param {boolean} [fetchOnMount=true] - Si se deben cargar los datos al montar el componente.
+ * @returns Un objeto con los datos, estados de carga y error, y funciones CRUD.
+ */
+export const useCrud = <T extends { id: number }>(
+    api: CrudApi<T>,
+    fetchOnMount: boolean = true
+) => {
     const [data, setData] = useState<T[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
     const fetchData = useCallback(async () => {
@@ -23,15 +38,18 @@ export const useCrud = <T extends { id: any }>(api: CrudApi<T>) => {
             const result = await api.getAll();
             setData(result);
         } catch (err: any) {
-            setError(err.message || 'Error al cargar los datos.');
+            setError(err.message || 'Error al cargar datos.');
+            console.error("Error fetching data:", err);
         } finally {
             setLoading(false);
         }
     }, [api]);
 
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        if (fetchOnMount) {
+            fetchData();
+        }
+    }, [fetchData, fetchOnMount]);
 
     const createItem = useCallback(async (item: Omit<T, 'id'>) => {
         setLoading(true);
@@ -39,10 +57,11 @@ export const useCrud = <T extends { id: any }>(api: CrudApi<T>) => {
         try {
             const newItem = await api.create(item);
             setData((prevData) => [...prevData, newItem]);
-            return newItem; // Devuelve el nuevo elemento creado
+            return newItem;
         } catch (err: any) {
             setError(err.message || 'Error al crear el elemento.');
-            throw err;
+            console.error("Error creating item:", err);
+            throw err; // Re-lanza el error para que el componente pueda manejarlo
         } finally {
             setLoading(false);
         }
@@ -56,16 +75,17 @@ export const useCrud = <T extends { id: any }>(api: CrudApi<T>) => {
             setData((prevData) =>
                 prevData.map((d) => (d.id === updatedItem.id ? updatedItem : d))
             );
-            return updatedItem; // Devuelve el elemento actualizado
+            return updatedItem;
         } catch (err: any) {
             setError(err.message || 'Error al actualizar el elemento.');
+            console.error("Error updating item:", err);
             throw err;
         } finally {
             setLoading(false);
         }
     }, [api]);
 
-    const deleteItem = useCallback(async (id: T['id']) => {
+    const deleteItem = useCallback(async (id: number) => {
         setLoading(true);
         setError(null);
         try {
@@ -73,11 +93,38 @@ export const useCrud = <T extends { id: any }>(api: CrudApi<T>) => {
             setData((prevData) => prevData.filter((d) => d.id !== id));
         } catch (err: any) {
             setError(err.message || 'Error al eliminar el elemento.');
+            console.error("Error deleting item:", err);
             throw err;
         } finally {
             setLoading(false);
         }
     }, [api]);
 
-    return { data, loading, error, fetchData, createItem, updateItem, deleteItem };
+    // Función para obtener un elemento por ID (utilizada en FormModal)
+    const getItemById = useCallback(async (id: number): Promise<T | undefined> => {
+        setLoading(true);
+        setError(null);
+        try {
+            const item = await api.getById(id);
+            // Convertir null a undefined si la API devuelve null para "no encontrado"
+            return item || undefined;
+        } catch (err: any) {
+            setError(err.message || 'Error al obtener el elemento por ID.');
+            console.error("Error fetching item by ID:", err);
+            return undefined; // Asegurarse de que siempre devuelva T | undefined en caso de error
+        } finally {
+            setLoading(false);
+        }
+    }, [api]);
+
+    return {
+        data,
+        loading,
+        error,
+        fetchData,
+        createItem,
+        updateItem,
+        deleteItem,
+        getItemById // Exportar esta función para uso externo, como en FormModal
+    };
 };

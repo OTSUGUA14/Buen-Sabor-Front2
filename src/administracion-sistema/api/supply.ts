@@ -1,8 +1,8 @@
 // src/administracion-sistema/api/supply.ts
 
-import type { ISupply } from './types/supply';
+import type { ISupply } from './types/ISupply'; // Asumimos que esta interfaz ha sido actualizada
 
-// Datos mock para insumos
+// Datos mock para insumos - ACTUALIZADOS
 let suppliesMock: ISupply[] = [
     {
         id: 1,
@@ -11,7 +11,10 @@ let suppliesMock: ISupply[] = [
         stockActual: 100,
         stockMinimo: 10,
         costo: 50.00,
-        esInsumo: true, // <-- Asegúrate de que exista y sea booleano
+        categoria: 'Materia Prima', // Nuevo campo
+        subCategoria: 'Cereales y Legumbres', // Nuevo campo
+        estado: 'Activo', // Nuevo campo
+        // esInsumo: true, // ELIMINADO
     },
     {
         id: 2,
@@ -20,7 +23,10 @@ let suppliesMock: ISupply[] = [
         stockActual: 50,
         stockMinimo: 5,
         costo: 30.00,
-        esInsumo: true, // <-- Asegúrate de que exista y sea booleano
+        categoria: 'Materia Prima',
+        subCategoria: 'Vegetales',
+        estado: 'Activo',
+        // esInsumo: true, // ELIMINADO
     },
     {
         id: 3,
@@ -29,7 +35,10 @@ let suppliesMock: ISupply[] = [
         stockActual: 70,
         stockMinimo: 8,
         costo: 120.00,
-        esInsumo: true, // <-- Asegúrate de que exista y sea booleano
+        categoria: 'Materia Prima',
+        subCategoria: 'Lácteos',
+        estado: 'Activo',
+        // esInsumo: true, // ELIMINADO
     },
     {
         id: 4,
@@ -38,7 +47,10 @@ let suppliesMock: ISupply[] = [
         stockActual: 200,
         stockMinimo: 20,
         costo: 80.00,
-        esInsumo: false, // <-- Un ejemplo de producto final o bebida
+        categoria: 'Bebidas',
+        subCategoria: 'Cervezas',
+        estado: 'Activo',
+        // esInsumo: false, // ELIMINADO
     },
     {
         id: 5,
@@ -47,7 +59,10 @@ let suppliesMock: ISupply[] = [
         stockActual: 30,
         stockMinimo: 3,
         costo: 60.00,
-        esInsumo: true, // <-- Asegúrate de que exista y sea booleano
+        categoria: 'Materia Prima',
+        subCategoria: 'Vegetales',
+        estado: 'Activo',
+        // esInsumo: true, // ELIMINADO
     },
 ];
 
@@ -57,36 +72,35 @@ const simulateNetworkLatency = (ms: number = 500) => {
 };
 
 export const supplyApi = {
-    // Cambia getAllSupplies a getAll
     getAll: async (): Promise<ISupply[]> => {
         await simulateNetworkLatency();
         return [...suppliesMock];
     },
 
-    getSupplyById: async (id: number): Promise<ISupply | undefined> => {
+    getById: async (id: number): Promise<ISupply | undefined> => {
         await simulateNetworkLatency();
         return suppliesMock.find(supply => supply.id === id);
     },
 
-    createSupply: async (newSupply: Omit<ISupply, 'id'>): Promise<ISupply> => {
+    create: async (newItem: Omit<ISupply, 'id'>): Promise<ISupply> => {
         await simulateNetworkLatency();
-        const id = Math.max(...suppliesMock.map(s => s.id)) + 1;
-        const supply: ISupply = { ...newSupply, id };
+        const id = suppliesMock.length > 0 ? Math.max(...suppliesMock.map(s => s.id)) + 1 : 1;
+        const supply: ISupply = { ...newItem, id };
         suppliesMock.push(supply);
         return supply;
     },
 
-    updateSupply: async (updatedSupply: ISupply): Promise<ISupply> => {
+    update: async (updatedItem: ISupply): Promise<ISupply> => {
         await simulateNetworkLatency();
-        const index = suppliesMock.findIndex(s => s.id === updatedSupply.id);
+        const index = suppliesMock.findIndex(s => s.id === updatedItem.id);
         if (index > -1) {
-            suppliesMock[index] = updatedSupply;
-            return updatedSupply;
+            suppliesMock[index] = updatedItem;
+            return updatedItem;
         }
         throw new Error('Insumo no encontrado para actualizar.');
     },
 
-    deleteSupply: async (id: number): Promise<void> => {
+    delete: async (id: number): Promise<void> => {
         await simulateNetworkLatency();
         const initialLength = suppliesMock.length;
         suppliesMock = suppliesMock.filter(supply => supply.id !== id);
