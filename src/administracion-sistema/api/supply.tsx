@@ -1,8 +1,8 @@
 // src/administracion-sistema/api/supply.ts
 
-import type { ISupply } from './types/ISupply';
+import type { Ingrediente } from './types/ISupply';
 
-let suppliesMock: ISupply[] = [
+let suppliesMock: Ingrediente[] = [
     {
         id: 1,
         nombre: 'Pechuga de Pollo',
@@ -121,7 +121,7 @@ const simulateNetworkLatency = (ms: number = 500) => {
 
 export const supplyApi = {
     getAll: async (): Promise<ISupply[]> => {
-        await simulateNetworkLatency();
+        await simulateNetworkLatency(); 
         return [...suppliesMock];
     },
 

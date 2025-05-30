@@ -13,8 +13,9 @@ import { GenericForm } from '../../components/crud/GenericForm/GenericForm';
 import type { IFormFieldConfig, ISelectOption } from '../../components/crud/GenericForm/GenericForm.types';
 import { InputField } from '../../components/common/InputField/InputField';
 import { SelectField } from '../../components/common/SelectField/SelectField';
-
-export const ProductsPage: React.FC = () => {
+import { getInstrumentosAll } from '../../utils/Api';
+import type { Ingrediente } from '../../api/types/ISupply';
+export const  ProductsPage: React.FC =async () => {
     const {
         data: products,
         loading,
@@ -94,31 +95,39 @@ export const ProductsPage: React.FC = () => {
             ),
         },
     ];
+    const ingredientesAll: Ingrediente[] = await getInstrumentosAll();
+  
+    
 
     const productFormFields: IFormFieldConfig[] = [
         { name: 'nombre', label: 'Nombre', type: 'text', validation: { required: true, minLength: 3 } },
-        { 
-            name: 'rubro', 
-            label: 'Rubro', 
-            type: 'select', 
+        {
+            name: 'rubro',
+            label: 'Rubro',
+            type: 'select',
             options: rubroOptions.filter(opt => opt.value !== 'TODOS'),
-            validation: { required: true } 
+            validation: { required: true }
         },
         {
-            name: 'descripcion', 
-            label: 'Descripción', 
+            name: 'descripcion',
+            label: 'Descripción',
             type: 'textarea',
-            validation: { required: true, minLength: 5 }, 
+            validation: { required: true, minLength: 5 },
             placeholder: 'Ej: Jugosa hamburguesa con lechuga, tomate y queso.',
         },
         {
             name: 'ingredientes',
             label: 'Ingredientes (nombres separados por coma)',
-            type: 'text',
+            type: 'select',
+            options: ingredientesAll
+                .filter(ingrediente => ingrediente.denomination && ingrediente.denomination.trim() !== '')
+                .map(ingrediente => ({
+                    value: ingrediente.denomination,
+                    label: ingrediente.denomination
+                })),
             validation: { required: true },
-            placeholder: 'Ej: Pan de papa, Medallon de carne, Lechuga',
-            transformInitialValue: (value: any) => Array.isArray(value) ? value.map((ing: { nombre: string }) => ing.nombre).join(', ') : '',
         },
+
         // ELIMINADAS LAS PROPIEDADES 'step', 'min', 'max' PARA COINCIDIR CON EmployeesPage
         { name: 'precioVenta', label: 'Precio Venta', type: 'number', validation: { required: true, min: 0 } },
         { name: 'ofertaPorcentaje', label: 'Oferta %', type: 'number', validation: { required: true, min: 0, max: 100 } },
@@ -146,7 +155,7 @@ export const ProductsPage: React.FC = () => {
             await deleteItem(productToDeleteId);
             setIsConfirmDialogOpen(false);
             setProductToDeleteId(null);
-            fetchData(); 
+            fetchData();
         }
     };
 
@@ -178,7 +187,7 @@ export const ProductsPage: React.FC = () => {
             stock: Number(formData.stock),
             estado: formData.estado as 'Activo' | 'Inactivo',
         };
-        
+
         if (productToEdit) {
             await updateItem(submitData);
         } else {
