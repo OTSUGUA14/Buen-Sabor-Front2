@@ -1,9 +1,25 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../styles/Login.module.css";
-// Si estás usando react-router-dom para Link, ya lo tienes en Navbar. Si necesitas usarlo aquí, importalo:
-// import { Link } from "react-router-dom"; 
+import type { UserLogin } from "../type/UserLogin";
+import { loginUser } from "../servicios/Api";
+
 
 export default function Login() {
+    const [username, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const userToLogin: UserLogin = {
+            username: username,
+            password: password
+        };
+
+        await loginUser(userToLogin);
+    };
+
     return (
         <div className={styles.loginPageContainer}>
             <div className={styles.loginCard}>
@@ -12,14 +28,16 @@ export default function Login() {
                     <img src="/icons/user-circle.svg" alt="User Icon" className={styles.userIcon} />
                 </div>
 
-                <form className={styles.loginForm}>
+                <form className={styles.loginForm} onSubmit={handleSubmit}>
                     <div className={styles.inputGroup}>
                         <label htmlFor="email" className={styles.inputLabel}>Correo electrónico</label>
                         <input
-                            type="email"
-                            id="email"
-                            placeholder="ejemplo@mail.com"
+                            type="text"
+                            id="username"
+                            placeholder="otsu"  
                             className={styles.loginInput}
+                            value={username}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
 
@@ -31,8 +49,10 @@ export default function Login() {
                                 id="password"
                                 placeholder="************"
                                 className={styles.loginInput}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                             />
-                            <img src="/icons/eye-off.svg" alt="Show Password" className={styles.passwordToggleIcon} />
+                          
                         </div>
                     </div>
 
@@ -57,4 +77,4 @@ export default function Login() {
             </div>
         </div>
     );
-};
+}

@@ -9,13 +9,16 @@ import Login from "../screens/Login";
 import SignUp from "../screens/RegisterPage";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-
-import { ProductsPage } from '../administracion-sistema/pages/ProductsPage/ProductsPage';
-import { SuppliesPage } from '../administracion-sistema/pages/SuppliesPage/SuppliesPage';
-import { ClientsPage } from '../administracion-sistema/pages/ClientPage/ClientsPage';
-import { EmployeesPage } from '../administracion-sistema/pages/EmployeesPage/EmployeesPage';
-import { StatisticsPage } from '../administracion-sistema/pages/StatisticsPage/StattisticsPage';
-import { AdminLayout } from '../administracion-sistema/components/layout/AdminLayout';
+import { AdminLayout } from "../administracion-sistema/components/layout/AdminLayout";
+import { ProductsPage } from "../administracion-sistema/pages/ProductsPage/ProductsPage";
+import { SuppliesPage } from "../administracion-sistema/pages/SuppliesPage/SuppliesPage";
+import { ClientsPage } from "../administracion-sistema/pages/ClientPage/ClientsPage";
+import { EmployeesPage } from "../administracion-sistema/pages/EmployeesPage/EmployeesPage";
+import { StatisticsPage } from "../administracion-sistema/pages/StatisticsPage/StattisticsPage";
+import { CashOrdersPage } from "../administracion-sistema/pages/cash/cash-OrderList/OrderPage";
+import { CookOrdersPage } from "../administracion-sistema/pages/cook/cook-OrderPage/cook-OrderPage";
+import UserProfile from "../screens/UserProfile";
+import RegisterPage from "../screens/RegisterPage";
 
 export function AppRouter() {
     return (
@@ -25,7 +28,7 @@ export function AppRouter() {
                 <Route path="/" element={<Home />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/menu" element={<Menu />} />
-                <Route path="/registro" element={<SignUp />} />
+                <Route path="/registro" element={<RegisterPage />} />
                 <Route path="/login" element={<Login />} />
 
                 <Route path="/admin" element={<AdminLayout />}>

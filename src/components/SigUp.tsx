@@ -1,41 +1,70 @@
 import { useState } from "react";
 import styles from "../styles/Login.module.css";
-import { valueRegex } from "../validation/ValueRegistro";
-import { regexPatterns, validation } from "../validation/Validatios";
 
 import "../index.css";
+import { regexPatterns } from "../validation/Validatios";
+import type { UserRegister } from "../type/UserData";
+import { registerUser } from "../servicios/Api";
+import { Link } from "react-router-dom";
+
 
 export default function SignUp() {
     const [userData, setUserData] = useState({
-        name: "",
-        phone_number: "",
-        sign_up_email: "",
-        addresses: "",
-        passWord: "",
+        firstName: "",
+        lastName: "",
+        phoneNumber: "",
+        email: "",
+        birthDate: "",
+        username: "",
+        password: "",
         repeat_password: "",
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setUserData((prev) => ({ ...prev, [name]: value }));
+
         const warnings = document.querySelectorAll<HTMLParagraphElement>("p.warning");
-        validation(name as keyof typeof valueRegex, value, warnings);
+        const pattern = regexPatterns[name as keyof typeof regexPatterns];
+
+        if (name == "repeat_password" && value == userData.repeat_password) {
+            warnings[7].classList.add("hide");
+
+        } else {
+            if (pattern && !pattern.test(value)) {
+                warnings.forEach((p) => {
+                    if (p.dataset.name === name) p.classList.remove("hide");
+                });
+            } else {
+                warnings.forEach((p) => {
+                    if (p.dataset.name === name) p.classList.add("hide");
+                });
+            }
+        }
+
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validar que todos los campos pasen el regex
-        const keysToValidate = ["name", "phone_number", "sign_up_email", "addresses", "passWord", "repeat_password"];
+        const keysToValidate = [
+            "firstName",
+            "lastName",
+            "phoneNumber",
+            "email",
+            "birthDate",
+            "username",
+            "password",
+            "repeat_password",
+        ];
+
         const allValid = keysToValidate.every((key) => {
             const value = userData[key as keyof typeof userData];
             const pattern = regexPatterns[key as keyof typeof regexPatterns];
             return pattern ? pattern.test(value) : false;
         });
 
-
-        // Validar que passWord y repeat_password coincidan
-        const passwordsMatch = userData.passWord === userData.repeat_password;
+        const passwordsMatch = userData.password === userData.repeat_password;
 
         if (!allValid) {
             alert("Por favor, completa todos los campos correctamente.");
@@ -47,9 +76,18 @@ export default function SignUp() {
             return;
         }
 
-        alert("Usuario registrado correctamente");
-        localStorage.setItem("Users", JSON.stringify([{ ...userData, state: true }]));
-        window.location.href = "menu.html";
+        const userToSend: UserRegister = {
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            phoneNumber: userData.phoneNumber,
+            email: userData.email,
+            birthDate: userData.birthDate, // ya en formato string
+            username: userData.username,
+            password: userData.password,
+        };
+
+
+        registerUser(userToSend);
     };
 
     return (
@@ -59,77 +97,113 @@ export default function SignUp() {
                 <div className={styles.userIconContainer}>
                     <img src="/icons/user-circle.svg" alt="User Icon" className={styles.userIcon} />
                 </div>
+
                 <form className={styles.loginForm} onSubmit={handleSubmit}>
+                    {/* firstName */}
                     <div className={styles.inputGroup}>
-                        <label htmlFor="name" className={styles.inputLabel}>Nombre*</label>
+                        <label htmlFor="firstName" className={styles.inputLabel}>Nombre*</label>
                         <input
                             type="text"
-                            id="name"
-                            name="name"
-                            placeholder="Juan Perez"
+                            id="firstName"
+                            name="firstName"
+                            placeholder="Juan"
                             className={styles.loginInput}
                             onChange={handleChange}
-                            value={userData.name}
+                            value={userData.firstName}
                         />
-                        <p className="warning hide" data-name="name"># Ingrese un nombre valido</p>
+                        <p className="warning hide" data-name="firstName"># Ingrese un nombre válido</p>
                     </div>
 
+                    {/* lastName */}
                     <div className={styles.inputGroup}>
-                        <label htmlFor="phone_number" className={styles.inputLabel}>Número de teléfono*</label>
+                        <label htmlFor="lastName" className={styles.inputLabel}>Apellido*</label>
                         <input
                             type="text"
-                            id="phone_number"
-                            name="phone_number"
+                            id="lastName"
+                            name="lastName"
+                            placeholder="Pérez"
+                            className={styles.loginInput}
+                            onChange={handleChange}
+                            value={userData.lastName}
+                        />
+                        <p className="warning hide" data-name="lastName"># Ingrese un apellido válido</p>
+                    </div>
+
+                    {/* phoneNumber */}
+                    <div className={styles.inputGroup}>
+                        <label htmlFor="phoneNumber" className={styles.inputLabel}>Teléfono*</label>
+                        <input
+                            type="text"
+                            id="phoneNumber"
+                            name="phoneNumber"
                             placeholder="1234567890"
                             className={styles.loginInput}
                             onChange={handleChange}
-                            value={userData.phone_number}
+                            value={userData.phoneNumber}
                         />
-                        <p className="warning hide" data-name="phone_number"># Ingrese un número de teléfono valido</p>
+                        <p className="warning hide" data-name="phoneNumber"># Ingrese un teléfono válido</p>
                     </div>
 
+                    {/* email */}
                     <div className={styles.inputGroup}>
-                        <label htmlFor="sign_up_email" className={styles.inputLabel}>Correo electrónico*</label>
+                        <label htmlFor="email" className={styles.inputLabel}>Correo electrónico*</label>
                         <input
                             type="email"
-                            id="sign_up_email"
-                            name="sign_up_email"
+                            id="email"
+                            name="email"
                             placeholder="ejemplo@email.com"
                             className={styles.loginInput}
                             onChange={handleChange}
-                            value={userData.sign_up_email}
+                            value={userData.email}
                         />
-                        <p className="warning hide" data-name="sign_up_email"># Ingrese un correo valido</p>
+                        <p className="warning hide" data-name="email"># Ingrese un correo válido</p>
                     </div>
 
+                    {/* birthDate */}
                     <div className={styles.inputGroup}>
-                        <label htmlFor="addresses" className={styles.inputLabel}>Dirección*</label>
+                        <label htmlFor="birthDate" className={styles.inputLabel}>Fecha de Nacimiento*</label>
                         <input
-                            type="text"
-                            id="addresses"
-                            name="addresses"
-                            placeholder="Av. Siempre Viva 123"
+                            type="date"
+                            id="birthDate"
+                            name="birthDate"
                             className={styles.loginInput}
                             onChange={handleChange}
-                            value={userData.addresses}
+                            value={userData.birthDate}
                         />
-                        <p className="warning hide" data-name="addresses"># Ingrese una dirrección valida</p>
+                        <p className="warning hide" data-name="birthDate"># Ingrese una fecha válida (YYYY-MM-DD)</p>
                     </div>
 
+                    {/* username */}
                     <div className={styles.inputGroup}>
-                        <label htmlFor="passWord" className={styles.inputLabel}>Contraseña*</label>
+                        <label htmlFor="username" className={styles.inputLabel}>Usuario*</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="juanperez"
+                            className={styles.loginInput}
+                            onChange={handleChange}
+                            value={userData.username}
+                        />
+                        <p className="warning hide" data-name="username"># Ingrese un nombre de usuario válido</p>
+                    </div>
+
+                    {/* password */}
+                    <div className={styles.inputGroup}>
+                        <label htmlFor="password" className={styles.inputLabel}>Contraseña*</label>
                         <input
                             type="password"
-                            id="passWord"
-                            name="passWord"
+                            id="password"
+                            name="password"
                             placeholder="************"
                             className={styles.loginInput}
                             onChange={handleChange}
-                            value={userData.passWord}
+                            value={userData.password}
                         />
-                        <p className="warning hide" data-name="passWord"># La contraseña debe tener 8 a 12 dígitos y una mayusculas y una minusculas por lo menos</p>
+                        <p className="warning hide" data-name="password"># La contraseña debe tener 8 a 12 dígitos con mayúscula y minúscula</p>
                     </div>
 
+                    {/* repeat_password */}
                     <div className={styles.inputGroup}>
                         <label htmlFor="repeat_password" className={styles.inputLabel}>Repetir contraseña*</label>
                         <input
@@ -141,19 +215,15 @@ export default function SignUp() {
                             onChange={handleChange}
                             value={userData.repeat_password}
                         />
-                        <p className="warning hide" data-name="repeat_password"># Tiene que ser igual que la contraseña</p>
+                        <p className="warning hide" data-name="repeat_password"># Las contraseñas deben coincidir</p>
                     </div>
 
                     <button type="submit" className={styles.loginButton}>REGISTRARSE</button>
-
-                    <p className={styles.orSeparator}>O REGÍSTRATE CON</p>
-                    <button type="button" className={styles.googleLoginButton}>
-                        <img src="/icons/google-icon.svg" alt="Google" className={styles.googleIcon} />
-                        Entrar con Google
-                    </button>
-
                     <p className={styles.signUpText}>
-                        Ya tienes cuenta? <a href="/Login" className={styles.signUpLink}>Iniciar sesión</a>
+                        Ya tenes cuenta?{" "}
+                        <Link to="/login" className={styles.signUpLink}>
+                            Inicia sesion
+                        </Link>
                     </p>
                 </form>
             </div>

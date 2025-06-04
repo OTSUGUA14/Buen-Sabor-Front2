@@ -2,11 +2,15 @@ import { valueRegex } from "./ValueRegistro";
 
 // Definición de patrones RegExp para validar cada campo específico
 export const regexPatterns: { [key: string]: RegExp } = {
-    name: /^[a-zA-Z\s]{3,}$/, // Sólo letras y espacios, mínimo 3 caracteres
-    phone_number: /^\d{7,14}$/, // Sólo números, entre 7 y 14 dígitos
-    addresses: /^.{5,}$/, // Cualquier carácter, mínimo 5 caracteres
-    sign_up_email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Email básico: algo@algo.algo
-    passWord: /^(?=.*[a-z])(?=.*[A-Z]).{8,12}$/, // 8-12 caracteres con al menos una mayúscula y una minúscula
+    firstName: /^[a-zA-Z\s]{3,}$/,            // Mínimo 3 letras y espacios
+    lastName: /^[a-zA-Z\s]{3,}$/,             // Mínimo 3 letras y espacios
+    phoneNumber: /^\d{7,14}$/,                // Sólo números, 7-14 dígitos
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,       // Email básico
+    username: /^[a-zA-Z0-9_]{3,}$/,            // Letras, números y guiones bajos, mínimo 3 caracteres
+    password: /^(?=.*[a-z])(?=.*[A-Z]).{8,12}$/, // 8-12 caracteres, al menos una mayúscula y una minúscula
+    birthDate: /^\d{4}-\d{2}-\d{2}$/,
+    repeat_password: /^(?=.*[a-z])(?=.*[A-Z]).{8,12}$/ // Igual que password
+
 };
 
 // Función de validación que actualiza el estado de validación y muestra/oculta mensajes de advertencia
