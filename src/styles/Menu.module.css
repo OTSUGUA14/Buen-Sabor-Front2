@@ -408,7 +408,7 @@
     max-width: 400px;
     margin: 0 auto;
     font-family: 'Segoe UI', sans-serif;
-    max-height: 300px;
+    max-height: 500px;
     /* ajusta según lo que te parezca */
     overflow-y: auto;
     padding-right: 0.5rem;
@@ -457,7 +457,7 @@ hr {
     font-size: 1.2rem;
     font-weight: bold;
     color: #FFA500;
-    text-align:center;
+    text-align: center;
 
 }
 
@@ -473,4 +473,32 @@ hr {
 
 .cartItems::-webkit-scrollbar-track {
     background-color: transparent;
+}
+
+.quantityControls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.incrementButton,
+.decrementButton {
+    padding: 4px 8px;
+    font-size: 16px;
+    background-color: #eee;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.continueButton {
+    background-color: #ff9900;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
 }

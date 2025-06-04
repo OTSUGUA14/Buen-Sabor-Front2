@@ -1,9 +1,12 @@
-import React, { useState } from 'react'; // Importa useState
+import { useState, useEffect } from 'react';
 import styles from '../styles/Menu.module.css';
-import ProductModal from '../components/ProductModal'; // Importa el nuevo componente modal
+import ProductModal from '../components/ProductModal';
+import CartModal from '../components/CartModal';
 
 export default function Menu() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+
+    const [isProductModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
     const handleProductClick = (productData: any) => {
@@ -15,7 +18,20 @@ export default function Menu() {
         setIsModalOpen(false);
         setSelectedProduct(null);
     };
-    const [cart, setCart] = useState<any[]>([]);
+
+
+    // Inicializamos carrito desde localStorage (si existe)
+    const [cart, setCart] = useState<any[]>(() => {
+        const savedCart = localStorage.getItem('cart');
+        return savedCart ? JSON.parse(savedCart) : [];
+    });
+    const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const deliveryFee = 800;
+    const total = subtotal + deliveryFee;
+    // Guardar carrito en localStorage cada vez que cambie
+    useEffect(() => {
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }, [cart]);
 
     const handleAddToCart = (product: any, quantity: number) => {
         setCart(prevCart => {
@@ -30,8 +46,34 @@ export default function Menu() {
                 return [...prevCart, { ...product, quantity }];
             }
         });
-        handleCloseModal(); // cerrar el modal luego de agregar
+        handleCloseModal();
     };
+
+    const handleIncrement = (productId: number) => {
+        setCart(prevCart =>
+            prevCart.map(item =>
+                item.id === productId
+                    ? { ...item, quantity: item.quantity + 1 }
+                    : item
+            )
+        );
+    };
+    const handlePayment = () => {
+        alert('¡Gracias por su compra!');
+        setCart([]); // Vaciar carrito
+        setIsCartModalOpen(false);
+    };
+    const handleDecrement = (productId: number) => {
+        setCart(prevCart => {
+            const updatedCart = prevCart.map(item =>
+                item.id === productId
+                    ? { ...item, quantity: item.quantity - 1 }
+                    : item
+            ).filter(item => item.quantity > 0);
+            return updatedCart;
+        });
+    };
+
     const hamburguesas = [
         {
             id: 1,
@@ -188,6 +230,21 @@ export default function Menu() {
                             {cart.map(item => (
                                 <li key={item.id} className={styles.cartItem}>
                                     <p>{item.name}</p>
+                                    <div className={styles.quantityControls}>
+                                        <button
+                                            onClick={() => handleDecrement(item.id)}
+                                            className={styles.decrementButton}
+                                        >
+                                            -
+                                        </button>
+                                        <span>{item.quantity}</span>
+                                        <button
+                                            onClick={() => handleIncrement(item.id)}
+                                            className={styles.incrementButton}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
                                     <span>{item.quantity} x ${item.price.toLocaleString('es-AR')}</span>
                                     <span>Total: ${(item.quantity * item.price).toLocaleString('es-AR')}</span>
                                 </li>
@@ -197,17 +254,32 @@ export default function Menu() {
                         <p className={styles.cartTotal}>
                             Total: ${cart.reduce((acc, item) => acc + item.price * item.quantity, 0).toLocaleString('es-AR')}
                         </p>
+                        <button
+                            className={styles.openCartButton}
+                            onClick={() => setIsCartModalOpen(true)}
+                        >
+                            Ver Carrito
+                        </button>
+
                     </div>
                 )}
             </aside>
 
-
             {/* Renderiza el modal */}
             <ProductModal
-                isOpen={isModalOpen}
+                isOpen={isProductModalOpen}
                 onClose={handleCloseModal}
                 product={selectedProduct}
                 onAddToCart={handleAddToCart}
+            />
+            <CartModal
+                isOpen={isCartModalOpen}
+                onClose={() => setIsCartModalOpen(false)}
+                cart={cart}
+                subtotal={subtotal}
+                deliveryFee={deliveryFee}
+                total={total}
+                onPayment={handlePayment}
             />
 
         </main>
