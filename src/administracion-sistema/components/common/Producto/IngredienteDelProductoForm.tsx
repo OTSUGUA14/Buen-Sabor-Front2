@@ -34,8 +34,8 @@ const IngredienteDelProductoForm: React.FC<ProductFormProps> = ({ ingredientesAl
                 >
                     <option value="">Seleccione un ingrediente</option>
                     {ingredientesAll.map(ing => (
-                        <option key={ing.idArticulo} value={ing.nombre}>
-                            {ing.nombre}
+                        <option key={ing.idArticulo} value={ing.denomination}>
+                            {ing.denomination}
                         </option>
                     ))}
                 </select>

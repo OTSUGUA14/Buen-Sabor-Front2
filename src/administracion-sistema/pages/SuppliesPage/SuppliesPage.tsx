@@ -197,27 +197,25 @@ export const SuppliesPage: React.FC = () => {
     };
 
     const handleFormSubmit = async (formData: Partial<Ingrediente>) => {
-        // 1️⃣ Asegúrate de generar/ampliar el campo `id`:
         const id = supplyToEdit?.id || Math.floor(Math.random() * 1e9);
 
-        // 2️⃣ Extrae la unidad y la categoría desde el formData (vienen como string):
         const unit = formData.measuringUnit as unknown as string;
         const categoriaNombre = formData.category as unknown as string;
 
         const submitData: Ingrediente = {
-            id,                             // <--- aquí
-            idArticulo: id,                 // mantenemos alias
+            id,                             
+            idArticulo: id,                 
             denomination: formData.denomination!,
             measuringUnit: {
                 unit,
-                idmeasuringUnit: 0,          // si tienes un ID real, colócalo aquí
+                idmeasuringUnit: 0,          
             },
             currentStock: Number(formData.currentStock),
             maxStock: Number(formData.maxStock),
             buyingPrice: Number(formData.buyingPrice),
             category: {
                 name: categoriaNombre,
-                idcategory: 0,               // si tienes un ID real, colócalo aquí
+                idcategory: 0,               
             },
             estado: formData.estado as 'Activo' | 'Inactivo',
         };
@@ -260,13 +258,6 @@ export const SuppliesPage: React.FC = () => {
                     className="status-select"
                 />
 
-                <SelectField
-                    name="categoryFilter"
-                    options={categoryOptions}
-                    value={categoryFilter}
-                    onChange={e => setCategoryFilter(e.target.value)}
-                    className="status-select"
-                />
             </div>
 
             <GenericTable

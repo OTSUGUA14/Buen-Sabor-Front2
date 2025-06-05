@@ -39,12 +39,13 @@ export default function Navbar() {
                                         </Link>
                                     </li>
                                     <li>
-                                        <button
+                                        <Link
+                                            to="/profile"
                                             className={styles.dropdownItem}
                                             onClick={() => setOpen(false)}
                                         >
-                                            Cerrar Sesión
-                                        </button>
+                                            PERFIL
+                                        </Link>
                                     </li>
                                 </ul>
                             </div>

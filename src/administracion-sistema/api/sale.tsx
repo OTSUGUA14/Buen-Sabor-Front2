@@ -57,7 +57,7 @@ const mockProducts: IProduct[] = [
         id: 1003,
         nombre: 'Pizza 4 quesos',
         descripcion: 'Deliciosa pizza con la mezcla de cuatro quesos gourmet.',
-        rubro: 'Pizza', // Rubro como literal
+        rubro: 'Pizza',
         ingredientes: [
             { id: 9, nombre: 'Harina 0000 (500grs)' },
             { id: 10, nombre: 'Muzzarella' },

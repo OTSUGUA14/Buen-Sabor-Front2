@@ -172,7 +172,7 @@ export const ProductsPage: React.FC = () => {
 
     const handleFormSubmit = async (formData: Partial<IProduct>) => {
         let ingredientesProcessed = selectedIngredientes.map((name, index) => ({
-            id: Date.now() + index, // o la lógica de id que uses
+            id: Date.now() + index,
             nombre: name
         }));
 
@@ -283,17 +283,14 @@ export const ProductsPage: React.FC = () => {
                             name={field.name}
                             type={field.type as any}
                             placeholder={field.placeholder}
-                          
                         />
                     ))}
 
-            
+
                     <IngredienteDelProductoForm
                         ingredientesAll={ingredientesAll}
                         onIngredientesChange={setSelectedIngredientes}
                     />
-
-               
                 </form>
             </FormModal>
 
