@@ -1,0 +1,15 @@
+.page-header h2 {
+    color: var(--text-color-dark);
+}
+
+.table-actions {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 5px;
+    justify-content: center; 
+}
+
+.generic-table th:nth-child(3), 
+.generic-table td:nth-child(3) {
+    min-width: 180px; 
+}

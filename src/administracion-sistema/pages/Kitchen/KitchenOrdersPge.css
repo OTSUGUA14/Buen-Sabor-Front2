@@ -1,0 +1,10 @@
+/* src/administracion-sistema/pages/KitchenOrdersPage/KitchenOrdersPage.css */
+
+.page-header h2 {
+    color: var(--text-color-dark); 
+}
+
+.table-actions {
+    display: flex;
+    flex-direction: column; 
+}

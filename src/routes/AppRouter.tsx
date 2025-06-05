@@ -9,13 +9,17 @@ import Login from "../screens/Login";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Perfil from "../screens/Profile";
+import RegisterPage from "../screens/RegisterPage";
+
 import { AdminLayout } from "../administracion-sistema/components/layout/AdminLayout";
 import { ProductsPage } from "../administracion-sistema/pages/ProductsPage/ProductsPage";
 import { SuppliesPage } from "../administracion-sistema/pages/SuppliesPage/SuppliesPage";
 import { ClientsPage } from "../administracion-sistema/pages/ClientPage/ClientsPage";
 import { EmployeesPage } from "../administracion-sistema/pages/EmployeesPage/EmployeesPage";
 import { StatisticsPage } from "../administracion-sistema/pages/StatisticsPage/StattisticsPage";
-import RegisterPage from "../screens/RegisterPage";
+import { OrdersPage } from "../administracion-sistema/pages/Cash/CashOrdersPage";
+import { KitchenOrdersPage } from "../administracion-sistema/pages/Kitchen/KitchenOrdersPage";
+import { DeliveryOrdersPage } from "../administracion-sistema/pages/Delivery/DeliveryOrdersPage";
 
 export function AppRouter() {
     return (
@@ -35,6 +39,9 @@ export function AppRouter() {
                     <Route path="clients" element={<ClientsPage />} />
                     <Route path="employees" element={<EmployeesPage />} />
                     <Route path="statistics" element={<StatisticsPage />} />
+                    <Route path="cash-orders" element={<OrdersPage />} />
+                    <Route path="kitchen-orders" element={<KitchenOrdersPage />} />
+                    <Route path="delivery-orders" element={<DeliveryOrdersPage />} />
                 </Route>
 
             </Routes>

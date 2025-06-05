@@ -1,0 +1,7 @@
+/* src/administracion-sistema/pages/OrdersPage/OrdersPage.css */
+
+.table-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}

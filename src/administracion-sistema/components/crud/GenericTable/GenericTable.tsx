@@ -87,9 +87,9 @@ export const GenericTable = <T extends { id: number }>({
                                                                     Editar
                                                                 </Button>
                                                             )}
-                                                            {handleDelete && ( // <-- Botón Eliminar condicional
+                                                            {handleDelete && ( 
                                                                 <Button
-                                                                    variant="outline-danger" // <-- Usando variant="outline-danger"
+                                                                    variant="outline-danger" 
                                                                     size="small"
                                                                     onClick={() => handleDelete(row.id)}
                                                                 >
