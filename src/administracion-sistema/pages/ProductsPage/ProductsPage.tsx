@@ -1,6 +1,5 @@
 // src/administracion-sistema/pages/ProductsPage/ProductsPage.tsx
 
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { GenericTable } from '../../components/crud/GenericTable/GenericTable';
 import type { ITableColumn } from '../../components/crud/GenericTable/GenericTable.types';
@@ -10,15 +9,14 @@ import { productApi } from '../../api/product';
 import type { IProduct } from '../../api/types/IProduct';
 import { ConfirmationDialog } from '../../components/common/ConfirmationDialog/ConfirmationDialog';
 import { FormModal } from '../../components/common/FormModal/FormModal';
-import { GenericForm } from '../../components/crud/GenericForm/GenericForm';
-import type { IFormFieldConfig, ISelectOption } from '../../components/crud/GenericForm/GenericForm.types';
 import { InputField } from '../../components/common/InputField/InputField';
 import { SelectField } from '../../components/common/SelectField/SelectField';
 import { getIngredientesAll } from '../../utils/Api';
 import IngredienteDelProductoForm from '../../components/common/Producto/IngredienteDelProductoForm';
-import type { Ingrediente } from '../../api/types/IIngrediente';
-export const ProductsPage: React.FC = () => {
+import type { IIngrediente } from '../../api/types/IIngrediente';
+import type { IFormFieldConfig, ISelectOption } from '../../components/crud/GenericForm/GenericForm.types';
 
+export const ProductsPage: React.FC = () => {
     const {
         data: products,
         loading,
@@ -33,19 +31,17 @@ export const ProductsPage: React.FC = () => {
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
     const [productToDeleteId, setProductToDeleteId] = useState<number | null>(null);
     const [productToEdit, setProductToEdit] = useState<IProduct | null>(null);
-    const [selectedIngredientes, setSelectedIngredientes] = useState<string[]>([]);
+    const [selectedIngredientes, setSelectedIngredientes] = useState<IIngrediente[]>([]);
+    const [ingredientesAll, setIngredientesAll] = useState<IIngrediente[]>([]);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('TODOS');
-    const [rubroFilter, setRubroFilter] = useState('TODOS');
 
     const statusOptions: ISelectOption[] = [
         { value: 'TODOS', label: 'TODOS' },
         { value: 'Activo', label: 'Activo' },
         { value: 'Inactivo', label: 'Inactivo' },
     ];
-    const [ingredientesAll, setIngredientesAll] = useState<Ingrediente[]>([]);
-
 
     useEffect(() => {
         const fetchIngredientes = async () => {
@@ -53,47 +49,23 @@ export const ProductsPage: React.FC = () => {
             setIngredientesAll(ingredientes);
         };
         fetchIngredientes();
-    }, []);
-
-    // Definición de las opciones de rubro directamente en ProductsPage, similar a roleOptions
-    const productRubrosValues: Array<IProduct['rubro']> = [
-        'Hamburguesa',
-        'Pizza',
-        'Empanadas',
-        'Postre ', // Nota el espacio aquí, asegúrate de que coincida exactamente con IProduct
-        'Bebida',
-        'Ensalada'
-    ];
-
-    const rubroOptions: ISelectOption[] = useMemo(() => [
-        { value: 'TODOS', label: 'TODOS' },
-        ...productRubrosValues.map(rubro => ({ value: rubro, label: rubro }))
-    ], []);
-
-    const filteredProducts = useMemo(() => {
-        return products.filter((product) => {
-            const matchesSearch = product.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                product.rubro.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                product.ingredientes.some(ing => ing.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
-            const matchesStatus = statusFilter === 'TODOS' || product.estado === statusFilter;
-            const matchesRubro = rubroFilter === 'TODOS' || product.rubro === rubroFilter;
-            return matchesSearch && matchesStatus && matchesRubro;
-        });
-    }, [products, searchTerm, statusFilter, rubroFilter]);
+    }, []); 
 
     const productColumns: ITableColumn<IProduct>[] = [
         { id: 'id', label: '#', numeric: true },
-        { id: 'nombre', label: 'Nombre' },
-        { id: 'rubro', label: 'Rubro' },
+        { id: 'name', label: 'Nombre' },
         {
-            id: 'ingredientes',
+            id: 'manufacturedArticleDetail',
             label: 'Ingredientes',
-            render: (item) => item.ingredientes.map(ing => ing.nombre).join(', ')
+            render: (item) => item.manufacturedArticleDetail.map(ing => ing.article.denomination).join(', ')
         },
-        { id: 'precioVenta', label: 'Precio Venta', numeric: true, render: (item) => `$${item.precioVenta.toFixed(2)}` },
-        { id: 'ofertaPorcentaje', label: 'Oferta %', numeric: true, render: (item) => `${item.ofertaPorcentaje}%` },
-        { id: 'stock', label: 'Stock', numeric: true },
-        { id: 'estado', label: 'Estado' },
+        { id: 'price', label: 'Precio Venta', numeric: true, render: (item) => `$${item.price.toFixed(2)}` },
+        {
+            id: 'isAvailable',
+            label: 'Estado',
+            render: (item) => item.isAvailable ? 'Activo' : 'Desactivado'
+        },
+        { id: 'estimatedTimeMinutes', label: 'Tiempo estimado', render: (item) => item.estimatedTimeMinutes },
         {
             id: 'acciones',
             label: 'Acciones',
@@ -110,51 +82,45 @@ export const ProductsPage: React.FC = () => {
         },
     ];
 
-
-
-
-    // Quitamos ingredientes del array productFormFields:
     const productFormFields: IFormFieldConfig[] = useMemo(() => [
-        { name: 'nombre', label: 'Nombre', type: 'text', validation: { required: true, minLength: 3 } },
+        { name: 'name', label: 'Nombre', type: 'text', validation: { required: true, minLength: 3 } },
         {
-            name: 'rubro',
-            label: 'Rubro',
-            type: 'select',
-            options: rubroOptions.filter(opt => opt.value !== 'TODOS'),
-            validation: { required: true }
-        },
-        {
-            name: 'descripcion',
+            name: 'description',
             label: 'Descripción',
             type: 'textarea',
             validation: { required: true, minLength: 5 },
             placeholder: 'Ej: Jugosa hamburguesa con lechuga, tomate y queso.',
         },
-        { name: 'precioVenta', label: 'Precio Venta', type: 'number', validation: { required: true, min: 0 } },
-        { name: 'ofertaPorcentaje', label: 'Oferta %', type: 'number', validation: { required: true, min: 0, max: 100 } },
-        { name: 'stock', label: 'Stock', type: 'number', validation: { required: true, min: 0 } },
+        { name: 'price', label: 'Precio Venta', type: 'number', validation: { required: true, min: 0 } },
         {
-            name: 'estado',
+            name: 'isAvailable',
             label: 'Estado',
             type: 'select',
             options: [
                 { value: 'Activo', label: 'Activo' },
-                { value: 'Inactivo', label: 'Inactivo' }
+                { value: 'Inactivo', label: 'Inactivo' },
             ],
-            validation: { required: true }
+            validation: { required: true },
         },
-    ], [rubroOptions]);
-
+    ], []);
 
     const handleCreate = () => {
         setProductToEdit(null);
+        setSelectedIngredientes([]);
         setIsModalOpen(true);
     };
 
     const handleEdit = (product: IProduct) => {
         setProductToEdit(product);
+        setSelectedIngredientes(
+            product.manufacturedArticleDetail.map(ing => ing.article)
+        );
         setIsModalOpen(true);
     };
+    const filteredProducts = products.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
 
     const handleDelete = (id: number) => {
         setProductToDeleteId(id);
@@ -170,66 +136,35 @@ export const ProductsPage: React.FC = () => {
         }
     };
 
-    const handleFormSubmit = async (formData: Partial<IProduct>) => {
-        let ingredientesProcessed = selectedIngredientes.map((name, index) => ({
-            id: Date.now() + index,
-            nombre: name
-        }));
+    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
 
-        const ingredientesRaw = formData.ingredientes as string[] | string | undefined;
-
-        if (Array.isArray(ingredientesRaw) && ingredientesRaw.length > 0) {
-            // Si es un array (multi-select), mapearlo
-            ingredientesProcessed = ingredientesRaw.map((name: string, index: number) => ({
-                id: productToEdit?.ingredientes?.[index]?.id || Date.now() + index,
-                nombre: name,
-            }));
-        } else if (typeof ingredientesRaw === 'string' && ingredientesRaw.trim() !== '') {
-            // Por compatibilidad: si es un string (single-select o legacy), convertirlo a array
-            ingredientesProcessed = ingredientesRaw.split(',')
-                .map((nameStr: string) => nameStr.trim())
-                .filter((name: string) => name !== '')
-                .map((name: string, index: number) => ({
-                    id: productToEdit?.ingredientes?.[index]?.id || Date.now() + index,
-                    nombre: name,
-                }));
-        } else if (productToEdit && !ingredientesRaw) {
-            ingredientesProcessed = [];
-        }
-
-        const submitData: IProduct = {
+        const newProduct: IProduct = {
             id: productToEdit?.id || Math.floor(Math.random() * 1000000000),
-            nombre: formData.nombre!,
-            descripcion: formData.descripcion || '',
-            rubro: formData.rubro! as IProduct['rubro'],
-            ingredientes: ingredientesProcessed,
-            precioVenta: Number(formData.precioVenta),
-            ofertaPorcentaje: Number(formData.ofertaPorcentaje),
-            stock: Number(formData.stock),
-            estado: formData.estado as 'Activo' | 'Inactivo',
+            name: formData.get('name') as string,
+            description: formData.get('description') as string,
+            price: Number(formData.get('price')),
+            stock: Number(formData.get('stock')),
+            isAvailable: formData.get('isAvailable') === 'Activo',
+            estimatedTimeMinutes: productToEdit?.estimatedTimeMinutes || 0,
+            manufacturedArticleDetail: selectedIngredientes.map(ing => ({
+                articleId: ing.id, // Ajusta según el campo real de ID
+                quantity: 1,
+                article: ing
+            })),
         };
 
         if (productToEdit) {
-            await updateItem(submitData);
+            await updateItem(newProduct);
         } else {
-            await createItem(submitData);
+            await createItem(newProduct);
         }
+
         setIsModalOpen(false);
         setProductToEdit(null);
+        setSelectedIngredientes([]);
         fetchData();
-    };
-    const handleFormSubmitWrapper = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        // Arma el objeto Partial<IProduct> desde el formulario:
-        const formData = new FormData(e.currentTarget);
-        const product: Partial<IProduct> = {
-            nombre: formData.get("name") as string,
-            precioVenta: Number(formData.get("price")),
-            // ...
-        };
-
-        await handleFormSubmit(product);
     };
 
     if (loading && products.length === 0) return <p>Cargando productos...</p>;
@@ -248,7 +183,7 @@ export const ProductsPage: React.FC = () => {
                 <InputField
                     name="search"
                     type="search"
-                    placeholder="Buscar por nombre, rubro o ingredientes..."
+                    placeholder="Buscar por nombre o ingredientes..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"
@@ -265,17 +200,14 @@ export const ProductsPage: React.FC = () => {
             <GenericTable
                 data={filteredProducts}
                 columns={productColumns}
-                handleEdit={handleEdit}
-                handleDelete={handleDelete}
             />
+
             <FormModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title={productToEdit ? 'Editar Producto' : 'Crear Producto'}
             >
-                <form onSubmit={handleFormSubmitWrapper}>
-
-                    {/* tus campos */}
+                <form onSubmit={handleFormSubmit}>
                     {productFormFields.map(field => (
                         <InputField
                             key={field.name}
@@ -283,18 +215,20 @@ export const ProductsPage: React.FC = () => {
                             name={field.name}
                             type={field.type as any}
                             placeholder={field.placeholder}
+                            defaultValue={productToEdit ? (productToEdit as any)[field.name] : ''}
                         />
                     ))}
-
-
                     <IngredienteDelProductoForm
                         ingredientesAll={ingredientesAll}
+                        setSelectedIngredientes={setSelectedIngredientes} // 💡 Agregado aquí
                         onIngredientesChange={setSelectedIngredientes}
+                        selectedIngredientes={selectedIngredientes}
                     />
+                    <Button variant="primary" type="submit">
+                        {productToEdit ? 'Actualizar' : 'Crear'}
+                    </Button>
                 </form>
             </FormModal>
-
-
 
             <ConfirmationDialog
                 isOpen={isConfirmDialogOpen}

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import type { Ingrediente } from '../../../api/types/IIngrediente';
+import type { IIngrediente } from '../../../api/types/IIngrediente';
 
 interface ProductFormProps {
-    ingredientesAll: Ingrediente[];
-    onIngredientesChange?: (ingredientes: string[]) => void;
+    ingredientesAll: IIngrediente[];
+    selectedIngredientes: IIngrediente[];
+    setSelectedIngredientes: React.Dispatch<React.SetStateAction<IIngrediente[]>>;
+    onIngredientesChange: (ingredientes: IIngrediente[]) => void;
 }
+
 
 const IngredienteDelProductoForm: React.FC<ProductFormProps> = ({ ingredientesAll, onIngredientesChange }) => {
     const [selectedIngredientes, setSelectedIngredientes] = useState<string[]>(['']);
@@ -20,8 +23,15 @@ const IngredienteDelProductoForm: React.FC<ProductFormProps> = ({ ingredientesAl
         setSelectedIngredientes(newIngredientes);
 
         if (onIngredientesChange) {
-            onIngredientesChange(newIngredientes.filter(item => item.trim() !== ''));
+            const selectedIngredienteObjects = newIngredientes
+                .filter(item => item.trim() !== '')
+                .map(denomination =>
+                    ingredientesAll.find(ing => ing.denomination === denomination)
+                )
+                .filter((item): item is IIngrediente => item !== undefined);
+            onIngredientesChange(selectedIngredienteObjects);
         }
+
     };
 
     return (

@@ -1,6 +1,6 @@
 // src/administracion-sistema/api/supply.ts
 
-import type { Ingrediente } from './types/IIngrediente';
+import type { IIngrediente } from './types/IIngrediente';
 
 
 
@@ -21,42 +21,42 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 export const supplyApi = {
-    getAll: async (): Promise<Ingrediente[]> => {
+    getAll: async (): Promise<IIngrediente[]> => {
         const res = await fetch(`${BASE_URL}/getAll`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
         });
-        return handleResponse<Ingrediente[]>(res);
+        return handleResponse<IIngrediente[]>(res);
     },
 
-    getById: async (id: number): Promise<Ingrediente> => {
+    getById: async (id: number): Promise<IIngrediente> => {
         const res = await fetch(`${BASE_URL}/getAll/${id}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
         });
-        return handleResponse<Ingrediente>(res);
+        return handleResponse<IIngrediente>(res);
     },
 
-    create: async (newItem: Omit<Ingrediente, 'id' | 'idArticulo'>): Promise<Ingrediente> => {
+    create: async (newItem: Omit<IIngrediente, 'id' | 'idArticulo'>): Promise<IIngrediente> => {
         const res = await fetch(`${BASE_URL}/add`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
             body: JSON.stringify(newItem),
         });
-        return handleResponse<Ingrediente>(res);
+        return handleResponse<IIngrediente>(res);
     },
 
-    update: async (updatedItem: Ingrediente): Promise<Ingrediente> => {
+    update: async (updatedItem: IIngrediente): Promise<IIngrediente> => {
         const res = await fetch(`${BASE_URL}/update/${updatedItem.idArticulo}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
             body: JSON.stringify(updatedItem),
         });
-        return handleResponse<Ingrediente>(res);
+        return handleResponse<IIngrediente>(res);
     },
 
     delete: async (id: number): Promise<void> => {

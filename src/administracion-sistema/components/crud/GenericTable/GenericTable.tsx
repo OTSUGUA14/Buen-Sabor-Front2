@@ -57,7 +57,6 @@ export const GenericTable = <T extends { id: number }>({
                     <tbody>
                         {rows.length === 0 ? (
                             <tr>
-                                {/* colSpan debe ser el número de columnas que se le pasaron */}
                                 <td colSpan={columns.length} style={{ textAlign: 'center', padding: '20px' }}>
                                     No hay datos para mostrar.
                                 </td>
@@ -67,47 +66,44 @@ export const GenericTable = <T extends { id: number }>({
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row) => (
                                     <tr key={row.id}>
-                                        {columns.map((column) => {
-                                            return (
-                                                <td
-                                                    key={String(column.id)}
-                                                    className={column.numeric ? "numeric" : ""}
-                                                >
-                                                    {column.render ? (
-                                                        column.render(row)
-                                                    ) : column.id === "acciones" ? (
-                                                        // Renderiza los botones de acción si la columna es 'acciones'
-                                                        <div className="actions-cell">
-                                                            {handleEdit && ( // <-- Botón Editar condicional
-                                                                <Button
-                                                                    variant="outline-primary"
-                                                                    size="small"
-                                                                    onClick={() => handleEdit(row)}
-                                                                >
-                                                                    Editar
-                                                                </Button>
-                                                            )}
-                                                            {handleDelete && ( 
-                                                                <Button
-                                                                    variant="outline-danger" 
-                                                                    size="small"
-                                                                    onClick={() => handleDelete(row.id)}
-                                                                >
-                                                                    Eliminar
-                                                                </Button>
-                                                            )}
-                                                        </div>
-                                                    ) : (
-                                                        // Accede a la propiedad del objeto dinámicamente
-                                                        (row as any)[column.id]
-                                                    )}
-                                                </td>
-                                            );
-                                        })}
+                                        {columns.map((column) => (
+                                            <td
+                                                key={String(column.id)}
+                                                className={column.numeric ? "numeric" : ""}
+                                            >
+                                                {column.render ? (
+                                                    column.render(row)
+                                                ) : column.id === "acciones" ? (
+                                                    <div className="actions-cell">
+                                                        {handleEdit && (
+                                                            <Button
+                                                                variant="outline-primary"
+                                                                size="small"
+                                                                onClick={() => handleEdit(row)}
+                                                            >
+                                                                Editar
+                                                            </Button>
+                                                        )}
+                                                        {handleDelete && (
+                                                            <Button
+                                                                variant="outline-danger"
+                                                                size="small"
+                                                                onClick={() => handleDelete(row.id)}
+                                                            >
+                                                                Eliminar
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    (row as any)[column.id]
+                                                )}
+                                            </td>
+                                        ))}
                                     </tr>
                                 ))
                         )}
                     </tbody>
+
                 </table>
             </div>
 

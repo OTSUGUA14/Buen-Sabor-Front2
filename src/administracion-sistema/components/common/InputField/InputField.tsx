@@ -8,6 +8,7 @@ interface InputFieldProps {
     name: string; // Nombre del campo (para el formulario)
     type?: React.HTMLInputTypeAttribute; // Tipo de input (text, number, email, password, etc.)
     value?: string | number; // Valor actual del campo
+    defaultValue?: string | number;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; // Manejador de cambio
     onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void; // Manejador de blur
     placeholder?: string; // Texto de marcador de posición

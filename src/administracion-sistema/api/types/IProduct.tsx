@@ -1,17 +1,25 @@
-export interface IIngrediente {
-    id: number;
-    nombre: string;
-    cantidad?: number; // opcional si no siempre existe
-}
+import type { IIngrediente } from "./IIngrediente";
+
 
 export interface IProduct {
     id: number;
-    nombre: string;
-    descripcion: string; 
-    rubro: 'Hamburguesa' | 'Pizza' | 'Empanadas' | 'Postre ' | 'Bebida' | 'Ensalada';
-    ingredientes: IIngrediente[]; 
-    precioVenta: number;
-    ofertaPorcentaje: number; 
+    name: string;
+    description: string;
+    manufacturedArticleDetail: ManufacturedArticleDetailDTO[];
+    price: number;
     stock: number;
-    estado: 'Activo' | 'Inactivo';
+    isAvailable: boolean;
+    estimatedTimeMinutes: number;
+    inventoryImageDTO?: InventoryImageDTO
+
+}
+interface InventoryImageDTO {
+    id: number;
+    imageData: Uint8Array; // o simplemente number[] si prefieres
+}
+
+export interface ManufacturedArticleDetailDTO {
+    articleId: number;  // Usamos number para Long
+    quantity: number;   // int también es number en TS
+    article: IIngrediente;
 }

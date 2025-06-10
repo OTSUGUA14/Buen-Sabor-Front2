@@ -1,4 +1,4 @@
-export interface Ingrediente {
+export interface IIngrediente {
     id: number; // Usa el mismo nombre de la API
     idArticulo: number;
     denomination: string;
