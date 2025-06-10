@@ -82,12 +82,13 @@ const CartModal: React.FC<CartModalProps> = ({
                 {/* Resumen de la orden */}
                 <div className={styles.orderSummary}>
                     <h3>Su orden</h3>
-                    {cart.map(item => (
-                        <div key={item.id} className={styles.itemRow}>
+                    {cart.map((item, index) => (
+                        <div key={`${item.id}-${index}`} className={styles.itemRow}>
                             <span>{item.name} x{item.quantity}</span>
                             <span>${(item.price * item.quantity).toLocaleString('es-AR')}</span>
                         </div>
                     ))}
+
                     <div className={styles.subtotalRow}>
                         <span>Subtotal</span>
                         <span>${subtotal.toLocaleString('es-AR')}</span>
@@ -120,7 +121,7 @@ const CartModal: React.FC<CartModalProps> = ({
                         CANCELAR
                     </button>
                     <button onClick={onPayment} className={styles.payButton}>
-                        Pagar
+                        {paymentMethod === 'Efectivo' ? 'Reservar' : 'Pagar'}
                     </button>
                 </div>
             </div>

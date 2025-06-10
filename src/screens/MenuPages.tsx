@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react';
 import styles from '../styles/Menu.module.css';
 import ProductModal from '../components/ProductModal';
 import CartModal from '../components/CartModal';
+import type { IProduct } from '../administracion-sistema/api/types/IProduct';
+import { getProductsAll } from '../administracion-sistema/utils/Api';
+import Menu from '../components/Menu';
 
-export default function Menu() {
+export default function MenuPages() {
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-
+    const [productosAll, setProductosAll] = useState<IProduct[]>([]);
     const [isProductModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
@@ -20,6 +23,7 @@ export default function Menu() {
     };
 
 
+
     // Inicializamos carrito desde localStorage (si existe)
     const [cart, setCart] = useState<any[]>(() => {
         const savedCart = localStorage.getItem('cart');
@@ -30,6 +34,11 @@ export default function Menu() {
     const total = subtotal + deliveryFee;
     // Guardar carrito en localStorage cada vez que cambie
     useEffect(() => {
+        const fetchProductos = async () => {
+            const platos = await getProductsAll();
+            setProductosAll(platos);
+        };
+        fetchProductos();
         localStorage.setItem('cart', JSON.stringify(cart));
     }, [cart]);
 
@@ -74,72 +83,29 @@ export default function Menu() {
         });
     };
 
-    const hamburguesas = [
-        {
-            id: 1,
-            name: "CLÁSICA DE LA CASA",
-            description: "Una hamburguesa clásica con carne super jugosa y sabor incomparable.",
-            ingredients: "pan de papa, doble carne jugosa, queso cheddar, lechuga, tomate, pepino, salsa de la casa",
-            price: 5600,
-            image: "https://images.rappi.cl/products/2091982356-1621649860361.png"
-        },
-        {
-            id: 2,
-            name: "BACON Y HUEVO",
-            description: "La perfecta combinación de carne, bacon crocante y huevo frito.",
-            ingredients: "pan brioche, carne de res, bacon, huevo, queso, cebolla caramelizada, salsa BBQ",
-            price: 12000,
-            image: "/productos/hamburguesa2.png"
-        },
-        {
-            id: 3,
-            name: "CEBOLLA Y BACON",
-            description: "Sabor intenso con cebolla caramelizada y crujiente bacon.",
-            ingredients: "pan de masa madre, carne, cebolla caramelizada, bacon, queso, pepinillos, aderezo",
-            price: 9700,
-            image: "/productos/hamburguesa3.png"
-        },
-        {
-            id: 4,
-            name: "POLLO CRISPY SIMPLE",
-            description: "Pechuga de pollo crocante con un toque fresco.",
-            ingredients: "pan de brioche, pollo frito, lechuga, tomate, mayonesa casera",
-            price: 8000,
-            image: "/productos/hamburguesa4.png"
-        },
-        {
-            id: 5,
-            name: "POLLO CEBOLLA Y BACON",
-            description: "Variante de pollo con cebolla y bacon.",
-            ingredients: "pan rústico, pollo a la plancha, cebolla morada, bacon, queso provolone, rúcula, alioli",
-            price: 9500,
-            image: "/productos/hamburguesa5.png"
-        },
-        {
-            id: 6,
-            name: "VEGANA SIMPLE",
-            description: "Una opción saludable y deliciosa para todos.",
-            ingredients: "pan integral, medallón de lentejas, espinaca, tomate, aguacate, aderezo de tahini",
-            price: 8400,
-            image: "/productos/hamburguesa6.png"
-        },
-    ];
+    const productosConCategoria = productosAll.map(producto => {
+        let categoria = '';
 
-    const pizzas = [
-        {
-            id: 7,
-            name: "MUZZARELLA",
-            description: "La clásica pizza de muzzarella con base de tomate y orégano.",
-            ingredients: "masa de pizza, salsa de tomate, mozzarella, orégano, aceite de oliva",
-            price: 6000,
-            image: "/productos/pizza1.png"
+        // Ejemplo básico: buscar por nombre
+        if (producto.name.toLowerCase().includes('pizza')) {
+            categoria = 'PIZZAS';
+        } else if (producto.name.toLowerCase().includes('hamburguesa')) {
+            categoria = 'HAMBURGUESAS';
+        } else {
+            categoria = 'OTROS';
         }
-    ];
+
+        return {
+            ...producto,
+            category: categoria
+        };
+    });
+
 
     return (
         <main className={styles.menuContainer}>
             {/* Categorías */}
-            <aside className={styles.sidebar}>
+            {/* <aside className={styles.sidebar}>
                 <ul className={styles.categoryList}>
                     <li className={styles.categoryListItem}>
                         <img src="/icons/burger.svg" alt="Hamburguesas" />
@@ -170,18 +136,18 @@ export default function Menu() {
                         <button className={styles.categoryButton}>BEBIDAS</button>
                     </li>
                 </ul>
-            </aside>
+            </aside> */}
 
             {/* Sección principal */}
-            <section className={styles.mainSection}>
-                {/* Buscador */}
-                <div className={styles.searchBarContainer}>
+            {/* <section className={styles.mainSection}> */}
+            {/* Buscador */}
+            {/* <div className={styles.searchBarContainer}>
                     <input type="text" placeholder="Buscar Plato" className={styles.searchInput} />
                     <img src="/icons/search.svg" alt="Buscar" className={styles.searchIcon} />
-                </div>
+                </div> */}
 
-                {/* Productos */}
-                <div className={styles.productSection}>
+            {/* Productos */}
+            {/* <div className={styles.productSection}>
                     <h2>HAMBURGUESAS</h2>
                     <div className={styles.productGrid}>
                         {hamburguesas.map(product => (
@@ -195,9 +161,9 @@ export default function Menu() {
                                 <span>${product.price.toLocaleString('es-AR')}</span>
                             </div>
                         ))}
-                    </div>
+                    </div> */}
 
-                    <h2>PIZZAS</h2>
+            {/* <h2>PIZZAS</h2>
                     <div className={styles.productGrid}>
                         {pizzas.map(product => (
                             <div
@@ -213,7 +179,9 @@ export default function Menu() {
                     </div>
 
                 </div>
-            </section>
+            </section> */}
+
+            <Menu products={productosConCategoria} onProductClick={handleProductClick} />
 
             {/* Carrito */}
             <aside className={styles.cartSidebar}>
@@ -227,8 +195,8 @@ export default function Menu() {
                 ) : (
                     <div className={styles.cartItems}>
                         <ul>
-                            {cart.map(item => (
-                                <li key={item.id} className={styles.cartItem}>
+                            {cart.map((item, index) => (
+                                <li key={index} className={styles.cartItem}>
                                     <p>{item.name}</p>
                                     <div className={styles.quantityControls}>
                                         <button

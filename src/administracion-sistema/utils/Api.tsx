@@ -1,3 +1,4 @@
+import type { IProductClient } from "../../type/IProductClient";
 import type { IIngrediente } from "../api/types/IIngrediente";
 import type { IProduct } from "../api/types/IProduct";
 
@@ -16,7 +17,7 @@ export const getIngredientesAll = async (): Promise<IIngrediente[]> => {
 
 
 
-export const getProductsAll = async (): Promise<[IProduct]> => {
+export const getProductsAll = async (): Promise<[IProductClient]> => {
 	const urlServer = 'http://localhost:8080/manufacturedArticle/getAll';
 	const response = await fetch(urlServer, {
 		method: 'GET',

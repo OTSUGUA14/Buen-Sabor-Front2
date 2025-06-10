@@ -1,7 +1,6 @@
-import type { IIngrediente } from "./IIngrediente";
+import type { IIngrediente } from "../administracion-sistema/api/types/IIngrediente";
 
-
-export interface IProduct {
+export interface IProductClient {
     id: number;
     name: string;
     description: string;
@@ -11,7 +10,7 @@ export interface IProduct {
     isAvailable: boolean;
     estimatedTimeMinutes: number;
     inventoryImageDTO?: InventoryImageDTO
-    
+    category: string; // <-- Agregado para categorizar
 }
 interface InventoryImageDTO {
     id: number;

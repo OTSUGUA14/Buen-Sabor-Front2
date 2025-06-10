@@ -13,9 +13,13 @@ export default function Home() {
                     <p className={styles.subtitle}>
                         Un plato para cada antojo, un sabor para cada día
                     </p>
-                    <button className={styles.menuButton}>
+                    <button
+                        className={styles.menuButton}
+                        onClick={() => (window.location.href = '/menu')}
+                    >
                         IR AL MENÚ
                     </button>
+
                 </div>
 
                 {/* LADO DERECHO */}
