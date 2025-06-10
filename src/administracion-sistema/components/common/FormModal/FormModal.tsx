@@ -8,7 +8,7 @@ interface FormModalProps {
     isOpen: boolean;
     onClose: () => void;
     title: string;
-    onSubmit?: (formData: Partial<IProduct>) => Promise<void>; // agregas esta línea
+    onSubmit?: (formData: Partial<IProduct>) => Promise<void>; 
     children: React.ReactNode;
 }
 
@@ -25,7 +25,6 @@ export const FormModal: React.FC<FormModalProps> = ({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (onSubmit) {
-            // Podrías recolectar datos del formulario aquí y pasarlos a onSubmit
             onSubmit({}); // Aquí va el formData
         }
     };

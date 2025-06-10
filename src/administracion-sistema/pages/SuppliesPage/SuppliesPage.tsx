@@ -6,7 +6,7 @@ import type { ITableColumn } from '../../components/crud/GenericTable/GenericTab
 import { Button } from '../../components/common/Button/Button';
 import { useCrud } from '../../hooks/useCrud';
 import { supplyApi } from '../../api/supply';
-import type { Ingrediente } from '../../api/types/IIngrediente';
+import type { IIngrediente } from '../../api/types/IIngrediente'; 
 import { ConfirmationDialog } from '../../components/common/ConfirmationDialog/ConfirmationDialog';
 import { FormModal } from '../../components/common/FormModal/FormModal';
 import { GenericForm } from '../../components/crud/GenericForm/GenericForm';
@@ -14,21 +14,8 @@ import type { IFormFieldConfig, ISelectOption } from '../../components/crud/Gene
 import { InputField } from '../../components/common/InputField/InputField';
 import { SelectField } from '../../components/common/SelectField/SelectField';
 import '../crud-pages.css';
-import { getIngredientesAll } from '../../utils/Api';
-
-
-
 
 export const SuppliesPage: React.FC = () => {
-    // const [ingredientesAll, setIngredientesAll] = useState<Ingrediente[]>([]);
-    // // 🚀 CRUD Hook
-    // useEffect(() => {
-    //     const fetchIngredientes = async () => {
-    //         const ingredientes = await getIngredientesAll();
-    //         setIngredientesAll(ingredientes);
-    //     };
-    //     fetchIngredientes();
-    // }, []);
     const {
         data: ingredientesAll,
         loading,
@@ -37,22 +24,21 @@ export const SuppliesPage: React.FC = () => {
         deleteItem,
         createItem,
         updateItem,
-    } = useCrud<Ingrediente>(supplyApi);
+    } = useCrud<IIngrediente>(supplyApi); 
+
     useEffect(() => {
         console.log("Ingredientes cargados:", ingredientesAll);
     }, [ingredientesAll]);
 
-    // 🔹 Estados UI
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
     const [supplyToDeleteId, setSupplyToDeleteId] = useState<number | null>(null);
-    const [supplyToEdit, setSupplyToEdit] = useState<Ingrediente | null>(null);
+    const [supplyToEdit, setSupplyToEdit] = useState<IIngrediente | null>(null);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'TODOS' | 'Activo' | 'Inactivo'>('TODOS');
     const [categoryFilter, setCategoryFilter] = useState<'TODOS' | string>('TODOS');
 
-    // 🔹 Opciones de filtro
     const statusOptions: ISelectOption[] = [
         { value: 'TODOS', label: 'TODOS' },
         { value: 'Activo', label: 'Activo' },
@@ -69,10 +55,8 @@ export const SuppliesPage: React.FC = () => {
     const categoryOptions: ISelectOption[] = useMemo(() => [
         { value: 'TODOS', label: 'TODOS' },
         ...supplyCategoryValues.map(cat => ({ value: cat, label: cat })),
-    ], []);
+    ], [supplyCategoryValues]); 
 
-    // 🔹 Filtrado de datos
-    // 🔹 Filtrado de datos (versión segura)
     const filteredSupplies = useMemo(() => {
         return ingredientesAll.filter(item => {
             const nombre = item.denomination?.toLowerCase() ?? '';
@@ -98,9 +82,7 @@ export const SuppliesPage: React.FC = () => {
         });
     }, [ingredientesAll, searchTerm, statusFilter, categoryFilter]);
 
-
-    // 🔹 Columnas para la tabla
-    const supplyColumns: ITableColumn<Ingrediente>[] = [
+    const supplyColumns: ITableColumn<IIngrediente>[] = [
         { id: 'idArticulo', label: '#' },
         { id: 'denomination', label: 'Nombre' },
         {
@@ -108,7 +90,6 @@ export const SuppliesPage: React.FC = () => {
             label: 'Unidad',
             render: i => i.measuringUnit?.unit ?? ''
         },
-
         { id: 'currentStock', label: 'Stock Actual', numeric: true },
         { id: 'maxStock', label: 'Stock Máximo', numeric: true },
         {
@@ -139,21 +120,20 @@ export const SuppliesPage: React.FC = () => {
         },
     ];
 
-    // 🔹 Configuración de campos para el formulario
     const supplyFormFields: IFormFieldConfig[] = [
-        { name: 'nombre', label: 'Nombre', type: 'text', validation: { required: true, minLength: 3 } },
+        { name: 'denomination', label: 'Nombre', type: 'text', validation: { required: true, minLength: 3 } },
         {
-            name: 'unidadMedicion',
+            name: 'unidadMedicion', 
             label: 'Unidad de Medida',
             type: 'select',
-            options: [{ value: 'Kg', label: 'Kg' }, { value: 'L', label: 'L' }], // Ajusta según tus unidades
+            options: [{ value: 'Kg', label: 'Kg' }, { value: 'L', label: 'L' }],
             validation: { required: true },
         },
-        { name: 'stockActual', label: 'Stock Actual', type: 'number', validation: { required: true, min: 0 } },
-        { name: 'stockMaximo', label: 'Stock Máximo', type: 'number', validation: { required: true, min: 0 } },
-        { name: 'precioCompra', label: 'Precio Compra', type: 'number', validation: { required: true, min: 0 } },
+        { name: 'currentStock', label: 'Stock Actual', type: 'number', validation: { required: true, min: 0 } },
+        { name: 'maxStock', label: 'Stock Máximo', type: 'number', validation: { required: true, min: 0 } },
+        { name: 'buyingPrice', label: 'Precio Compra', type: 'number', validation: { required: true, min: 0 } },
         {
-            name: 'categoria',
+            name: 'categoria', 
             label: 'Categoría',
             type: 'select',
             options: categoryOptions.filter(opt => opt.value !== 'TODOS'),
@@ -171,13 +151,13 @@ export const SuppliesPage: React.FC = () => {
         },
     ];
 
-    // 🔹 Handlers CRUD
+    // 7. Handlers CRUD
     const handleCreate = () => {
         setSupplyToEdit(null);
         setIsModalOpen(true);
     };
 
-    const handleEdit = (item: Ingrediente) => {
+    const handleEdit = (item: IIngrediente) => {
         setSupplyToEdit(item);
         setIsModalOpen(true);
     };
@@ -195,27 +175,26 @@ export const SuppliesPage: React.FC = () => {
             fetchData();
         }
     };
-
-    const handleFormSubmit = async (formData: Partial<Ingrediente>) => {
+    const handleFormSubmit = async (formData: Partial<IIngrediente>) => {
         const id = supplyToEdit?.id || Math.floor(Math.random() * 1e9);
 
         const unit = formData.measuringUnit as unknown as string;
         const categoriaNombre = formData.category as unknown as string;
 
-        const submitData: Ingrediente = {
-            id,                             
-            idArticulo: id,                 
+        const submitData: IIngrediente = {
+            id,
+            idArticulo: id,
             denomination: formData.denomination!,
             measuringUnit: {
                 unit,
-                idmeasuringUnit: 0,          
+                idmeasuringUnit: 0,
             },
             currentStock: Number(formData.currentStock),
             maxStock: Number(formData.maxStock),
             buyingPrice: Number(formData.buyingPrice),
             category: {
                 name: categoriaNombre,
-                idcategory: 0,               
+                idcategory: 0,
             },
             estado: formData.estado as 'Activo' | 'Inactivo',
         };
@@ -230,7 +209,6 @@ export const SuppliesPage: React.FC = () => {
         fetchData();
     };
 
-    // 🔹 Render
     if (loading && ingredientesAll.length === 0) return <p>Cargando insumos...</p>;
     if (error) return <p className="error-message">Error al cargar insumos: {error}</p>;
 
@@ -257,14 +235,11 @@ export const SuppliesPage: React.FC = () => {
                     onChange={e => setStatusFilter(e.target.value as 'TODOS' | 'Activo' | 'Inactivo')}
                     className="status-select"
                 />
-
             </div>
 
             <GenericTable
                 data={filteredSupplies}
                 columns={supplyColumns}
-                handleEdit={handleEdit}
-                handleDelete={handleDelete}
             />
 
             <FormModal
@@ -272,7 +247,7 @@ export const SuppliesPage: React.FC = () => {
                 onClose={() => setIsModalOpen(false)}
                 title={supplyToEdit ? 'Editar Insumo' : 'Crear Insumo'}
             >
-                <GenericForm<Ingrediente>
+                <GenericForm<IIngrediente> 
                     initialData={supplyToEdit ?? undefined}
                     fieldsConfig={supplyFormFields}
                     onSubmit={handleFormSubmit}

@@ -17,6 +17,7 @@ import type { IIngrediente } from '../../api/types/IIngrediente';
 import type { IFormFieldConfig, ISelectOption } from '../../components/crud/GenericForm/GenericForm.types';
 
 export const ProductsPage: React.FC = () => {
+    // CRUD hook
     const {
         data: products,
         loading,
@@ -27,6 +28,7 @@ export const ProductsPage: React.FC = () => {
         updateItem,
     } = useCrud<IProduct>(productApi);
 
+    // Estados
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
     const [productToDeleteId, setProductToDeleteId] = useState<number | null>(null);
@@ -37,20 +39,23 @@ export const ProductsPage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('TODOS');
 
+    // Filtro por estado
     const statusOptions: ISelectOption[] = [
         { value: 'TODOS', label: 'TODOS' },
         { value: 'Activo', label: 'Activo' },
         { value: 'Inactivo', label: 'Inactivo' },
     ];
 
+    // Cargar ingredientes
     useEffect(() => {
         const fetchIngredientes = async () => {
             const ingredientes = await getIngredientesAll();
             setIngredientesAll(ingredientes);
         };
         fetchIngredientes();
-    }, []); 
+    }, []);
 
+    // Columnas de la tabla
     const productColumns: ITableColumn<IProduct>[] = [
         { id: 'id', label: '#', numeric: true },
         { id: 'name', label: 'Nombre' },
@@ -71,17 +76,14 @@ export const ProductsPage: React.FC = () => {
             label: 'Acciones',
             render: (item) => (
                 <div className="table-actions">
-                    <Button variant="secondary" onClick={() => handleEdit(item)}>
-                        Editar
-                    </Button>
-                    <Button variant="danger" onClick={() => handleDelete(item.id)}>
-                        Eliminar
-                    </Button>
+                    <Button variant="secondary" onClick={() => handleEdit(item)}>Editar</Button>
+                    <Button variant="danger" onClick={() => handleDelete(item.id)}>Eliminar</Button>
                 </div>
             ),
         },
     ];
 
+    // Campos del formulario
     const productFormFields: IFormFieldConfig[] = useMemo(() => [
         { name: 'name', label: 'Nombre', type: 'text', validation: { required: true, minLength: 3 } },
         {
@@ -104,6 +106,12 @@ export const ProductsPage: React.FC = () => {
         },
     ], []);
 
+    // Filtro de productos
+    const filteredProducts = products.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Handlers
     const handleCreate = () => {
         setProductToEdit(null);
         setSelectedIngredientes([]);
@@ -117,10 +125,6 @@ export const ProductsPage: React.FC = () => {
         );
         setIsModalOpen(true);
     };
-    const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
 
     const handleDelete = (id: number) => {
         setProductToDeleteId(id);
@@ -149,7 +153,7 @@ export const ProductsPage: React.FC = () => {
             isAvailable: formData.get('isAvailable') === 'Activo',
             estimatedTimeMinutes: productToEdit?.estimatedTimeMinutes || 0,
             manufacturedArticleDetail: selectedIngredientes.map(ing => ({
-                articleId: ing.id, // Ajusta según el campo real de ID
+                articleId: ing.id,
                 quantity: 1,
                 article: ing
             })),
@@ -167,6 +171,7 @@ export const ProductsPage: React.FC = () => {
         fetchData();
     };
 
+    // Renderizado
     if (loading && products.length === 0) return <p>Cargando productos...</p>;
     if (error) return <p className="error-message">Error al cargar productos: {error}</p>;
 
@@ -174,9 +179,7 @@ export const ProductsPage: React.FC = () => {
         <div className="crud-page-container">
             <div className="page-header">
                 <h2>Gestión de Productos</h2>
-                <Button variant="primary" onClick={handleCreate}>
-                    Nuevo Producto
-                </Button>
+                <Button variant="primary" onClick={handleCreate}>Nuevo Producto</Button>
             </div>
 
             <div className="filter-controls">
@@ -207,27 +210,34 @@ export const ProductsPage: React.FC = () => {
                 onClose={() => setIsModalOpen(false)}
                 title={productToEdit ? 'Editar Producto' : 'Crear Producto'}
             >
-                <form onSubmit={handleFormSubmit}>
-                    {productFormFields.map(field => (
-                        <InputField
-                            key={field.name}
-                            label={field.label}
-                            name={field.name}
-                            type={field.type as any}
-                            placeholder={field.placeholder}
-                            defaultValue={productToEdit ? (productToEdit as any)[field.name] : ''}
-                        />
-                    ))}
-                    <IngredienteDelProductoForm
-                        ingredientesAll={ingredientesAll}
-                        setSelectedIngredientes={setSelectedIngredientes} // 💡 Agregado aquí
-                        onIngredientesChange={setSelectedIngredientes}
-                        selectedIngredientes={selectedIngredientes}
+                {productFormFields.map(field => (
+                    <InputField
+                        key={field.name}
+                        label={field.label}
+                        name={field.name}
+                        type={field.type as any}
+                        placeholder={field.placeholder}
+                        value={
+                            field.name === 'isAvailable'
+                                ? productToEdit
+                                    ? productToEdit.isAvailable
+                                        ? 'Activo'
+                                        : 'Inactivo'
+                                    : ''
+                                : (productToEdit as any)?.[field.name] ?? ''
+                        }
                     />
-                    <Button variant="primary" type="submit">
-                        {productToEdit ? 'Actualizar' : 'Crear'}
-                    </Button>
-                </form>
+
+                ))}
+                <IngredienteDelProductoForm
+                    ingredientesAll={ingredientesAll}
+                    setSelectedIngredientes={setSelectedIngredientes}
+                    onIngredientesChange={setSelectedIngredientes}
+                    selectedIngredientes={selectedIngredientes}
+                />
+                <Button variant="primary" type="submit">
+                    {productToEdit ? 'Actualizar' : 'Crear'}
+                </Button>
             </FormModal>
 
             <ConfirmationDialog

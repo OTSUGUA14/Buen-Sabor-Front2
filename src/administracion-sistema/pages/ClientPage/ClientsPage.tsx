@@ -3,8 +3,8 @@ import { GenericTable } from '../../components/crud/GenericTable/GenericTable';
 import type { ITableColumn } from '../../components/crud/GenericTable/GenericTable.types';
 import { Button } from '../../components/common/Button/Button';
 import { useCrud } from '../../hooks/useCrud';
-import { clientApi } from '../../api/client'; // Importa la API de clientes
-import type { IClient } from '../../api/types/IClient'; // Importa la interfaz de clientes
+import { clientApi } from '../../api/client'; 
+import type { IClient } from '../../api/types/IClient'; 
 import { ConfirmationDialog } from '../../components/common/ConfirmationDialog/ConfirmationDialog';
 import { FormModal } from '../../components/common/FormModal/FormModal';
 import { GenericForm } from '../../components/crud/GenericForm/GenericForm';

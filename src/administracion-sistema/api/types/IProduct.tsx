@@ -15,11 +15,11 @@ export interface IProduct {
 }
 interface InventoryImageDTO {
     id: number;
-    imageData: Uint8Array; // o simplemente number[] si prefieres
+    imageData: Uint8Array; 
 }
 
 export interface ManufacturedArticleDetailDTO {
-    articleId: number;  // Usamos number para Long
-    quantity: number;   // int también es number en TS
+    articleId: number;
+    quantity: number;   
     article: IIngrediente;
 }

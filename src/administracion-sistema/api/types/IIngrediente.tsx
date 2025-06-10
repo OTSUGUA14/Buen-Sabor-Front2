@@ -1,5 +1,5 @@
 export interface IIngrediente {
-    id: number; // Usa el mismo nombre de la API
+    id: number; 
     idArticulo: number;
     denomination: string;
     currentStock: number;

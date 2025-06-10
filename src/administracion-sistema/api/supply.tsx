@@ -3,13 +3,6 @@
 import type { IIngrediente } from './types/IIngrediente';
 
 
-
-
-
-// src/administracion-sistema/api/supplyApi.ts
-
-
-
 const BASE_URL = 'http://localhost:8080/article';
 
 async function handleResponse<T>(response: Response): Promise<T> {
