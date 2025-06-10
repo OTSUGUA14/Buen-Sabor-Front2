@@ -3,7 +3,7 @@
 import { Route, Routes } from "react-router-dom";
 
 import Home from "../screens/Home";
-import Menu from "../screens/Menu";
+import Menu from "../screens/MenuPages";
 
 import Login from "../screens/Login";
 import Navbar from "../components/Navbar";

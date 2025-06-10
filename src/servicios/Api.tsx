@@ -1,3 +1,4 @@
+import type { IProduct } from "../administracion-sistema/api/types/IProduct";
 import type { UserRegister } from "../type/UserData";
 import type { UserLogin } from "../type/UserLogin";
 
@@ -39,6 +40,28 @@ export const loginUser = async (userToLogin: UserLogin): Promise<void> => {
         console.log(userToLogin);
         
         const response = await fetch('http://localhost:8080/client/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userToLogin),
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al registrar el usuario');
+        }
+
+        alert('Inicio de sesion completado');
+        window.location.href = '/menu';
+    } catch (error) {
+        alert('error al iniciar sesion.');
+        console.error(error);
+    }
+};
+
+export const getProduct = async (userToLogin: IProduct): Promise<void> => {
+    try {
+        console.log(userToLogin);
+        
+        const response = await fetch('http://localhost:8080/manufacturedArticle/getAll', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userToLogin),
