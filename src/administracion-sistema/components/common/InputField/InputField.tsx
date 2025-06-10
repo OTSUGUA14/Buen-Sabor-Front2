@@ -1,21 +1,20 @@
 // src/administracion-sistema/components/common/InputField/InputField.tsx
 
-import React from 'react';
-import './InputField.css'; // Crearemos este archivo CSS
+import './InputField.css'; 
 
 interface InputFieldProps {
-    label?: string; // Etiqueta del campo
-    name: string; // Nombre del campo (para el formulario)
-    type?: React.HTMLInputTypeAttribute; // Tipo de input (text, number, email, password, etc.)
-    value?: string | number; // Valor actual del campo
+    label?: string;
+    name: string; 
+    type?: React.HTMLInputTypeAttribute; 
+    value?: string | number; 
     defaultValue?: string | number;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; // Manejador de cambio
-    onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void; // Manejador de blur
-    placeholder?: string; // Texto de marcador de posición
-    error?: string; // Mensaje de error a mostrar
-    disabled?: boolean; // Si el campo está deshabilitado
-    readOnly?: boolean; // Si el campo es solo de lectura
-    className?: string; // Clases CSS adicionales
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; 
+    onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void; 
+    placeholder?: string; 
+    error?: string; 
+    disabled?: boolean; 
+    readOnly?: boolean; 
+    className?: string;
 }
 
 export const InputField: React.FC<InputFieldProps> = ({

@@ -5,29 +5,32 @@ import type { IProduct } from './types/IProduct';
 
 
 export const productApi = {
-    getAll: async (): Promise<IProduct[]> => {
-
-        return getProductsAll();
-        
+    create: async (product: Omit<IProduct, 'id'>) => {
+        const response = await fetch('http://localhost:8080/manufacturedArticle/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product),
+        });
+        if (!response.ok) throw new Error('Error al crear producto');
+        return await response.json();
     },
-
+    update: async (product: IProduct) => {
+        const response = await fetch(`http://localhost:8080/manufacturedArticle/update/${product.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product),
+        });
+        if (!response.ok) throw new Error('Error al actualizar producto');
+        return await response.json();
+    },
+    getAll: async (): Promise<IProduct[]> => {
+        return getProductsAll();
+    },
     getById: async (id: number): Promise<IProduct | undefined> => {
         const allProducts = await getProductsAll();
         return allProducts.find(p => p.id === id);
     },
-
-    create: async (item: Omit<IProduct, 'id'>): Promise<IProduct> => {
-        // Aquí deberías hacer un POST al backend real, por ahora lanza error o mock
-        throw new Error('No implementado: crear producto remoto');
-    },
-
-    update: async (item: IProduct): Promise<IProduct> => {
-        // Aquí deberías hacer un PUT/PATCH al backend real, por ahora lanza error o mock
-        throw new Error('No implementado: actualizar producto remoto');
-    },
-
     delete: async (id: number): Promise<void> => {
-        // Aquí deberías hacer un DELETE al backend real, por ahora lanza error o mock
         throw new Error('No implementado: eliminar producto remoto');
     }
 };

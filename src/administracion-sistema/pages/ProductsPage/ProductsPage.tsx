@@ -33,11 +33,12 @@ export const ProductsPage: React.FC = () => {
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
     const [productToDeleteId, setProductToDeleteId] = useState<number | null>(null);
     const [productToEdit, setProductToEdit] = useState<IProduct | null>(null);
-    const [selectedIngredientes, setSelectedIngredientes] = useState<IIngrediente[]>([]);
+    type IngredienteConCantidad = { ingrediente: IIngrediente; cantidad: number };
+    const [selectedIngredientes, setSelectedIngredientes] = useState<IngredienteConCantidad[]>([]);
     const [ingredientesAll, setIngredientesAll] = useState<IIngrediente[]>([]);
-
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('TODOS');
+    const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
 
     // Filtro por estado
     const statusOptions: ISelectOption[] = [
@@ -115,15 +116,33 @@ export const ProductsPage: React.FC = () => {
     const handleCreate = () => {
         setProductToEdit(null);
         setSelectedIngredientes([]);
+        setFormValues({});
         setIsModalOpen(true);
     };
 
     const handleEdit = (product: IProduct) => {
         setProductToEdit(product);
         setSelectedIngredientes(
-            product.manufacturedArticleDetail.map(ing => ing.article)
+            product.manufacturedArticleDetail.map(ing => ({
+                ingrediente: ing.article,
+                cantidad: ing.quantity
+            }))
         );
+        setFormValues({
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            isAvailable: product.isAvailable ? 'Activo' : 'Inactivo',
+        });
         setIsModalOpen(true);
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormValues(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
     const handleDelete = (id: number) => {
@@ -142,20 +161,19 @@ export const ProductsPage: React.FC = () => {
 
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const formData = new FormData(e.currentTarget);
 
         const newProduct: IProduct = {
             id: productToEdit?.id || Math.floor(Math.random() * 1000000000),
-            name: formData.get('name') as string,
-            description: formData.get('description') as string,
-            price: Number(formData.get('price')),
-            stock: Number(formData.get('stock')),
-            isAvailable: formData.get('isAvailable') === 'Activo',
+            name: formValues.name,
+            description: formValues.description,
+            price: Number(formValues.price),
+            stock: productToEdit?.stock || 0,
+            isAvailable: formValues.isAvailable === 'Activo',
             estimatedTimeMinutes: productToEdit?.estimatedTimeMinutes || 0,
             manufacturedArticleDetail: selectedIngredientes.map(ing => ({
-                articleId: ing.id,
-                quantity: 1,
-                article: ing
+                articleId: ing.ingrediente.id,
+                quantity: ing.cantidad,
+                article: ing.ingrediente
             })),
         };
 
@@ -168,6 +186,7 @@ export const ProductsPage: React.FC = () => {
         setIsModalOpen(false);
         setProductToEdit(null);
         setSelectedIngredientes([]);
+        setFormValues({});
         fetchData();
     };
 
@@ -210,34 +229,28 @@ export const ProductsPage: React.FC = () => {
                 onClose={() => setIsModalOpen(false)}
                 title={productToEdit ? 'Editar Producto' : 'Crear Producto'}
             >
-                {productFormFields.map(field => (
-                    <InputField
-                        key={field.name}
-                        label={field.label}
-                        name={field.name}
-                        type={field.type as any}
-                        placeholder={field.placeholder}
-                        value={
-                            field.name === 'isAvailable'
-                                ? productToEdit
-                                    ? productToEdit.isAvailable
-                                        ? 'Activo'
-                                        : 'Inactivo'
-                                    : ''
-                                : (productToEdit as any)?.[field.name] ?? ''
-                        }
-                    />
+                <form onSubmit={handleFormSubmit}>
+                    {productFormFields.map(field => (
+                        <InputField
+                            key={field.name}
+                            label={field.label}
+                            name={field.name}
+                            type={field.type as any}
+                            placeholder={field.placeholder}
+                            value={formValues[field.name] ?? ''}
+                            onChange={handleInputChange}
+                        />
+                    ))}
 
-                ))}
-                <IngredienteDelProductoForm
-                    ingredientesAll={ingredientesAll}
-                    setSelectedIngredientes={setSelectedIngredientes}
-                    onIngredientesChange={setSelectedIngredientes}
-                    selectedIngredientes={selectedIngredientes}
-                />
-                <Button variant="primary" type="submit">
-                    {productToEdit ? 'Actualizar' : 'Crear'}
-                </Button>
+                    <IngredienteDelProductoForm
+                        ingredientesAll={ingredientesAll}
+                        selectedIngredientes={selectedIngredientes}
+                        onIngredientesChange={setSelectedIngredientes}
+                    />
+                    <Button variant="primary" type="submit">
+                        {productToEdit ? 'Actualizar' : 'Crear'}
+                    </Button>
+                </form>
             </FormModal>
 
             <ConfirmationDialog

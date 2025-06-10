@@ -1,56 +1,71 @@
-import { useState } from 'react';
+import React from 'react';
 import type { IIngrediente } from '../../../api/types/IIngrediente';
 
-interface ProductFormProps {
+type IngredienteConCantidad = { ingrediente: IIngrediente; cantidad: number };
+
+interface Props {
     ingredientesAll: IIngrediente[];
-    selectedIngredientes: IIngrediente[];
-    setSelectedIngredientes: React.Dispatch<React.SetStateAction<IIngrediente[]>>;
-    onIngredientesChange: (ingredientes: IIngrediente[]) => void;
+    selectedIngredientes: IngredienteConCantidad[];
+    onIngredientesChange: (ingredientes: IngredienteConCantidad[]) => void;
 }
 
+const IngredienteDelProductoForm: React.FC<Props> = ({
+    ingredientesAll,
+    selectedIngredientes,
+    onIngredientesChange,
+}) => {
+    // Agregar un ingrediente nuevo
+    const handleAdd = () => {
+        if (ingredientesAll.length === 0) return;
+        onIngredientesChange([
+            ...selectedIngredientes,
+            { ingrediente: ingredientesAll[0], cantidad: 1 }
+        ]);
+    };
 
-const IngredienteDelProductoForm: React.FC<ProductFormProps> = ({ ingredientesAll, onIngredientesChange }) => {
-    const [selectedIngredientes, setSelectedIngredientes] = useState<string[]>(['']);
-
-    const handleChange = (index: number, value: string) => {
-        const newIngredientes = [...selectedIngredientes];
-        newIngredientes[index] = value;
-
-        if (index === selectedIngredientes.length - 1 && value.trim() !== '') {
-            newIngredientes.push('');
+    // Cambiar ingrediente o cantidad
+    const handleChange = (idx: number, field: 'ingrediente' | 'cantidad', value: any) => {
+        const updated = [...selectedIngredientes];
+        if (field === 'ingrediente') {
+            const found = ingredientesAll.find(i => i.idArticulo === Number(value));
+            if (found) updated[idx].ingrediente = found;
+        } else {
+            updated[idx].cantidad = Number(value);
         }
+        onIngredientesChange(updated);
+    };
 
-        setSelectedIngredientes(newIngredientes);
-
-        if (onIngredientesChange) {
-            const selectedIngredienteObjects = newIngredientes
-                .filter(item => item.trim() !== '')
-                .map(denomination =>
-                    ingredientesAll.find(ing => ing.denomination === denomination)
-                )
-                .filter((item): item is IIngrediente => item !== undefined);
-            onIngredientesChange(selectedIngredienteObjects);
-        }
-
+    // Quitar ingrediente
+    const handleRemove = (idx: number) => {
+        const updated = selectedIngredientes.filter((_, i) => i !== idx);
+        onIngredientesChange(updated);
     };
 
     return (
-        <>
-            {selectedIngredientes.map((ingrediente, index) => (
-                <select
-                    key={index}
-                    value={ingrediente}
-                    onChange={(e) => handleChange(index, e.target.value)}
-                >
-                    <option value="">Seleccione un ingrediente</option>
-                    {ingredientesAll.map(ing => (
-                        <option key={ing.idArticulo} value={ing.denomination}>
-                            {ing.denomination}
-                        </option>
-                    ))}
-                </select>
+        <div>
+            <label>Ingredientes del producto</label>
+            {selectedIngredientes.map((item, idx) => (
+                <div key={idx} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                    <select
+                        value={item.ingrediente.idArticulo}
+                        onChange={e => handleChange(idx, 'ingrediente', e.target.value)}
+                    >
+                        {ingredientesAll.map(ing => (
+                            <option key={ing.idArticulo} value={ing.idArticulo}>{ing.denomination}</option>
+                        ))}
+                    </select>
+                    <input
+                        type="number"
+                        min={1}
+                        value={item.cantidad}
+                        onChange={e => handleChange(idx, 'cantidad', e.target.value)}
+                        style={{ width: 60 }}
+                    />
+                    <button type="button" onClick={() => handleRemove(idx)}>Quitar</button>
+                </div>
             ))}
-        </>
+            <button type="button" onClick={handleAdd}>Agregar ingrediente</button>
+        </div>
     );
 };
 
