@@ -3,12 +3,11 @@
 import React from 'react';
 import './FormModal.css'; // Estilos para el modal del formulario
 import type { IProduct } from '../../../api/types/IProduct';
-
 interface FormModalProps {
     isOpen: boolean;
     onClose: () => void;
     title: string;
-    onSubmit?: (formData: Partial<IProduct>) => Promise<void>; 
+    onSubmit?: (e: React.FormEvent<HTMLFormElement>) => Promise<void>; // Cambiado aquí
     children: React.ReactNode;
 }
 
@@ -22,12 +21,13 @@ export const FormModal: React.FC<FormModalProps> = ({
 }) => {
     if (!isOpen) return null;
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (onSubmit) {
-            onSubmit({}); // Aquí va el formData
+            onSubmit(e);
         }
     };
+
 
     return (
         <div className="form-modal-overlay" onClick={onClose}>
@@ -41,7 +41,6 @@ export const FormModal: React.FC<FormModalProps> = ({
                 <div className="form-modal-body">
                     <form onSubmit={handleSubmit}>
                         {children}
-                        
                     </form>
                 </div>
             </div>

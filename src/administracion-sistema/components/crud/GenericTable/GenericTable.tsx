@@ -64,8 +64,8 @@ export const GenericTable = <T extends { id: number }>({
                         ) : (
                             rows
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((row) => (
-                                    <tr key={row.id}>
+                                .map((row, index) => (
+                                    <tr key={row.id ?? index}>
                                         {columns.map((column) => (
                                             <td
                                                 key={String(column.id)}
@@ -102,6 +102,7 @@ export const GenericTable = <T extends { id: number }>({
                                     </tr>
                                 ))
                         )}
+
                     </tbody>
 
                 </table>

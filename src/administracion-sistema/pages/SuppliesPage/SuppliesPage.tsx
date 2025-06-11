@@ -27,7 +27,7 @@ export const SuppliesPage: React.FC = () => {
     } = useCrud<IIngrediente>(supplyApi); 
 
     useEffect(() => {
-        console.log("Ingredientes cargados:", ingredientesAll);
+        
     }, [ingredientesAll]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -83,7 +83,7 @@ export const SuppliesPage: React.FC = () => {
     }, [ingredientesAll, searchTerm, statusFilter, categoryFilter]);
 
     const supplyColumns: ITableColumn<IIngrediente>[] = [
-        { id: 'idArticulo', label: '#' },
+        { id: 'idarticle', label: '#' },
         { id: 'denomination', label: 'Nombre' },
         {
             id: 'measuringUnit',
@@ -112,7 +112,7 @@ export const SuppliesPage: React.FC = () => {
                     <Button variant="secondary" onClick={() => handleEdit(item)}>
                         Editar
                     </Button>
-                    <Button variant="danger" onClick={() => handleDelete(item.idArticulo)}>
+                    <Button variant="danger" onClick={() => handleDelete(item.idarticle)}>
                         Eliminar
                     </Button>
                 </div>
@@ -183,7 +183,7 @@ export const SuppliesPage: React.FC = () => {
 
         const submitData: IIngrediente = {
             id,
-            idArticulo: id,
+            idarticle: id,
             denomination: formData.denomination!,
             measuringUnit: {
                 unit,

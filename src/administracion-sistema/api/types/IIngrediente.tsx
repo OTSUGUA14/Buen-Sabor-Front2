@@ -1,6 +1,6 @@
 export interface IIngrediente {
     id: number; 
-    idArticulo: number;
+    idarticle: number;
     denomination: string;
     currentStock: number;
     maxStock: number;

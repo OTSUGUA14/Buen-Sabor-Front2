@@ -27,7 +27,7 @@ const IngredienteDelProductoForm: React.FC<Props> = ({
     const handleChange = (idx: number, field: 'ingrediente' | 'cantidad', value: any) => {
         const updated = [...selectedIngredientes];
         if (field === 'ingrediente') {
-            const found = ingredientesAll.find(i => i.idArticulo === Number(value));
+            const found = ingredientesAll.find(i => i.idarticle === Number(value));
             if (found) updated[idx].ingrediente = found;
         } else {
             updated[idx].cantidad = Number(value);
@@ -47,11 +47,11 @@ const IngredienteDelProductoForm: React.FC<Props> = ({
             {selectedIngredientes.map((item, idx) => (
                 <div key={idx} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
                     <select
-                        value={item.ingrediente.idArticulo}
+                        value={item.ingrediente.idarticle}
                         onChange={e => handleChange(idx, 'ingrediente', e.target.value)}
                     >
                         {ingredientesAll.map(ing => (
-                            <option key={ing.idArticulo} value={ing.idArticulo}>{ing.denomination}</option>
+                            <option key={ing.idarticle} value={ing.idarticle}>{ing.denomination}</option>
                         ))}
                     </select>
                     <input

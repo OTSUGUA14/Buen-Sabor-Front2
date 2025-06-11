@@ -47,6 +47,8 @@ export const useCrud = <T extends { id: number }>(
     const createItem = useCallback(async (item: Omit<T, 'id'>) => {
         setLoading(true);
         setError(null);
+        console.log(item);
+        
         try {
             const newItem = await api.create(item);
             setData((prevData) => [...prevData, newItem]);

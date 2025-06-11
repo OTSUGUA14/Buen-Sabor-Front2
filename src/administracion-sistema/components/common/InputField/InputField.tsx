@@ -1,20 +1,30 @@
 // src/administracion-sistema/components/common/InputField/InputField.tsx
 
-import './InputField.css'; 
+import './InputField.css';
+
+interface Option {
+    value: string | number;
+    label: string;
+}
 
 interface InputFieldProps {
     label?: string;
-    name: string; 
-    type?: React.HTMLInputTypeAttribute; 
-    value?: string | number; 
+    name: string;
+    type?: React.HTMLInputTypeAttribute | 'select';
+    value?: string | number;
     defaultValue?: string | number;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; 
-    onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void; 
-    placeholder?: string; 
-    error?: string; 
-    disabled?: boolean; 
-    readOnly?: boolean; 
+    onChange?: (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => void;
+    onBlur?: (
+        e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>
+    ) => void;
+    placeholder?: string;
+    error?: string;
+    disabled?: boolean;
+    readOnly?: boolean;
     className?: string;
+    options?: Option[]; // 🆕
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -29,22 +39,49 @@ export const InputField: React.FC<InputFieldProps> = ({
     disabled,
     readOnly,
     className,
+    options, // 🆕
 }) => {
     return (
         <div className={`input-field-container ${className || ''}`}>
             {label && <label htmlFor={name}>{label}</label>}
-            <input
-                id={name}
-                name={name}
-                type={type}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
-                placeholder={placeholder}
-                disabled={disabled}
-                readOnly={readOnly}
-                className={error ? 'input-error' : ''}
-            />
+
+            {type === 'select' ? (
+                <select
+                    id={name}
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    disabled={disabled}
+                    className={error ? 'input-error' : ''}
+                >
+                    {placeholder && (
+                        <option value="" disabled>
+                            {placeholder}
+                        </option>
+                    )}
+                    {options &&
+                        options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                </select>
+            ) : (
+                <input
+                    id={name}
+                    name={name}
+                    type={type}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    placeholder={placeholder}
+                    disabled={disabled}
+                    readOnly={readOnly}
+                    className={error ? 'input-error' : ''}
+                />
+            )}
+
             {error && <span className="error-message">{error}</span>}
         </div>
     );

@@ -7,7 +7,6 @@ export interface IProduct {
     description: string;
     manufacturedArticleDetail: ManufacturedArticleDetailDTO[];
     price: number;
-    stock: number;
     isAvailable: boolean;
     estimatedTimeMinutes: number;
     inventoryImageDTO?: InventoryImageDTO
@@ -21,5 +20,5 @@ interface InventoryImageDTO {
 export interface ManufacturedArticleDetailDTO {
     articleId: number;
     quantity: number;   
-    article: IIngrediente;
+    article?: IIngrediente;
 }
