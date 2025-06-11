@@ -1,6 +1,6 @@
 // src/administracion-sistema/components/common/ConfirmationDialog/ConfirmationDialog.tsx
 
-import React from 'react';
+
 import { Button } from '../Button/Button'; // Importamos nuestro Button genérico
 import './ConfirmationDialog.css'; // Estilos para el diálogo de confirmación
 

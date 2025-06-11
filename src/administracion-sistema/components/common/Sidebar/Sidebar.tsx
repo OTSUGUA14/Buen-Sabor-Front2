@@ -1,6 +1,4 @@
-// src/administracion-sistema/components/sidebar/Sidebar.tsx
 
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Sidebar.css';
 
@@ -23,7 +21,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
                             Productos
                         </Link>
                     </li>
-                    <li> {/* <-- NUEVO: Enlace a Insumos */}
+                    <li> 
                         <Link
                             to="/admin/supplies"
                             className={location.pathname === '/admin/supplies' ? 'active' : ''}
@@ -33,10 +31,10 @@ export const Sidebar: React.FC<SidebarProps> = () => {
                     </li>
                     <li>
                         <Link
-                            to="/admin/clients"
-                            className={location.pathname === '/admin/clients' ? 'active' : ''}
+                            to="/admin/category"
+                            className={location.pathname === '/admin/category' ? 'active' : ''}
                         >
-                            Clientes
+                            Categorias
                         </Link>
                     </li>
                     <li>

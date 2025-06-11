@@ -1,10 +1,10 @@
-import React from 'react';
-import type { IIngrediente } from '../../../api/types/IIngrediente';
 
-type IngredienteConCantidad = { ingrediente: IIngrediente; cantidad: number };
+import type { IArticle } from '../../../api/types/IArticle';
+
+type IngredienteConCantidad = { ingrediente: IArticle; cantidad: number };
 
 interface Props {
-    ingredientesAll: IIngrediente[];
+    ingredientesAll: IArticle[];
     selectedIngredientes: IngredienteConCantidad[];
     onIngredientesChange: (ingredientes: IngredienteConCantidad[]) => void;
 }

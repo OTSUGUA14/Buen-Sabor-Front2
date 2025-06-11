@@ -92,16 +92,20 @@ export const useForm = <T extends Record<string, any>>(
 
     // Manejador de cambio para los inputs
     const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value, type } = e.target;
-        let newValue: any = value;
+        const { name, type } = e.target;
 
-        // Conversión de tipo para números
-        if (type === 'number') {
-            newValue = value === '' ? undefined : Number(value); // undefined si está vacío, para evitar NaN en inputs vacíos
-        }
-        // Conversión para checkbox
-        if (type === 'checkbox') {
+        let newValue: any;
+
+        if (type === 'file') {
+            const files = (e.target as HTMLInputElement).files;
+            newValue = files && files.length > 0 ? files[0] : null;
+        } else if (type === 'checkbox') {
             newValue = (e.target as HTMLInputElement).checked;
+        } else if (type === 'number') {
+            const value = (e.target as HTMLInputElement).value;
+            newValue = value === '' ? undefined : Number(value);
+        } else {
+            newValue = (e.target as HTMLInputElement).value;
         }
 
         setFormData(prevData => ({
@@ -109,7 +113,6 @@ export const useForm = <T extends Record<string, any>>(
             [name]: newValue,
         }));
 
-        // Validar el campo inmediatamente
         setErrors(prevErrors => ({
             ...prevErrors,
             [name]: validateField(name, newValue),

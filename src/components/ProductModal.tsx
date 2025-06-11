@@ -1,29 +1,24 @@
-import React from 'react';
+
+import { useState } from 'react';
 import styles from '../styles/Menu.module.css';
+import type { IProductClient } from '../type/IProductClient';
 
 // Define las props que el modal esperará
 interface ProductModalProps {
     isOpen: boolean;
     onClose: () => void;
-    product: {
-        id: number;
-        name: string;
-        description: string;
-        ingredients: string;
-        price: number;
-        image: string;
-    } | null;
+    product: IProductClient
     onAddToCart: (product: any, quantity: number) => void;
 }
 
-const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product ,onAddToCart}) => {
+const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product, onAddToCart }) => {
     // Si el modal no está abierto o no hay producto, no renderizamos nada
     if (!isOpen || !product) {
         return null;
     }
 
     // Estado local para la cantidad del producto
-    const [quantity, setQuantity] = React.useState(1);
+    const [quantity, setQuantity] = useState(1);
 
     const handleDecreaseQuantity = () => {
         setQuantity(prev => Math.max(1, prev - 1)); // Mínimo 1
@@ -48,13 +43,22 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product ,o
                 </button>
 
                 <div className={styles.modalImageContainer}>
-                    <img src={product.image} alt={product.name} className={styles.modalImage} />
+                    <img
+                        src={`data:image/png;base64,${product.manufacInventoryImage.imageData}`}
+                        alt={product.name}
+                        className={styles.modalImage} />
+
                     <h3 className={styles.modalProductName}>{product.name}</h3>
                 </div>
 
                 <p className={styles.modalDescription}>{product.description}</p>
                 <p className={styles.modalIngredients}>
-                    <span className={styles.ingredientsTitle}>Ingredientes:</span> {product.ingredients}
+                    <span className={styles.ingredientsTitle}>Ingredientes:</span>{' '}
+                    {product.manufacturedArticleDetail
+                        ?.map(ing => ing.article?.denomination ?? '')
+                        .filter(denomination => denomination)
+                        .join(', ')}
+
                 </p>
 
                 <div className={styles.modalPriceSection}>

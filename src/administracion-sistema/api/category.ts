@@ -1,9 +1,6 @@
-// src/administracion-sistema/api/supply.ts
+import type { ICategory } from './types/ICategory';
 
-import type { IIngrediente } from './types/IArticle';
-
-
-const BASE_URL = 'http://localhost:8080/article';
+const BASE_URL = 'http://localhost:8080/category';
 
 async function handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
@@ -13,43 +10,43 @@ async function handleResponse<T>(response: Response): Promise<T> {
     return response.json();
 }
 
-export const supplyApi = {
-    getAll: async (): Promise<IIngrediente[]> => {
+export const categoryApi = {
+    getAll: async (): Promise<ICategory[]> => {
         const res = await fetch(`${BASE_URL}/getAll`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
         });
-        return handleResponse<IIngrediente[]>(res);
+        return handleResponse<ICategory[]>(res);
     },
 
-    getById: async (id: number): Promise<IIngrediente> => {
-        const res = await fetch(`${BASE_URL}/getAll/${id}`, {
+    getById: async (id: number): Promise<ICategory> => {
+        const res = await fetch(`${BASE_URL}/getById/${id}`, { // <-- corregido aquí
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
         });
-        return handleResponse<IIngrediente>(res);
+        return handleResponse<ICategory>(res);
     },
 
-    create: async (newItem: Omit<IIngrediente, 'id' | 'idArticulo'>): Promise<IIngrediente> => {
+    create: async (newItem: Omit<ICategory, 'id'>): Promise<ICategory> => { // <-- corregido aquí
         const res = await fetch(`${BASE_URL}/add`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
             body: JSON.stringify(newItem),
         });
-        return handleResponse<IIngrediente>(res);
+        return handleResponse<ICategory>(res);
     },
 
-    update: async (updatedItem: IIngrediente): Promise<IIngrediente> => {
-        const res = await fetch(`${BASE_URL}/update/${updatedItem.idArticulo}`, {
+    update: async (updatedItem: ICategory): Promise<ICategory> => {
+        const res = await fetch(`${BASE_URL}/update/${updatedItem.id}`, { // <-- corregido aquí
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
             body: JSON.stringify(updatedItem),
         });
-        return handleResponse<IIngrediente>(res);
+        return handleResponse<ICategory>(res);
     },
 
     delete: async (id: number): Promise<void> => {

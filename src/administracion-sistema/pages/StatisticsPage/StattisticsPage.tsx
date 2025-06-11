@@ -1,6 +1,6 @@
 // src/administracion-sistema/pages/StatisticsPage/StatisticsPage.tsx
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { saleApi } from '../../api/sale';
 import { productApi } from '../../api/product';
 import type { ISale, IProductStatsRow } from '../../api/types/ISale';

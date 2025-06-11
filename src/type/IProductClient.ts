@@ -1,24 +1,39 @@
-import type { IIngrediente } from "../administracion-sistema/api/types/IIngrediente";
+import type { IArticle } from "../administracion-sistema/api/types/IArticle";
+
 
 export interface IProductClient {
     id: number;
+    idmanufacturedArticle?: number;
     name: string;
     description: string;
-    manufacturedArticleDetail: ManufacturedArticleDetailDTO[];
     price: number;
-    stock: number;
-    isAvailable: boolean;
     estimatedTimeMinutes: number;
-    inventoryImageDTO?: InventoryImageDTO
-    category: string; // <-- Agregado para categorizar
-}
-interface InventoryImageDTO {
-    id: number;
-    imageData: Uint8Array; // o simplemente number[] si prefieres
+    manufacturedArticleDetail: ManufacturedArticleDetail[];
+    category: Category;
+    manufacInventoryImage: InventoryImage;
+    isAvailable: boolean;
 }
 
-export interface ManufacturedArticleDetailDTO {
-    articleId: number;  // Usamos number para Long
-    quantity: number;   // int también es number en TS
-    article: IIngrediente;
+export interface ManufacturedArticleDetail {
+    idmanufacturedArticleDetail?: number;
+    quantity: number;
+    article?: IArticle;
+}
+
+export interface InventoryImage {
+    imageData: string;
+    idinventoryImage?: number; // <-- Con signo ? es opcional
+}
+export interface MeasuringUnit {
+    idmeasuringUnit: number;
+    unit: string;
+}
+
+export interface Category {
+    idcategory: number;
+    name: string;
+}
+export interface ManufacturedArticleDetailInput {
+    articleId: number;
+    quantity: number;
 }

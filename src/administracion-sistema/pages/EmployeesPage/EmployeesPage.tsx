@@ -1,6 +1,6 @@
 // src/administracion-sistema/pages/EmployeesPage/EmployeesPage.tsx
 
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { GenericTable } from '../../components/crud/GenericTable/GenericTable';
 import type { ITableColumn } from '../../components/crud/GenericTable/GenericTable.types';
 import { Button } from '../../components/common/Button/Button';
@@ -13,7 +13,7 @@ import { GenericForm } from '../../components/crud/GenericForm/GenericForm';
 import type { IFormFieldConfig, ISelectOption } from '../../components/crud/GenericForm/GenericForm.types';
 import { InputField } from '../../components/common/InputField/InputField';
 import { SelectField } from '../../components/common/SelectField/SelectField';
-import '../crud-pages.css'; // Usamos el CSS genérico para páginas CRUD
+import '../crud-pages.css'; 
 
 export const EmployeesPage: React.FC = () => {
     const {

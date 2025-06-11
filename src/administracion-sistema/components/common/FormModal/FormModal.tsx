@@ -1,8 +1,8 @@
 // src/administracion-sistema/components/common/FormModal/FormModal.tsx
 
-import React from 'react';
+
 import './FormModal.css'; // Estilos para el modal del formulario
-import type { IProduct } from '../../../api/types/IProduct';
+
 interface FormModalProps {
     isOpen: boolean;
     onClose: () => void;

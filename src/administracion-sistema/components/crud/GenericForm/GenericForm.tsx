@@ -1,10 +1,11 @@
 // src/administracion-sistema/components/crud/GenericForm/GenericForm.tsx
 
-import React from 'react';
+
 import { useForm } from '../../../hooks/useForm';
 import { Button } from '../../common/Button/Button';
 import type { IFormFieldConfig, FormData, ISelectOption } from './GenericForm.types';
 import './GenericForm.css';
+import { useMemo } from 'react';
 
 interface GenericFormProps<T extends Record<string, any>> {
     initialData?: FormData<T>;
@@ -19,8 +20,8 @@ export const GenericForm = <T extends Record<string, any>>({
     onSubmit,
     submitButtonText = 'Guardar',
 }: GenericFormProps<T>) => {
-    // Asegura que initialData.ingredientes se transforma ANTES de pasarlo al useForm
-    const processedInitialData = React.useMemo(() => {
+    // Hola chicos como estan?
+    const processedInitialData = useMemo(() => {  
         if (!initialData) return undefined;
 
         const newInitialData = { ...initialData };
@@ -86,7 +87,17 @@ export const GenericForm = <T extends Record<string, any>>({
                             onChange={handleChange}
                             disabled={field.readOnly}
                         />
-                    ) : (
+                    ) : field.type === 'file' ? (
+                        <input
+                            type="file"
+                            id={field.name}
+                            name={field.name}
+                            onChange={handleChange}
+                            readOnly={field.readOnly}
+                            className={errors[field.name] ? 'input-error' : ''}
+                        />
+
+                    ):(
                         <input
                             type={field.type}
                             id={field.name}

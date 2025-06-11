@@ -1,8 +1,4 @@
 
-/**
- * @interface IEmployee
- * @description 
- */
 export interface IEmployee {
     id: number;
     nombre: string;

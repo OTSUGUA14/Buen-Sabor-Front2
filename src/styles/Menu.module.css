@@ -502,3 +502,14 @@ hr {
     cursor: pointer;
     margin-top: 10px;
 }
+
+/* Esto asegura que el scroll no tape el título */
+.categorySection {
+    scroll-margin-top: 100px;
+    margin-bottom: 3rem;
+}
+
+.categoryTitle {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}

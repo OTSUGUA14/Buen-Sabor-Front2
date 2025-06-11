@@ -1,4 +1,5 @@
 import type { IProduct } from "../administracion-sistema/api/types/IProduct";
+import type { Category } from "../type/IProductClient";
 import type { UserRegister } from "../type/UserData";
 import type { UserLogin } from "../type/UserLogin";
 
@@ -15,7 +16,7 @@ export const registerUser = async (userToSend: UserRegister): Promise<void> => {
             ...userToSend,
             birthDate: new Date(userToSend.birthDate).toISOString()
         };
-        
+
 
         const response = await fetch('http://localhost:8080/client/register', {
             method: 'POST',
@@ -38,7 +39,7 @@ export const registerUser = async (userToSend: UserRegister): Promise<void> => {
 export const loginUser = async (userToLogin: UserLogin): Promise<void> => {
     try {
         console.log(userToLogin);
-        
+
         const response = await fetch('http://localhost:8080/client/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -50,7 +51,7 @@ export const loginUser = async (userToLogin: UserLogin): Promise<void> => {
         }
 
         alert('Inicio de sesion completado');
-        window.location.href = '/menu';
+        
     } catch (error) {
         alert('error al iniciar sesion.');
         console.error(error);
@@ -60,7 +61,7 @@ export const loginUser = async (userToLogin: UserLogin): Promise<void> => {
 export const getProduct = async (userToLogin: IProduct): Promise<void> => {
     try {
         console.log(userToLogin);
-        
+
         const response = await fetch('http://localhost:8080/manufacturedArticle/getAll', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -78,3 +79,19 @@ export const getProduct = async (userToLogin: IProduct): Promise<void> => {
         console.error(error);
     }
 };
+
+export const getCategopryAll = async (): Promise<[Category]> => {
+    const urlServer = 'http://localhost:8080/category/getAll';
+    const response = await fetch(urlServer, {
+        method: 'GET',
+        headers: {
+            'Content-type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+        mode: 'cors'
+    });
+
+
+
+    return await response.json();
+}

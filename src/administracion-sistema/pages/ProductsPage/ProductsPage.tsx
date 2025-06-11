@@ -1,23 +1,22 @@
 // src/administracion-sistema/pages/ProductsPage/ProductsPage.tsx
 
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { GenericTable } from '../../components/crud/GenericTable/GenericTable';
 import type { ITableColumn } from '../../components/crud/GenericTable/GenericTable.types';
 import { Button } from '../../components/common/Button/Button';
 import { useCrud } from '../../hooks/useCrud';
 import { productApi } from '../../api/product';
-import type { IProduct } from '../../api/types/IProduct';
+import type { Category, InventoryImage, IProduct, ManufacturedArticleDetail } from '../../api/types/IProduct';
 import { ConfirmationDialog } from '../../components/common/ConfirmationDialog/ConfirmationDialog';
 import { FormModal } from '../../components/common/FormModal/FormModal';
 import { InputField } from '../../components/common/InputField/InputField';
 import { SelectField } from '../../components/common/SelectField/SelectField';
-import { getIngredientesAll } from '../../utils/Api';
+import { getCategopryAll, getIngredientesAll } from '../../utils/Api';
 import IngredienteDelProductoForm from '../../components/common/Producto/IngredienteDelProductoForm';
-import type { IIngrediente } from '../../api/types/IIngrediente';
+import type { IArticle } from '../../api/types/IArticle';
 import type { IFormFieldConfig, ISelectOption } from '../../components/crud/GenericForm/GenericForm.types';
 
 export const ProductsPage: React.FC = () => {
-    // CRUD hook
     const {
         data: products,
         loading,
@@ -28,22 +27,19 @@ export const ProductsPage: React.FC = () => {
         updateItem,
     } = useCrud<IProduct>(productApi);
 
-    // Estados
-
     const [productsCount, setProductsCount] = useState(0);
-
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
     const [productToDeleteId, setProductToDeleteId] = useState<number | null>(null);
     const [productToEdit, setProductToEdit] = useState<IProduct | null>(null);
-    type IngredienteConCantidad = { ingrediente: IIngrediente; cantidad: number };
+    type IngredienteConCantidad = { ingrediente: IArticle; cantidad: number };
     const [selectedIngredientes, setSelectedIngredientes] = useState<IngredienteConCantidad[]>([]);
-    const [ingredientesAll, setIngredientesAll] = useState<IIngrediente[]>([]);
+    const [ingredientesAll, setIngredientesAll] = useState<IArticle[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('TODOS');
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
-
+    const [categories, setCategories] = useState<Category[]>([]);
     // Filtro por estado
     const statusOptions: ISelectOption[] = [
         { value: 'TODOS', label: 'TODOS' },
@@ -53,6 +49,7 @@ export const ProductsPage: React.FC = () => {
 
     // Cargar ingredientes
     useEffect(() => {
+
         setProductsCount(products.length);
         const fetchIngredientes = async () => {
             const ingredientes = await getIngredientesAll();
@@ -61,9 +58,21 @@ export const ProductsPage: React.FC = () => {
         fetchIngredientes();
     }, [products]);
 
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const categoriesFromApi: Category[] = await getCategopryAll();
+                setCategories(categoriesFromApi);
+            } catch (error) {
+                console.error("Error cargando categorías", error);
+            }
+        };
+        fetchCategories();
+    }, []);
+
     // Columnas de la tabla
     const productColumns: ITableColumn<IProduct>[] = [
-        { id: 'id', label: '#', numeric: true },
+        { id: 'idmanufacturedArticle', label: '#', numeric: true },
         { id: 'name', label: 'Nombre' },
         {
             id: 'manufacturedArticleDetail',
@@ -74,7 +83,22 @@ export const ProductsPage: React.FC = () => {
                     .filter(denomination => denomination) // eliminar vacíos
                     .join(', ')
         },
-        { id: 'price', label: 'Precio Venta', numeric: true, render: (item) => `$${item.price.toFixed(2)}` },
+        {
+            id: 'category',
+            label: 'Categoría',
+            render: (item) => item.category?.name ?? 'Sin categoría'
+        },
+
+        {
+            id: 'price',
+            label: 'Precio Venta',
+            numeric: true,
+            render: (item) =>
+                typeof item.price === 'number'
+                    ? `$${item.price.toFixed(2)}`
+                    : 'Sin precio'
+        }
+        ,
         {
             id: 'isAvailable',
             label: 'Estado',
@@ -95,7 +119,12 @@ export const ProductsPage: React.FC = () => {
 
     // Campos del formulario
     const productFormFields: IFormFieldConfig[] = useMemo(() => [
-        { name: 'name', label: 'Nombre', type: 'text', validation: { required: true, minLength: 3 } },
+        {
+            name: 'name',
+            label: 'Nombre',
+            type: 'text',
+            validation: { required: true, minLength: 3 }
+        },
         {
             name: 'description',
             label: 'Descripción',
@@ -103,22 +132,56 @@ export const ProductsPage: React.FC = () => {
             validation: { required: true, minLength: 5 },
             placeholder: 'Ej: Jugosa hamburguesa con lechuga, tomate y queso.',
         },
-        { name: 'price', label: 'Precio Venta', type: 'number', validation: { required: true, min: 0 } },
+        {
+            name: 'price',
+            label: 'Precio Venta',
+            type: 'number',
+            validation: { required: true, min: 0 }
+        },
+        {
+            name: 'estimatedTimeMinutes',
+            label: 'Tiempo Estimado (minutos)',
+            type: 'number',
+            validation: { required: true, min: 1 },
+            placeholder: 'Ej: 15'
+        },
         {
             name: 'isAvailable',
             label: 'Estado',
             type: 'select',
             options: [
+                { value: '', label: 'Seleccionar una categoría...' },
                 { value: 'Activo', label: 'Activo' },
                 { value: 'Inactivo', label: 'Inactivo' },
             ],
             validation: { required: true },
         },
-    ], []);
+        {
+            name: 'inventoryImageDTO',
+            label: 'Imagen del Inventario',
+            type: 'file',
+            validation: { required: true },
+            accept: 'image/*',
+        },
+        {
+            name: 'category',
+            label: 'Categoría',
+            type: 'select',
+            options: [
+                { value: '', label: 'Seleccionar una categoría...' },
+                ...categories.map(cat => ({
+                    value: cat.idcategory,
+                    label: cat.name
+                }))
+            ],
+            validation: { required: true },
+        }
+    ], [categories]);
+
 
     // Filtro de productos
     const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        (product.name ?? '').toLowerCase().includes((searchTerm ?? '').toLowerCase())
     );
 
     // Handlers
@@ -135,10 +198,11 @@ export const ProductsPage: React.FC = () => {
             product.manufacturedArticleDetail
                 .filter(ing => ing.article !== undefined)
                 .map(ing => ({
-                    ingrediente: ing.article as IIngrediente, // estamos seguros de que no es undefined
+                    ingrediente: ing.article as IArticle, // estamos seguros de que no es undefined
                     cantidad: ing.quantity
                 }))
         );
+
 
 
         setFormValues({
@@ -146,17 +210,38 @@ export const ProductsPage: React.FC = () => {
             description: product.description,
             price: product.price,
             isAvailable: product.isAvailable ? 'Activo' : 'Inactivo',
+            manufacInventoryImage: product.inventoryImageDTO,
+            estimatedTimeMinutes: product.estimatedTimeMinutes,
+            category: product.category?.idcategory ?? ''
         });
+
+
         setIsModalOpen(true);
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setFormValues(prev => ({
+
+    const handleInputChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    ) => {
+        const { name, type } = e.target;
+        let value: any;
+
+        if (type === 'file') {
+            const files = (e.target as HTMLInputElement).files;
+            value = files && files.length > 0 ? files[0] : null;
+
+
+        } else {
+            value = e.target.value;
+        }
+
+        setFormValues((prev) => ({
             ...prev,
             [name]: value
         }));
+
     };
+
 
     const handleDelete = (id: number) => {
         setProductToDeleteId(id);
@@ -171,38 +256,87 @@ export const ProductsPage: React.FC = () => {
             fetchData();
         }
     };
+    // Función auxiliar para convertir File a Base64
+    const convertFileToBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const result = reader.result as string;
+                resolve(result);
+            };
+            reader.onerror = (error) => reject(error);
+        });
+    };
 
-    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log(selectedIngredientes);
-        
-        const newProduct: IProduct = {
-            id: productsCount,
-            name: formValues.name,
-            description: formValues.description,
-            price: Number(formValues.price),
-            isAvailable: formValues.isAvailable === 'Activo',
-            estimatedTimeMinutes: Number(productToEdit?.estimatedTimeMinutes) || 0,
-            manufacturedArticleDetail: selectedIngredientes.map(ing => ({
-                articleId: ing.ingrediente.idarticle,
-                quantity: ing.cantidad,
-            })),
-        };
 
-    
-        if (productToEdit) {
-            await updateItem(newProduct);
-        } else {
-            const { id, ...productWithoutId } = newProduct;
-            await createItem(productWithoutId);
+
+
+    // ...existing code...
+    const handleFormSubmit = async () => {
+        // Validar campos requeridos
+        const requiredFields = ['name', 'description', 'price', 'estimatedTimeMinutes', 'isAvailable', 'inventoryImageDTO', 'category'];
+
+        for (const field of requiredFields) {
+            if (!formValues[field] || (typeof formValues[field] === 'string' && formValues[field].trim() === '')) {
+                alert(`El campo "${field}" es obligatorio.`);
+                return;
+            }
         }
 
-        setIsModalOpen(false);
-        setProductToEdit(null);
-        setSelectedIngredientes([]);
-        setFormValues({});
-        fetchData();
+        // Validar que haya al menos un ingrediente seleccionado
+        if (selectedIngredientes.length === 0) {
+            alert('Debe seleccionar al menos un ingrediente.');
+            return;
+        }
+
+        let inventoryImageDTO: InventoryImage = { imageData: '' };
+
+        try {
+            const base64Data = await convertFileToBase64(formValues.inventoryImageDTO);
+            const base64String = base64Data.split(',')[1];
+            inventoryImageDTO = { imageData: base64String };
+
+            const manufacturedArticleDetail: ManufacturedArticleDetail[] = selectedIngredientes.map((ing) => ({
+                articleId: ing.ingrediente.idarticle,
+                quantity: ing.cantidad,
+            }));
+
+            const isAvailable = formValues.isAvailable === 'Activo';
+
+            // Construir el objeto según si es edición o creación
+            let newProduct: any = {
+                name: formValues.name,
+                description: formValues.description,
+                price: parseFloat(formValues.price),
+                estimatedTimeMinutes: Number(formValues.estimatedTimeMinutes),
+                isAvailable,
+                manufacturedArticleDetail,
+                inventoryImageDTO,
+                category: Number(formValues.category),
+            };
+
+            if (productToEdit) {
+                // Solo en edición, agrega idmanufacturedArticle
+                newProduct.idmanufacturedArticle = productToEdit.idmanufacturedArticle;
+                console.log(newProduct);
+
+                await updateItem(newProduct);
+            } else {
+                // Solo en creación, agrega id autogenerado
+                newProduct.id = productsCount;
+                await createItem(newProduct);
+            }
+
+            setIsModalOpen(false);
+            fetchData();
+        } catch (error) {
+            alert('Error al procesar el formulario.');
+            console.error(error);
+        }
     };
+    // ...existing code...
+
 
     // Renderizado
     if (loading && products.length === 0) return <p>Cargando productos...</p>;
@@ -244,18 +378,22 @@ export const ProductsPage: React.FC = () => {
                 title={productToEdit ? 'Editar Producto' : 'Crear Producto'}
                 onSubmit={handleFormSubmit}  // pasar el handler aquí
             >
-                {productFormFields.map(field => (
-                    <InputField
-                        key={field.name}
-                        label={field.label}
-                        name={field.name}
-                        type={field.type as any}
-                        placeholder={field.placeholder}
-                        value={formValues[field.name] ?? ''}
-                        onChange={handleInputChange}
-                        options={field.type === 'select' ? field.options || [] : undefined}
-                    />
-                ))}
+                {productFormFields.map(field => {
+                    const isFileInput = field.type === 'file';
+                    return (
+                        <InputField
+                            key={field.name}
+                            label={field.label}
+                            name={field.name}
+                            type={field.type as any}
+                            placeholder={field.placeholder}
+                            onChange={handleInputChange}
+                            options={field.type === 'select' ? field.options || [] : undefined}
+                            {...(!isFileInput ? { value: formValues[field.name] ?? '' } : {})}
+                        />
+                    );
+                })}
+
 
                 <IngredienteDelProductoForm
                     ingredientesAll={ingredientesAll}

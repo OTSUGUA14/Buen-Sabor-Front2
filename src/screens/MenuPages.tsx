@@ -2,15 +2,17 @@ import { useState, useEffect } from 'react';
 import styles from '../styles/Menu.module.css';
 import ProductModal from '../components/ProductModal';
 import CartModal from '../components/CartModal';
-import type { IProduct } from '../administracion-sistema/api/types/IProduct';
+
 import { getProductsAll } from '../administracion-sistema/utils/Api';
 import Menu from '../components/Menu';
+import type { IProductClient } from '../type/IProductClient';
 
 export default function MenuPages() {
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-    const [productosAll, setProductosAll] = useState<IProduct[]>([]);
+    const [productosAll, setProductosAll] = useState<IProductClient[]>([]);
     const [isProductModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
+
 
     const handleProductClick = (productData: any) => {
         setSelectedProduct(productData);
@@ -32,7 +34,9 @@ export default function MenuPages() {
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const deliveryFee = 800;
     const total = subtotal + deliveryFee;
-    // Guardar carrito en localStorage cada vez que cambie
+
+
+    // Guarda el carrito en localStorage cada vez que cambie
     useEffect(() => {
         const fetchProductos = async () => {
             const platos = await getProductsAll();
@@ -41,6 +45,11 @@ export default function MenuPages() {
         fetchProductos();
         localStorage.setItem('cart', JSON.stringify(cart));
     }, [cart]);
+    
+    // Limpia el localStorage del carrito al cargar la página
+    useEffect(() => {
+        localStorage.removeItem('cart');
+    }, []);
 
     const handleAddToCart = (product: any, quantity: number) => {
         setCart(prevCart => {
@@ -83,105 +92,14 @@ export default function MenuPages() {
         });
     };
 
-    const productosConCategoria = productosAll.map(producto => {
-        let categoria = '';
 
-        // Ejemplo básico: buscar por nombre
-        if (producto.name.toLowerCase().includes('pizza')) {
-            categoria = 'PIZZAS';
-        } else if (producto.name.toLowerCase().includes('hamburguesa')) {
-            categoria = 'HAMBURGUESAS';
-        } else {
-            categoria = 'OTROS';
-        }
-
-        return {
-            ...producto,
-            category: categoria
-        };
-    });
 
 
     return (
         <main className={styles.menuContainer}>
-            {/* Categorías */}
-            {/* <aside className={styles.sidebar}>
-                <ul className={styles.categoryList}>
-                    <li className={styles.categoryListItem}>
-                        <img src="/icons/burger.svg" alt="Hamburguesas" />
-                        <button className={styles.categoryButton}>HAMBURGUESAS</button>
-                    </li>
-                    <li className={styles.categoryListItem}>
-                        <img src="/icons/pizza.svg" alt="Pizzas" />
-                        <button className={styles.categoryButton}>PIZZAS</button>
-                    </li>
-                    <li className={styles.categoryListItem}>
-                        <img src="/icons/empanada.svg" alt="Empanadas" />
-                        <button className={styles.categoryButton}>EMPANADAS</button>
-                    </li>
-                    <li className={styles.categoryListItem}>
-                        <img src="/icons/salad.svg" alt="Ensaladas" />
-                        <button className={styles.categoryButton}>ENSALADAS</button>
-                    </li>
-                    <li className={styles.categoryListItem}>
-                        <img src="/icons/fries.svg" alt="Acompañamientos" />
-                        <button className={styles.categoryButton}>ACOMPAÑAMIENTOS</button>
-                    </li>
-                    <li className={styles.categoryListItem}>
-                        <img src="/icons/dessert.svg" alt="Postres" />
-                        <button className={styles.categoryButton}>POSTRES</button>
-                    </li>
-                    <li className={styles.categoryListItem}>
-                        <img src="/icons/drink.svg" alt="Bebidas" />
-                        <button className={styles.categoryButton}>BEBIDAS</button>
-                    </li>
-                </ul>
-            </aside> */}
 
-            {/* Sección principal */}
-            {/* <section className={styles.mainSection}> */}
-            {/* Buscador */}
-            {/* <div className={styles.searchBarContainer}>
-                    <input type="text" placeholder="Buscar Plato" className={styles.searchInput} />
-                    <img src="/icons/search.svg" alt="Buscar" className={styles.searchIcon} />
-                </div> */}
 
-            {/* Productos */}
-            {/* <div className={styles.productSection}>
-                    <h2>HAMBURGUESAS</h2>
-                    <div className={styles.productGrid}>
-                        {hamburguesas.map(product => (
-                            <div
-                                key={product.id}
-                                className={styles.productCard}
-                                onClick={() => handleProductClick(product)} // Agregamos el onClick aquí
-                            >
-                                <img src={product.image} alt={product.name} />
-                                <p>{product.name}</p>
-                                <span>${product.price.toLocaleString('es-AR')}</span>
-                            </div>
-                        ))}
-                    </div> */}
-
-            {/* <h2>PIZZAS</h2>
-                    <div className={styles.productGrid}>
-                        {pizzas.map(product => (
-                            <div
-                                key={product.id}
-                                className={styles.productCard}
-                                onClick={() => handleProductClick(product)}
-                            >
-                                <img src={product.image} alt={product.name} />
-                                <p>{product.name}</p>
-                                <span>${product.price.toLocaleString('es-AR')}</span>
-                            </div>
-                        ))}
-                    </div>
-
-                </div>
-            </section> */}
-
-            <Menu products={productosConCategoria} onProductClick={handleProductClick} />
+            <Menu products={productosAll} onProductClick={handleProductClick} />
 
             {/* Carrito */}
             <aside className={styles.cartSidebar}>

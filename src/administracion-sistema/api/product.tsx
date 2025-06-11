@@ -5,7 +5,7 @@ import type { IProduct } from './types/IProduct';
 
 
 export const productApi = {
-    create: async (product: Omit<IProduct, 'id'>) => {  
+    create: async (product: Omit<IProduct, 'id'>) => {
         const response = await fetch('http://localhost:8080/manufacturedArticle/add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -15,10 +15,30 @@ export const productApi = {
         return await response.json();
     },
     update: async (product: IProduct) => {
-        const response = await fetch(`http://localhost:8080/manufacturedArticle/update/${product.id}`, {
+        const {
+            idmanufacturedArticle,
+            name,
+            description,
+            price,
+            estimatedTimeMinutes,
+            isAvailable,
+            manufacturedArticleDetail
+        } = product;
+
+        const body = {
+            name,
+            description,
+            price,
+            estimatedTimeMinutes,
+            isAvailable,
+            manufacturedArticleDetail
+        };
+        console.log(body);
+        
+        const response = await fetch(`http://localhost:8080/manufacturedArticle/update/${idmanufacturedArticle}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(product),
+            body: JSON.stringify(body),
         });
         if (!response.ok) throw new Error('Error al actualizar producto');
         return await response.json();

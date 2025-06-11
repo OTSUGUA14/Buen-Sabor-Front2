@@ -1,6 +1,6 @@
 // src/administracion-sistema/pages/KitchenOrdersPage/KitchenOrdersPage.tsx
 
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { GenericTable } from '../../components/crud/GenericTable/GenericTable';
 import type { ITableColumn } from '../../components/crud/GenericTable/GenericTable.types';
 import { Button } from '../../components/common/Button/Button';

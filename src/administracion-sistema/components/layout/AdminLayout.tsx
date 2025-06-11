@@ -1,6 +1,4 @@
-// src/administracion-sistema/components/layout/AdminLayout/AdminLayout.tsx
 
-import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from '../../components/common/Sidebar/Sidebar'; // <-- Importa el nuevo componente Sidebar
 import './AdminLayout.css'; // Mantén solo los estilos del layout general aquí

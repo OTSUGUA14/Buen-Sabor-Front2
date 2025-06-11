@@ -1,24 +1,38 @@
-import type { IIngrediente } from "./IIngrediente";
-
+import type { IArticle } from "./IArticle";
 
 export interface IProduct {
     id: number;
+    idmanufacturedArticle?: number;
     name: string;
     description: string;
-    manufacturedArticleDetail: ManufacturedArticleDetailDTO[];
     price: number;
-    isAvailable: boolean;
     estimatedTimeMinutes: number;
-    inventoryImageDTO?: InventoryImageDTO
-    
-}
-interface InventoryImageDTO {
-    id: number;
-    imageData: Uint8Array; 
+    manufacturedArticleDetail: ManufacturedArticleDetail[];
+    category: Category;
+    inventoryImageDTO: InventoryImage;
+    isAvailable: boolean;
 }
 
-export interface ManufacturedArticleDetailDTO {
+export interface ManufacturedArticleDetail {
+    idmanufacturedArticleDetail?: number;
+    quantity: number;
+    article?: IArticle;
+}
+
+export interface InventoryImage {
+    imageData: string;
+    idinventoryImage?: number;
+}
+export interface MeasuringUnit {
+    idmeasuringUnit: number;
+    unit: string;
+}
+
+export interface Category {
+    idcategory: number;
+    name: string;
+}
+export interface ManufacturedArticleDetailInput {
     articleId: number;
-    quantity: number;   
-    article?: IIngrediente;
+    quantity: number;
 }

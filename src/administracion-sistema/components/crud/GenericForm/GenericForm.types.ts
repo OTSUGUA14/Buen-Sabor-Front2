@@ -9,7 +9,7 @@ export interface ISelectOption {
 export interface IFormFieldConfig {
     name: string;
     label: string;
-    type: 'text' | 'number' | 'email' | 'password' | 'date' | 'select' | 'textarea' | 'search' | 'checkbox' | 'array';
+    type: 'text' | 'number' | 'email' | 'password' | 'date' | 'select' | 'textarea' | 'search' | 'checkbox' | 'array'| 'file';
     validation?: {
         required?: boolean;
         minLength?: number;

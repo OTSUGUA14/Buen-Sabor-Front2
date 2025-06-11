@@ -1,6 +1,4 @@
-// src/administracion-sistema/components/common/SelectField/SelectField.tsx
 
-import React from 'react';
 import './SelectField.css'; // Crearemos este archivo CSS
 
 interface SelectOption {

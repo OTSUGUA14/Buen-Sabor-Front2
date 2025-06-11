@@ -1,6 +1,6 @@
 // src/administracion-sistema/components/crud/GenericTable/GenericTable.tsx
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import type { IGenericTableProps, ITableColumn } from "./GenericTable.types";
 import { Button } from "../../common/Button/Button";
 import './GenericTable.css';
@@ -8,8 +8,8 @@ import './GenericTable.css';
 export const GenericTable = <T extends { id: number }>({
     data,
     columns,
-    handleEdit, // <-- Ahora son opcionales
-    handleDelete, // <-- Ahora son opcionales
+    handleEdit, 
+    handleDelete, 
 }: IGenericTableProps<T>) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);

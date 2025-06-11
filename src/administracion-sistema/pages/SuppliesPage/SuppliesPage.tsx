@@ -1,12 +1,12 @@
 // src/administracion-sistema/pages/SuppliesPage/SuppliesPage.tsx
 
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { GenericTable } from '../../components/crud/GenericTable/GenericTable';
 import type { ITableColumn } from '../../components/crud/GenericTable/GenericTable.types';
 import { Button } from '../../components/common/Button/Button';
 import { useCrud } from '../../hooks/useCrud';
 import { supplyApi } from '../../api/supply';
-import type { IIngrediente } from '../../api/types/IIngrediente'; 
+import type { IIngrediente } from '../../api/types/IArticle'; 
 import { ConfirmationDialog } from '../../components/common/ConfirmationDialog/ConfirmationDialog';
 import { FormModal } from '../../components/common/FormModal/FormModal';
 import { GenericForm } from '../../components/crud/GenericForm/GenericForm';

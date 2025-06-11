@@ -8,7 +8,7 @@ const mockProducts: IProduct[] = [
         id: 1000,
         nombre: 'Clásica de la casa',
         descripcion: 'La hamburguesa clásica con lechuga, tomate y cebolla morada.',
-        rubro: 'Hamburguesa', // Rubro como literal
+        rubro: 'Hamburguesa', 
         ingredientes: [
             { id: 1, nombre: 'Pan de papa' },
             { id: 2, nombre: 'Medallon de carne' },

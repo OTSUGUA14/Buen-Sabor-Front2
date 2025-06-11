@@ -1,4 +1,4 @@
-export interface IIngrediente {
+export interface IArticle  {
     id: number; 
     idarticle: number;
     denomination: string;

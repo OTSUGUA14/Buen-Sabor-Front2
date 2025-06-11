@@ -77,6 +77,7 @@ export const InputField: React.FC<InputFieldProps> = ({
                     onBlur={onBlur}
                     placeholder={placeholder}
                     disabled={disabled}
+                    
                     readOnly={readOnly}
                     className={error ? 'input-error' : ''}
                 />
