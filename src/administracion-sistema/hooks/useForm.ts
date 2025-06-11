@@ -12,25 +12,26 @@ export const useForm = <T extends Record<string, any>>(
     const [errors, setErrors] = useState<Record<string, string | undefined>>({});
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-    // Inicializar formData con los valores iniciales y los valores por defecto de la configuración
     useEffect(() => {
         const defaultValues: FormData<T> = {};
         fieldsConfig.forEach(field => {
-            // Si hay un valor inicial para ese campo o un defaultValue en la config
             if (initialData && initialData[field.name] !== undefined) {
                 defaultValues[field.name as keyof T] = initialData[field.name as keyof T];
             } else if (field.defaultValue !== undefined) {
                 defaultValues[field.name as keyof T] = field.defaultValue;
             } else {
-                // Asegurarse de que todos los campos del config estén presentes en formData
-                // con un valor inicial si no se especifica
                 defaultValues[field.name as keyof T] = undefined;
             }
         });
-        setFormData(prev => ({ ...defaultValues, ...prev, ...initialData })); // Merge inicialData sobre defaults
-    }, [initialData, fieldsConfig]);
 
-    // Función para validar un campo específico
+        const isDifferent = Object.keys(defaultValues).some(
+            key => formData[key] !== defaultValues[key]
+        );
+        if (isDifferent) {
+            setFormData({ ...defaultValues });
+        }
+    }, [JSON.stringify(initialData), JSON.stringify(fieldsConfig)]);
+
     const validateField = useCallback((name: string, value: any): string | undefined => {
         const fieldConfig = fieldsConfig.find(f => f.name === name);
         if (!fieldConfig || !fieldConfig.validation) {

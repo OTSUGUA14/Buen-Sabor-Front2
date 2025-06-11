@@ -24,15 +24,8 @@ export interface IFormFieldConfig {
     className?: string;
     readOnly?: boolean;
     transformInitialValue?: (value: any) => any;
-
-    // Esto es clave para los campos tipo 'array':
+    defaultValue?: any; 
     fields?: IFormFieldConfig[];
 }
 
-// Definición de FormData, típicamente Partial<T> es suficiente
 export type FormData<T> = Partial<T>;
-
-// Si necesitas una definición más compleja para casos donde los campos pueden ser strings o el tipo original
-// export type FormData<T> = {
-//   [K in keyof T]?: T[K] extends Array<infer U> ? string | U[] : T[K] extends object ? FormData<T[K]> : T[K] | string;
-// };
