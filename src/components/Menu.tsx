@@ -24,8 +24,6 @@ const Menu: React.FC<MenuProps> = ({ products, onProductClick }) => {
         fetchCategories();
     }, []);
 
-
-
     return (
         <div className={styles.menuContainer}>
             {/* Barra lateral con scroll */}
@@ -62,7 +60,9 @@ const Menu: React.FC<MenuProps> = ({ products, onProductClick }) => {
                 {/* Mostrar todas las categorías con sus productos */}
                 {categories.map((category) => {
                     const categoryProducts = products.filter(
-                        (product) => product.category.idcategory === category.idcategory
+                        (product) =>
+                            product.category.idcategory === category.idcategory &&
+                            product.isAvailable // Solo productos disponibles
                     );
 
                     if (categoryProducts.length === 0) return null;
@@ -91,7 +91,6 @@ const Menu: React.FC<MenuProps> = ({ products, onProductClick }) => {
                                                 ? `$${product.price.toLocaleString('es-AR')}`
                                                 : 'Precio no disponible'}
                                         </span>
-
                                     </div>
                                 ))}
                             </div>

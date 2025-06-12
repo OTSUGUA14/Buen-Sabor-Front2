@@ -1,4 +1,3 @@
-
 import { getProductsAll } from '../utils/Api';
 import type { IProduct } from './types/IProduct';
 
@@ -22,7 +21,8 @@ export const productApi = {
             price,
             estimatedTimeMinutes,
             isAvailable,
-            manufacturedArticleDetail
+            manufacturedArticleDetail,
+            manufacInventoryImage // <-- Agrega la imagen aquí
         } = product;
 
         const body = {
@@ -31,7 +31,8 @@ export const productApi = {
             price,
             estimatedTimeMinutes,
             isAvailable,
-            manufacturedArticleDetail
+            manufacturedArticleDetail,
+            manufacInventoryImage // <-- Y aquí también
         };
         console.log(body);
         
@@ -43,8 +44,12 @@ export const productApi = {
         if (!response.ok) throw new Error('Error al actualizar producto');
         return await response.json();
     },
-    getAll: async (): Promise<IProduct[]> => {
-        return getProductsAll();
+    getAll: async () => {
+        const rawProducts = await getProductsAll();
+        return rawProducts.map((p: any) => ({
+            ...p,
+            isAvailable: p.available, // convierte el campo si existe
+        }));
     },
     getById: async (id: number): Promise<IProduct | undefined> => {
         const allProducts = await getProductsAll();

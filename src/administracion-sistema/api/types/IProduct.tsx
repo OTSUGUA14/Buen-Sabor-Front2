@@ -9,7 +9,8 @@ export interface IProduct {
     estimatedTimeMinutes: number;
     manufacturedArticleDetail: ManufacturedArticleDetail[];
     category: Category;
-    inventoryImageDTO: InventoryImage;
+    manufacInventoryImage
+    : InventoryImage;
     isAvailable: boolean;
 }
 

@@ -28,6 +28,7 @@ export const ProductsPage: React.FC = () => {
     } = useCrud<IProduct>(productApi);
 
     const [productsCount, setProductsCount] = useState(0);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
@@ -160,7 +161,6 @@ export const ProductsPage: React.FC = () => {
             name: 'inventoryImageDTO',
             label: 'Imagen del Inventario',
             type: 'file',
-            validation: { required: true },
             accept: 'image/*',
         },
         {
@@ -193,32 +193,40 @@ export const ProductsPage: React.FC = () => {
     };
 
     const handleEdit = (product: IProduct) => {
+
+
         setProductToEdit(product);
         setSelectedIngredientes(
             product.manufacturedArticleDetail
                 .filter(ing => ing.article !== undefined)
                 .map(ing => ({
-                    ingrediente: ing.article as IArticle, // estamos seguros de que no es undefined
+                    ingrediente: ing.article as IArticle,
                     cantidad: ing.quantity
                 }))
         );
-
-
 
         setFormValues({
             name: product.name,
             description: product.description,
             price: product.price,
             isAvailable: product.isAvailable ? 'Activo' : 'Inactivo',
-            manufacInventoryImage: product.inventoryImageDTO,
+            inventoryImageDTO: null, // Limpiar el input file
             estimatedTimeMinutes: product.estimatedTimeMinutes,
             category: product.category?.idcategory ?? ''
         });
+    
 
+        // Mostrar imagen actual si existe
+        if (product.manufacInventoryImage
+            ?.imageData) {
+            setImagePreview(`data:image/jpeg;base64,${product.manufacInventoryImage
+                .imageData}`);
+        } else {
+            setImagePreview(null);
+        }
 
         setIsModalOpen(true);
     };
-
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -230,7 +238,14 @@ export const ProductsPage: React.FC = () => {
             const files = (e.target as HTMLInputElement).files;
             value = files && files.length > 0 ? files[0] : null;
 
-
+            // Mostrar previsualización
+            if (value) {
+                const reader = new FileReader();
+                reader.onload = (ev) => setImagePreview(ev.target?.result as string);
+                reader.readAsDataURL(value);
+            } else {
+                setImagePreview(null);
+            }
         } else {
             value = e.target.value;
         }
@@ -239,9 +254,7 @@ export const ProductsPage: React.FC = () => {
             ...prev,
             [name]: value
         }));
-
     };
-
 
     const handleDelete = (id: number) => {
         setProductToDeleteId(id);
@@ -275,7 +288,7 @@ export const ProductsPage: React.FC = () => {
     // ...existing code...
     const handleFormSubmit = async () => {
         // Validar campos requeridos
-        const requiredFields = ['name', 'description', 'price', 'estimatedTimeMinutes', 'isAvailable', 'inventoryImageDTO', 'category'];
+        const requiredFields = ['name', 'description', 'price', 'estimatedTimeMinutes', 'isAvailable', 'category'];
 
         for (const field of requiredFields) {
             if (!formValues[field] || (typeof formValues[field] === 'string' && formValues[field].trim() === '')) {
@@ -293,10 +306,16 @@ export const ProductsPage: React.FC = () => {
         let inventoryImageDTO: InventoryImage = { imageData: '' };
 
         try {
-            const base64Data = await convertFileToBase64(formValues.inventoryImageDTO);
-            const base64String = base64Data.split(',')[1];
-            inventoryImageDTO = { imageData: base64String };
-
+            if (formValues.inventoryImageDTO) {
+                const base64Data = await convertFileToBase64(formValues.inventoryImageDTO);
+                const base64String = base64Data.split(',')[1];
+                inventoryImageDTO = { imageData: base64String };
+            } else if (productToEdit && productToEdit.manufacInventoryImage?.imageData) {
+                // Si no hay nueva imagen pero existe una previa, usa la anterior
+                inventoryImageDTO = { imageData: productToEdit.manufacInventoryImage.imageData };
+            } else {
+                inventoryImageDTO = { imageData: '' };
+            }
             const manufacturedArticleDetail: ManufacturedArticleDetail[] = selectedIngredientes.map((ing) => ({
                 articleId: ing.ingrediente.idarticle,
                 quantity: ing.cantidad,
@@ -319,7 +338,7 @@ export const ProductsPage: React.FC = () => {
             if (productToEdit) {
                 // Solo en edición, agrega idmanufacturedArticle
                 newProduct.idmanufacturedArticle = productToEdit.idmanufacturedArticle;
-                console.log(newProduct);
+                
 
                 await updateItem(newProduct);
             } else {
@@ -376,7 +395,7 @@ export const ProductsPage: React.FC = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title={productToEdit ? 'Editar Producto' : 'Crear Producto'}
-                onSubmit={handleFormSubmit}  // pasar el handler aquí
+                onSubmit={handleFormSubmit}
             >
                 {productFormFields.map(field => {
                     const isFileInput = field.type === 'file';
@@ -394,6 +413,17 @@ export const ProductsPage: React.FC = () => {
                     );
                 })}
 
+                {/* Previsualización de la imagen */}
+                {imagePreview && (
+                    <div style={{ marginBottom: 16 }}>
+                        <label>Vista previa de la imagen:</label>
+                        <img
+                            src={imagePreview}
+                            alt="Vista previa"
+                            style={{ maxWidth: 200, maxHeight: 200, display: 'block', marginTop: 8 }}
+                        />
+                    </div>
+                )}
 
                 <IngredienteDelProductoForm
                     ingredientesAll={ingredientesAll}
