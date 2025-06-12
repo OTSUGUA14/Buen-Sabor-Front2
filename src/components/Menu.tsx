@@ -61,8 +61,8 @@ const Menu: React.FC<MenuProps> = ({ products, onProductClick }) => {
                 {categories.map((category) => {
                     const categoryProducts = products.filter(
                         (product) =>
-                            product.category.idcategory === category.idcategory &&
-                            product.isAvailable 
+                            product.category?.idcategory === category.idcategory &&
+                            product.isAvailable
                     );
 
                     if (categoryProducts.length === 0) return null;

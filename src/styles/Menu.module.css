@@ -9,6 +9,7 @@
 
 /* Contenedor principal del menú */
 .menuContainer {
+    width: 100%;
     display: flex;
     padding: 2rem 0;
     margin-top: 2.4rem;

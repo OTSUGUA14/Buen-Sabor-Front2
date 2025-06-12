@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import styles from '../styles/CartModal.module.css';
 
+
 interface CartItem {
     id: number;
     name: string;
@@ -34,6 +35,8 @@ const CartModal: React.FC<CartModalProps> = ({
     const [paymentMethod, setPaymentMethod] = useState('MercadoPago');
 
     if (!isOpen) return null;
+
+    const calculatedTotal = deliveryMethod === 'Delivery' ? subtotal + deliveryFee : subtotal;
 
     return (
         <div className={styles.modalOverlay}>
@@ -93,13 +96,18 @@ const CartModal: React.FC<CartModalProps> = ({
                         <span>Subtotal</span>
                         <span>${subtotal.toLocaleString('es-AR')}</span>
                     </div>
-                    <div className={styles.subtotalRow}>
-                        <span>Delivery</span>
-                        <span>${deliveryFee.toLocaleString('es-AR')}</span>
-                    </div>
+
+                    {/* costo delivery (solo si es Delivery) */}
+                    {deliveryMethod === 'Delivery' && (
+                        <div className={styles.subtotalRow}>
+                            <span>Delivery</span>
+                            <span>${deliveryFee.toLocaleString('es-AR')}</span>
+                        </div>
+                    )}
+
                     <div className={styles.totalRow}>
                         <span>TOTAL</span>
-                        <span>${total.toLocaleString('es-AR')}</span>
+                        <span>${calculatedTotal.toLocaleString('es-AR')}</span>
                     </div>
                 </div>
 
@@ -122,7 +130,6 @@ const CartModal: React.FC<CartModalProps> = ({
                     </button>
                     <button onClick={onPayment} className={styles.payButton}>
                         {paymentMethod === 'Efectivo' ? 'Reservar' : 'Pagar'}
-                        
                     </button>
                 </div>
             </div>
