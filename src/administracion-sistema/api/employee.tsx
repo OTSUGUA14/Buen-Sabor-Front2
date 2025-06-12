@@ -1,71 +1,45 @@
 // src/administracion-sistema/api/employee.ts
 
-import type { IEmployee } from './types/IEmployee';
-
-let employeesData: IEmployee[] = [
-    { id: 101, nombre: 'Ana Gómez', correo: 'ana.gomez@example.com', direccion: 'Calle del Sol 1', estado: 'Activo', rol: 'Admin' },
-    { id: 102, nombre: 'Roberto Fernández', correo: 'roberto.f@example.com', direccion: 'Av. Luna 50', estado: 'Activo', rol: 'Cocinero' },
-    { id: 103, nombre: 'Sofía Díaz', correo: 'sofia.d@example.com', direccion: 'Paseo de las Flores 22', estado: 'Activo', rol: 'Cajero' },
-    { id: 104, nombre: 'Luis Torres', correo: 'luis.t@example.com', direccion: 'Ruta 40 Km 10', estado: 'Inactivo', rol: 'Repartidor' },
-    { id: 105, nombre: 'Marta Ríos', correo: 'marta.r@example.com', direccion: 'Barrio Norte 7', estado: 'Activo', rol: 'Cajero' },
-];
+import type { IEmployee } from "./types/IEmployee";
 
 export const employeeApi = {
     getAll: async (): Promise<IEmployee[]> => {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve([...employeesData]);
-            }, 500);
-        });
+        const res = await fetch('http://localhost:8080/employee/getAll');
+        if (!res.ok) throw new Error('Error al obtener empleados');
+        return res.json();
     },
 
-    getById: async (id: number): Promise<IEmployee | undefined> => {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const employee = employeesData.find(e => e.id === id);
-                resolve(employee);
-            }, 300);
-        });
+    getById: async (id: number): Promise<IEmployee> => {
+        const res = await fetch(`http://localhost:8080/employee/get/${id}`);
+        if (!res.ok) throw new Error(`Error al obtener empleado con ID ${id}`);
+        return res.json();
     },
 
-    create: async (item: Omit<IEmployee, 'id'>): Promise<IEmployee> => {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const newEmployee: IEmployee = {
-                    id: Math.floor(Math.random() * 1000000), 
-                    ...item,
-                };
-                employeesData.push(newEmployee);
-                resolve(newEmployee);
-            }, 400);
+    create: async (employee: Omit<IEmployee, 'id' | 'domiciles'>): Promise<IEmployee> => {
+        const res = await fetch('http://localhost:8080/employee/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(employee),
         });
+        if (!res.ok) throw new Error('Error al crear empleado');
+        return res.json();
     },
 
-    update: async (item: IEmployee): Promise<IEmployee> => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                const index = employeesData.findIndex(e => e.id === item.id);
-                if (index !== -1) {
-                    employeesData[index] = { ...employeesData[index], ...item };
-                    resolve(employeesData[index]);
-                } else {
-                    reject(new Error(`Employee with ID ${item.id} not found.`));
-                }
-            }, 400);
+    update: async (employee: IEmployee): Promise<IEmployee> => {
+        const { id, ...rest } = employee;
+        const res = await fetch(`http://localhost:8080/employee/update/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(rest),
         });
+        if (!res.ok) throw new Error('Error al actualizar empleado');
+        return res.json();
     },
 
     delete: async (id: number): Promise<void> => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                const initialLength = employeesData.length;
-                employeesData = employeesData.filter(e => e.id !== id);
-                if (employeesData.length < initialLength) {
-                    resolve();
-                } else {
-                    reject(new Error(`Employee with ID ${id} not found.`));
-                }
-            }, 300);
+        const res = await fetch(`http://localhost:8080/employee/delete/${id}`, {
+            method: 'DELETE',
         });
+        if (!res.ok) throw new Error('Error al eliminar empleado');
     },
 };

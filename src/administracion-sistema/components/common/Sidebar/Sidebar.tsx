@@ -8,7 +8,7 @@ interface ISelectOption {
     label: string;
 }
 
-interface SidebarProps {}
+interface SidebarProps { }
 
 const statusOptions: ISelectOption[] = [
     { value: 'Admin', label: 'Admin' },
@@ -17,12 +17,12 @@ const statusOptions: ISelectOption[] = [
     { value: 'Delivery', label: 'Delivery' },
 ];
 
-// Mapa de rutas correctamente alineado a tu AppRouter
+// Mapa de rutas 
 const roleRoutes: { [key: string]: string } = {
     'Cocinero': '/admin/kitchen-orders',
     'Cajero': '/admin/cash-orders',
     'Delivery': '/admin/delivery-orders',
-    'Admin': '/admin/products'  
+    'Admin': '/admin/products'
 };
 
 export const Sidebar: React.FC<SidebarProps> = () => {
@@ -44,6 +44,15 @@ export const Sidebar: React.FC<SidebarProps> = () => {
         <aside className="sidebar">
             <nav className="nav-menu">
                 <ul>
+                    <li className="status-filter">
+                        <SelectField
+                            name="statusFilter"
+                            options={statusOptions}
+                            value={statusFilter}
+                            onChange={handleChange}
+                            className="status-select"
+                        />
+                    </li>
                     <li>
                         <Link to="/admin/products" className={location.pathname === '/admin/products' ? 'active' : ''}>
                             Productos
@@ -66,18 +75,10 @@ export const Sidebar: React.FC<SidebarProps> = () => {
                     </li>
                     <li>
                         <Link to="/admin/statistics" className={location.pathname === '/admin/statistics' ? 'active' : ''}>
-                            Estadísticas
+                            Estadisticas
                         </Link>
                     </li>
-                    <li className="status-filter">
-                        <SelectField
-                            name="statusFilter"
-                            options={statusOptions}
-                            value={statusFilter}
-                            onChange={handleChange}
-                            className="status-select"
-                        />
-                    </li>
+
                 </ul>
             </nav>
         </aside>

@@ -191,7 +191,6 @@ export const ProductsPage: React.FC = () => {
 
     const handleEdit = (product: IProduct) => {
 
-
         setProductToEdit(product);
         setSelectedIngredientes(
             product.manufacturedArticleDetail
@@ -430,13 +429,6 @@ export const ProductsPage: React.FC = () => {
                 </Button>
             </FormModal>
             
-            <ConfirmationDialog
-                isOpen={isConfirmDialogOpen}
-                onClose={() => setIsConfirmDialogOpen(false)}
-                onConfirm={handleConfirmDelete}
-                title="Confirmar Eliminacion"
-                message="¿Estas seguro que deseas eliminar esta categoria?"
-            />
         </div>
     );
 };

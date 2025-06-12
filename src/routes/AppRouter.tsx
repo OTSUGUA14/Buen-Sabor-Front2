@@ -21,6 +21,7 @@ import { StatisticsPage } from "../administracion-sistema/pages/StatisticsPage/S
 import { OrdersPage } from "../administracion-sistema/pages/Cash/CashOrdersPage";
 import { KitchenOrdersPage } from "../administracion-sistema/pages/Kitchen/KitchenOrdersPage";
 import { DeliveryOrdersPage } from "../administracion-sistema/pages/Delivery/DeliveryOrdersPage";
+import MenuPages from "../screens/MenuPages";
 
 export function AppRouter() {
     return (
@@ -29,7 +30,7 @@ export function AppRouter() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/home" element={<Home />} />
-                <Route path="/menu" element={<Menu />} />
+                <Route path="/menu" element={<MenuPages />} />
                 <Route path="/registro" element={<RegisterPage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/loginEmployee" element={<LoginEmployee />} />

@@ -23,13 +23,15 @@ export default function MenuPages() {
         setIsModalOpen(false);
         setSelectedProduct(null);
     };
-
-
-
     // Inicializamos carrito desde localStorage (si existe)
     const [cart, setCart] = useState<any[]>(() => {
-        const savedCart = localStorage.getItem('cart');
-        return savedCart ? JSON.parse(savedCart) : [];
+        try {
+            const savedCart = localStorage.getItem('cart');
+            const parsed = savedCart ? JSON.parse(savedCart) : [];
+            return Array.isArray(parsed) ? parsed : [];
+        } catch {
+            return [];
+        }
     });
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const deliveryFee = 800;
@@ -43,20 +45,32 @@ export default function MenuPages() {
             setProductosAll(platos);
         };
         fetchProductos();
-        localStorage.setItem('cart', JSON.stringify(cart));
-    }, [cart]);
-    
-    // Limpia el localStorage del carrito al cargar la página
-    useEffect(() => {
-        localStorage.removeItem('cart');
-    }, []);
+        const minimalCart = cart.map(item => ({
+            id: item.id,
+            quantity: item.quantity,
+            price: item.price
+        }));
+        const cartString = JSON.stringify(minimalCart);
 
-    const handleAddToCart = (product: any, quantity: number) => {
+        if (minimalCart.length > 0) {
+            if (cartString.length < 5000000) {
+                localStorage.setItem('cart', cartString);
+            } else {
+                alert("El carrito es demasiado grande para guardar.");
+            }
+        } else {
+            localStorage.removeItem('cart');
+        }
+    }, [cart]);
+
+    // Guarda el carrito solo si tiene productos, si no lo elimina
+
+    const handleAddToCart = (product:IProductClient , quantity: number) => {
         setCart(prevCart => {
-            const existingItem = prevCart.find(item => item.id === product.id);
+            const existingItem = prevCart.find(item => item.idmanufacturedArticle === product.idmanufacturedArticle);
             if (existingItem) {
                 return prevCart.map(item =>
-                    item.id === product.id
+                    item.idmanufacturedArticle === product.idmanufacturedArticle
                         ? { ...item, quantity: item.quantity + quantity }
                         : item
                 );
@@ -66,11 +80,12 @@ export default function MenuPages() {
         });
         handleCloseModal();
     };
-
-    const handleIncrement = (productId: number) => {
+    const handleIncrement = (productId: number) => {    
+        console.log(cart);
         setCart(prevCart =>
+            
             prevCart.map(item =>
-                item.id === productId
+                item.idmanufacturedArticle === productId
                     ? { ...item, quantity: item.quantity + 1 }
                     : item
             )
@@ -78,13 +93,14 @@ export default function MenuPages() {
     };
     const handlePayment = () => {
         alert('¡Gracias por su compra!');
-        setCart([]); 
+        setCart([]);
         setIsCartModalOpen(false);
     };
     const handleDecrement = (productId: number) => {
         setCart(prevCart => {
             const updatedCart = prevCart.map(item =>
-                item.id === productId
+                item.idmanufacturedArticle
+ === productId
                     ? { ...item, quantity: item.quantity - 1 }
                     : item
             ).filter(item => item.quantity > 0);
@@ -118,14 +134,16 @@ export default function MenuPages() {
                                     <p>{item.name}</p>
                                     <div className={styles.quantityControls}>
                                         <button
-                                            onClick={() => handleDecrement(item.id)}
+                                            onClick={() => handleDecrement(item.idmanufacturedArticle
+)}
                                             className={styles.decrementButton}
                                         >
                                             -
                                         </button>
                                         <span>{item.quantity}</span>
                                         <button
-                                            onClick={() => handleIncrement(item.id)}
+                                            onClick={() => handleIncrement(item.idmanufacturedArticle
+)}
                                             className={styles.incrementButton}
                                         >
                                             +

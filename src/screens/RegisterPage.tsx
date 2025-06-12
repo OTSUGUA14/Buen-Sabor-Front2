@@ -167,23 +167,23 @@ export default function RegisterPage() {
 
 
 
-{/* esto es al pedo pedirlo */}
+                    {/* esto es al pedo pedirlo */}
                     {/* birthDate */}
-                    {/* <div className={styles.inputGroup}>
+                    <div className={styles.inputGroup}>
                         <label htmlFor="birthDate" className={styles.inputLabel}>Fecha de Nacimiento*</label>
                         <input
                             type="date"
-                            id="birthDate"
+                            id="birthDate"  
                             name="birthDate"
                             className={styles.loginInput}
                             onChange={handleChange}
                             value={userData.birthDate}
                         />
                         <p className="warning hide" data-name="birthDate"># Ingrese una fecha válida (YYYY-MM-DD)</p>
-                    </div> */}
+                    </div> 
 
                     {/* username */}
-                    {/* <div className={styles.inputGroup}>
+                    <div className={styles.inputGroup}>
                         <label htmlFor="username" className={styles.inputLabel}>Usuario*</label>
                         <input
                             type="text"
@@ -195,7 +195,7 @@ export default function RegisterPage() {
                             value={userData.username}
                         />
                         <p className="warning hide" data-name="username"># Ingrese un nombre de usuario válido</p>
-                    </div> */}
+                    </div>
 
                     {/* password */}
                     <div className={styles.inputGroup}>

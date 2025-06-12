@@ -1,4 +1,5 @@
 import type { IProduct } from "../administracion-sistema/api/types/IProduct";
+import type { OrderRequestDTO, UserPreferenceRequest, } from "../type/IOrderData";
 import type { Category } from "../type/IProductClient";
 import type { UserRegister } from "../type/UserData";
 import type { UserLogin } from "../type/UserLogin";
@@ -109,4 +110,30 @@ export const getCategopryAll = async (): Promise<[Category]> => {
 
 
     return await response.json();
+}
+
+export async function createPreferenceMP(pedido?: UserPreferenceRequest) {
+    let urlServer = 'http://localhost:8080/instrumentos/api/create_preference_mp';
+    let method: string = "POST";
+    const response = await fetch(urlServer, {
+        "method": method,
+        "body": JSON.stringify(pedido),
+        "headers": {
+            "Content-Type": 'application/json'
+        }
+    });
+    return await response.json()
+}
+
+export async function createOrder(pedido?:OrderRequestDTO ) {
+    let urlServer = 'http://localhost:8080/api/orders';
+    let method: string = "POST";
+    const response = await fetch(urlServer, {
+        "method": method,
+        "body": JSON.stringify(pedido),
+        "headers": {
+            "Content-Type": 'application/json'
+        }
+    });
+    return await response.json()
 }

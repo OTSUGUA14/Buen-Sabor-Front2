@@ -122,6 +122,7 @@ const CartModal: React.FC<CartModalProps> = ({
                     </button>
                     <button onClick={onPayment} className={styles.payButton}>
                         {paymentMethod === 'Efectivo' ? 'Reservar' : 'Pagar'}
+                        
                     </button>
                 </div>
             </div>

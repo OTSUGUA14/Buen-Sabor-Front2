@@ -1,8 +1,6 @@
 import { getProductsAll } from '../utils/Api';
 import type { IProduct } from './types/IProduct';
 
-
-
 export const productApi = {
     create: async (product: Omit<IProduct, 'id'>) => {
         const response = await fetch('http://localhost:8080/manufacturedArticle/add', {
@@ -22,7 +20,7 @@ export const productApi = {
             estimatedTimeMinutes,
             isAvailable,
             manufacturedArticleDetail,
-            manufacInventoryImage // <-- Agrega la imagen aquí
+            manufacInventoryImage 
         } = product;
 
         const body = {
@@ -32,7 +30,7 @@ export const productApi = {
             estimatedTimeMinutes,
             isAvailable,
             manufacturedArticleDetail,
-            manufacInventoryImage // <-- Y aquí también
+            manufacInventoryImage 
         };
         console.log(body);
         
@@ -48,7 +46,7 @@ export const productApi = {
         const rawProducts = await getProductsAll();
         return rawProducts.map((p: any) => ({
             ...p,
-            isAvailable: p.available, // convierte el campo si existe
+            isAvailable: p.available, 
         }));
     },
     getById: async (id: number): Promise<IProduct | undefined> => {

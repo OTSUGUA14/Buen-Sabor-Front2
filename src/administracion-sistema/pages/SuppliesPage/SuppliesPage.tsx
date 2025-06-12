@@ -252,13 +252,6 @@ export const SuppliesPage: React.FC = () => {
                 />
             </FormModal>
 
-            <ConfirmationDialog
-                isOpen={isConfirmDialogOpen}
-                onClose={() => setIsConfirmDialogOpen(false)}
-                onConfirm={handleConfirmDelete}
-                title="Confirmar Eliminación"
-                message="¿Estás seguro que deseas eliminar este insumo?"
-            />
         </div>
     );
 };

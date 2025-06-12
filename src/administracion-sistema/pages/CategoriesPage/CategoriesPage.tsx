@@ -137,13 +137,6 @@ export const CategoriesPage: React.FC = () => {
                 />
             </FormModal>
 
-            <ConfirmationDialog
-                isOpen={isConfirmDialogOpen}
-                onClose={() => setIsConfirmDialogOpen(false)}
-                onConfirm={handleConfirmDelete}
-                title="Confirmar Eliminacion"
-                message="¿Estas seguro que deseas eliminar esta categoria?"
-            />
         </div>
     );
 };

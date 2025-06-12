@@ -143,13 +143,13 @@ export const StatisticsPage: React.FC = () => {
     return (
         <div className="crud-page-container">
             <div className="page-header">
-                <h2>Estadísticas de Ventas (Top 10 Productos)</h2>
+                <h2>Estadísticas de Ventas</h2>
             </div>
 
             <div className="filter-controls">
                 <InputField
                     label="Desde"
-                    name="startDate" // <-- AÑADIDO: Propiedad 'name' requerida
+                    name="startDate" 
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
