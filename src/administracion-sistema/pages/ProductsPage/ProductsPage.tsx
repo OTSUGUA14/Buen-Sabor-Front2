@@ -41,14 +41,13 @@ export const ProductsPage: React.FC = () => {
     const [statusFilter, setStatusFilter] = useState('TODOS');
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
     const [categories, setCategories] = useState<Category[]>([]);
-    // Filtro por estado
+    
     const statusOptions: ISelectOption[] = [
         { value: 'TODOS', label: 'TODOS' },
         { value: 'Activo', label: 'Activo' },
         { value: 'Inactivo', label: 'Inactivo' },
     ];
 
-    // Cargar ingredientes
     useEffect(() => {
 
         setProductsCount(products.length);
@@ -71,7 +70,6 @@ export const ProductsPage: React.FC = () => {
         fetchCategories();
     }, []);
 
-    // Columnas de la tabla
     const productColumns: ITableColumn<IProduct>[] = [
         { id: 'idmanufacturedArticle', label: '#', numeric: true },
         { id: 'name', label: 'Nombre' },
@@ -210,13 +208,12 @@ export const ProductsPage: React.FC = () => {
             description: product.description,
             price: product.price,
             isAvailable: product.isAvailable ? 'Activo' : 'Inactivo',
-            inventoryImageDTO: null, // Limpiar el input file
+            inventoryImageDTO: null, 
             estimatedTimeMinutes: product.estimatedTimeMinutes,
             category: product.category?.idcategory ?? ''
         });
     
 
-        // Mostrar imagen actual si existe
         if (product.manufacInventoryImage
             ?.imageData) {
             setImagePreview(`data:image/jpeg;base64,${product.manufacInventoryImage
@@ -354,7 +351,6 @@ export const ProductsPage: React.FC = () => {
             console.error(error);
         }
     };
-    // ...existing code...
 
 
     // Renderizado

@@ -3,7 +3,7 @@ import styles from "../styles/Login.module.css";
 
 import "../index.css";
 import { regexPatterns } from "../validation/Validatios";
-import type { UserRegister } from "../type/UserData";
+import type { Domicile, UserRegister } from "../type/UserData";
 import { registerUser } from "../servicios/Api";
 import { Link } from "react-router-dom";
 
@@ -18,6 +18,9 @@ export default function RegisterPage() {
         username: "",
         password: "",
         repeat_password: "",
+        auth0Id: null,
+        userImage: null,
+        domiciles: [] as Domicile[],
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,11 +30,11 @@ export default function RegisterPage() {
         const warnings = document.querySelectorAll<HTMLParagraphElement>("p.warning");
         const pattern = regexPatterns[name as keyof typeof regexPatterns];
 
-        if (name == "repeat_password" && value == userData.repeat_password) {
-            warnings[7].classList.add("hide");
-
-        } else {
-            if (pattern && !pattern.test(value)) {
+        // Solo valida si el valor es string y el patrón existe
+        if (typeof value === "string" && pattern) {
+            if (name === "repeat_password" && value === userData.repeat_password) {
+                warnings[7].classList.add("hide");
+            } else if (!pattern.test(value)) {
                 warnings.forEach((p) => {
                     if (p.dataset.name === name) p.classList.remove("hide");
                 });
@@ -48,7 +51,7 @@ export default function RegisterPage() {
         e.preventDefault();
 
         const keysToValidate = [
-            "firstName",
+            "name",
             "lastName",
             "phoneNumber",
             "email",
@@ -57,11 +60,11 @@ export default function RegisterPage() {
             "password",
             "repeat_password",
         ];
-
         const allValid = keysToValidate.every((key) => {
             const value = userData[key as keyof typeof userData];
             const pattern = regexPatterns[key as keyof typeof regexPatterns];
-            return pattern ? pattern.test(value) : false;
+            // Solo valida si value es string y pattern existe
+            return pattern && typeof value === "string" ? pattern.test(value) : false;
         });
 
         const passwordsMatch = userData.password === userData.repeat_password;
@@ -77,13 +80,16 @@ export default function RegisterPage() {
         }
 
         const userToSend: UserRegister = {
-            firstName: userData.firstName,
+            name: userData.firstName,
             lastName: userData.lastName,
             phoneNumber: userData.phoneNumber,
             email: userData.email,
-            birthDate: userData.birthDate, // ya en formato string
+            birthDate: userData.birthDate,
             username: userData.username,
             password: userData.password,
+            auth0Id: userData.auth0Id,
+            userImage: userData.userImage,
+            domiciles: userData.domiciles,
         };
 
 

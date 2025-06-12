@@ -36,10 +36,8 @@ export const registerUser = async (userToSend: UserRegister): Promise<void> => {
     }
 };
 
-export const loginUser = async (userToLogin: UserLogin): Promise<void> => {
+export const loginUser = async (userToLogin: UserLogin): Promise<any> => {
     try {
-        console.log(userToLogin);
-
         const response = await fetch('http://localhost:8080/client/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -47,15 +45,32 @@ export const loginUser = async (userToLogin: UserLogin): Promise<void> => {
         });
 
         if (!response.ok) {
-            throw new Error('Error al registrar el usuario');
+            throw new Error('Error al iniciar sesión');
         }
 
-        alert('Inicio de sesion completado');
-        
+        const text = await response.text();
+        const match = text.match(/ID:\s*(\d+)/);
+        if (match) {
+            const userId = match[1];
+            const profile = await getProfileById(userId);
+            alert('Inicio de sesión completado');
+            // NO redirijas aquí
+            return profile;
+        } else {
+            alert('Respuesta inesperada del servidor');
+        }
     } catch (error) {
-        alert('error al iniciar sesion.');
+        alert('Error al iniciar sesión.');
         console.error(error);
     }
+};
+export const getProfileById = async (id: string | number) => {
+    const response = await fetch(`http://localhost:8080/client/${id}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    if (!response.ok) throw new Error('Error al obtener el perfil');
+    return await response.json();
 };
 
 export const getProduct = async (userToLogin: IProduct): Promise<void> => {

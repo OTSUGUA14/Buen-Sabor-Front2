@@ -1,6 +1,6 @@
-import type { IProductClient } from "../../type/IProductClient";
+import type { Category,IProductClient } from "../../type/IProductClient";
 
-import type { Category, IProduct } from "../api/types/IProduct";
+import type { } from "../api/types/IProduct";
 
 export const getIngredientesAll = async (): Promise<[]> => {
 	const urlServer = 'http://localhost:8080/article/getAll';

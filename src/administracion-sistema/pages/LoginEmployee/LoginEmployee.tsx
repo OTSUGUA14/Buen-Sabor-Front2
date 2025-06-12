@@ -1,14 +1,13 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import styles from "../styles/Login.module.css";
-import type { UserLogin } from "../type/UserLogin";
-import { loginUser } from "../servicios/Api";
-import { useUser } from "../components/UserContext";
-
+import {useNavigate } from "react-router-dom";
+import styles from "../../../styles/Login.module.css";
+import { loginUser } from "../../../servicios/Api";
+import { useUser } from "../../../components/UserContext";
+import type { UserLogin } from "../../../type/UserLogin";
 
 
 export default function Login() {
-    const [email, setEmail] = useState("");
+    const [username, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const { setProfile } = useUser();
     const navigate = useNavigate();
@@ -16,20 +15,15 @@ export default function Login() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!email.trim() || !password.trim()) {
-            alert("Por favor, completa el usuario y la contraseña.");
-            return;
-        }
-
         const userToLogin: UserLogin = {
-            email: email,
+            username: username,
             password: password
         };
 
         const profile = await loginUser(userToLogin);
         if (profile) {
             setProfile(profile);
-            navigate("/menu"); // Redirige solo después de guardar el perfil
+            navigate("/admin"); 
         }
     };
 
@@ -46,10 +40,10 @@ export default function Login() {
                         <label htmlFor="email" className={styles.inputLabel}>Correo electrónico</label>
                         <input
                             type="text"
-                            id="email"
-                            placeholder="otsu"  
+                            id="username"
+                            placeholder="juanperez@buensabor.com"  
                             className={styles.loginInput}
-                            value={email}
+                            value={username}
                             onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
@@ -71,20 +65,6 @@ export default function Login() {
                     <button type="submit" className={styles.loginButton}>
                         INICIAR SESION
                     </button>
-
-                    <p className={styles.orSeparator}>O INGRESA CON</p>
-
-                    <button type="button" className={styles.googleLoginButton}>
-                        <img src="/icons/google-icon.svg" alt="Google" className={styles.googleIcon} />
-                        Entrar con Google
-                    </button>
-
-                    <p className={styles.signUpText}>
-                        No tienes cuenta?{" "}
-                        <Link to="/registro" className={styles.signUpLink}>
-                            Regístrate
-                        </Link>
-                    </p>
                 </form>
             </div>
         </div>

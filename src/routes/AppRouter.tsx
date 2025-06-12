@@ -6,6 +6,7 @@ import Home from "../screens/Home";
 import Menu from "../screens/MenuPages";
 
 import Login from "../screens/Login";
+import LoginEmployee from "../administracion-sistema/pages/LoginEmployee/LoginEmployee";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Perfil from "../screens/Profile";
@@ -31,6 +32,7 @@ export function AppRouter() {
                 <Route path="/menu" element={<Menu />} />
                 <Route path="/registro" element={<RegisterPage />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/loginEmployee" element={<LoginEmployee />} />
                 <Route path="/profile" element={<Perfil />} />
                 
                 <Route path="/admin" element={<AdminLayout />}>
