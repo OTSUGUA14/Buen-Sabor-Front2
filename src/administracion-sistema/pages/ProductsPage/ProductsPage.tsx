@@ -41,7 +41,7 @@ export const ProductsPage: React.FC = () => {
     const [statusFilter, setStatusFilter] = useState('TODOS');
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
     const [categories, setCategories] = useState<Category[]>([]);
-    
+
     const statusOptions: ISelectOption[] = [
         { value: 'TODOS', label: 'TODOS' },
         { value: 'Activo', label: 'Activo' },
@@ -79,7 +79,7 @@ export const ProductsPage: React.FC = () => {
             render: (item) =>
                 item.manufacturedArticleDetail
                     .map(ing => ing.article?.denomination ?? '')
-                    .filter(denomination => denomination) // eliminar vacíos
+                    .filter(denomination => denomination)
                     .join(', ')
         },
         {
@@ -110,7 +110,6 @@ export const ProductsPage: React.FC = () => {
             render: (item) => (
                 <div className="table-actions">
                     <Button variant="secondary" onClick={() => handleEdit(item)}>Editar</Button>
-                    <Button variant="danger" onClick={() => handleDelete(item.id)}>Eliminar</Button>
                 </div>
             ),
         },
@@ -208,11 +207,11 @@ export const ProductsPage: React.FC = () => {
             description: product.description,
             price: product.price,
             isAvailable: product.isAvailable ? 'Activo' : 'Inactivo',
-            inventoryImageDTO: null, 
+            inventoryImageDTO: null,
             estimatedTimeMinutes: product.estimatedTimeMinutes,
             category: product.category?.idcategory ?? ''
         });
-    
+
 
         if (product.manufacInventoryImage
             ?.imageData) {
@@ -335,7 +334,7 @@ export const ProductsPage: React.FC = () => {
             if (productToEdit) {
                 // Solo en edición, agrega idmanufacturedArticle
                 newProduct.idmanufacturedArticle = productToEdit.idmanufacturedArticle;
-                
+
 
                 await updateItem(newProduct);
             } else {
@@ -430,14 +429,13 @@ export const ProductsPage: React.FC = () => {
                     {productToEdit ? 'Actualizar' : 'Crear'}
                 </Button>
             </FormModal>
-
-
+            
             <ConfirmationDialog
                 isOpen={isConfirmDialogOpen}
                 onClose={() => setIsConfirmDialogOpen(false)}
                 onConfirm={handleConfirmDelete}
-                title="Confirmar Eliminación"
-                message="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
+                title="Confirmar Eliminacion"
+                message="¿Estas seguro que deseas eliminar esta categoria?"
             />
         </div>
     );

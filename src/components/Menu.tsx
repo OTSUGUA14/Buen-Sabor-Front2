@@ -62,7 +62,7 @@ const Menu: React.FC<MenuProps> = ({ products, onProductClick }) => {
                     const categoryProducts = products.filter(
                         (product) =>
                             product.category.idcategory === category.idcategory &&
-                            product.isAvailable // Solo productos disponibles
+                            product.isAvailable 
                     );
 
                     if (categoryProducts.length === 0) return null;

@@ -108,36 +108,39 @@ export const GenericTable = <T extends { id: number }>({
                 </table>
             </div>
 
-            {rows.length > 0 && (
-                <div className="pagination-controls">
-                    <span>Filas por página:</span>
-                    <select value={rowsPerPage} onChange={handleChangeRowsPerPage}>
-                        <option value={10}>10</option>
-                        <option value={25}>25</option>
-                        <option value={100}>100</option>
-                    </select>
-                    <span>
-                        {page * rowsPerPage + 1}-
-                        {Math.min((page + 1) * rowsPerPage, rows.length)} de {rows.length}
-                    </span>
-                    <Button
-                        onClick={() => handleChangePage(page - 1)}
-                        disabled={page === 0}
-                        variant="secondary"
-                        size="small"
-                    >
-                        Anterior
-                    </Button>
-                    <Button
-                        onClick={() => handleChangePage(page + 1)}
-                        disabled={page >= totalPages - 1}
-                        variant="secondary"
-                        size="small"
-                    >
-                        Siguiente
-                    </Button>
-                </div>
-            )}
+
+{/* arreglar paginacion */}
+
+            {/* {rows.length > 0 && (
+                // <div className="pagination-controls">
+                //     <span>Filas por página:</span>
+                //     <select value={rowsPerPage} onChange={handleChangeRowsPerPage}>
+                //         <option value={10}>10</option>
+                //         <option value={25}>25</option>
+                //         <option value={100}>100</option>
+                //     </select>
+                //     <span>
+                //         {page * rowsPerPage + 1}-
+                //         {Math.min((page + 1) * rowsPerPage, rows.length)} de {rows.length}
+                //     </span>
+                //     <Button
+                //         onClick={() => handleChangePage(page - 1)}
+                //         disabled={page === 0}
+                //         variant="secondary"
+                //         size="small"
+                //     >
+                //         Anterior
+                //     </Button>
+                //     <Button
+                //         onClick={() => handleChangePage(page + 1)}
+                //         disabled={page >= totalPages - 1}
+                //         variant="secondary"
+                //         size="small"
+                //     >
+                //         Siguiente
+                //     </Button>
+                // </div>
+            )} */}
         </div>
     );
 };

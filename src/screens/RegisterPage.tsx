@@ -165,8 +165,11 @@ export default function RegisterPage() {
                         <p className="warning hide" data-name="email"># Ingrese un correo válido</p>
                     </div>
 
+
+
+{/* esto es al pedo pedirlo */}
                     {/* birthDate */}
-                    <div className={styles.inputGroup}>
+                    {/* <div className={styles.inputGroup}>
                         <label htmlFor="birthDate" className={styles.inputLabel}>Fecha de Nacimiento*</label>
                         <input
                             type="date"
@@ -177,10 +180,10 @@ export default function RegisterPage() {
                             value={userData.birthDate}
                         />
                         <p className="warning hide" data-name="birthDate"># Ingrese una fecha válida (YYYY-MM-DD)</p>
-                    </div>
+                    </div> */}
 
                     {/* username */}
-                    <div className={styles.inputGroup}>
+                    {/* <div className={styles.inputGroup}>
                         <label htmlFor="username" className={styles.inputLabel}>Usuario*</label>
                         <input
                             type="text"
@@ -192,7 +195,7 @@ export default function RegisterPage() {
                             value={userData.username}
                         />
                         <p className="warning hide" data-name="username"># Ingrese un nombre de usuario válido</p>
-                    </div>
+                    </div> */}
 
                     {/* password */}
                     <div className={styles.inputGroup}>
@@ -225,6 +228,14 @@ export default function RegisterPage() {
                     </div>
 
                     <button type="submit" className={styles.loginButton}>REGISTRARSE</button>
+
+                    <p className={styles.orSeparator}>O INGRESA CON</p>
+
+                    <button type="button" className={styles.googleLoginButton}>
+                        <img src="/icons/google-icon.svg" alt="Google" className={styles.googleIcon} />
+                        Entrar con Google
+                    </button>
+
                     <p className={styles.signUpText}>
                         Ya tenes cuenta?{" "}
                         <Link to="/login" className={styles.signUpLink}>

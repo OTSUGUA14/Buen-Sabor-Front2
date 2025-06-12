@@ -48,9 +48,6 @@ export const CategoriesPage: React.FC = () => {
                     <Button variant="secondary" onClick={() => handleEdit(item)}>
                         Editar
                     </Button>
-                    <Button variant="danger" onClick={() => handleDelete(item.id)}>
-                        Eliminar
-                    </Button>
                 </div>
             ),
         },

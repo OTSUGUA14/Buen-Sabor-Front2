@@ -79,20 +79,7 @@ export const DeliveryOrdersPage: React.FC = () => {
                             Entregado
                         </Button>
                     )}
-                    <Button
-                        variant="outline-primary" 
-                        size="small"
-                        onClick={() => console.log('Llamar a:', item.telefonoCliente)}
-                    >
-                        Llamar
-                    </Button>
-                    <Button
-                        variant="secondary"
-                        size="small"
-                        onClick={() => console.log('Ver en mapa:', item.direccionEntrega)}
-                    >
-                        Mapa
-                    </Button>
+                                        
                 </div>
             ),
         },

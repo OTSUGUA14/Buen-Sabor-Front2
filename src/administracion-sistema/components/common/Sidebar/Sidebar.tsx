@@ -11,17 +11,18 @@ interface ISelectOption {
 interface SidebarProps {}
 
 const statusOptions: ISelectOption[] = [
+    { value: 'Admin', label: 'Admin' },
     { value: 'Cocinero', label: 'Cocinero' },
     { value: 'Cajero', label: 'Cajero' },
     { value: 'Delivery', label: 'Delivery' },
-    { value: 'Admin', label: 'Admin' },
 ];
 
+// Mapa de rutas correctamente alineado a tu AppRouter
 const roleRoutes: { [key: string]: string } = {
-    'Cocinero': '/admin/KitchenOrdersPage',
-    'Cajero': '/admin/CashOrdersPage',
-    'Delivery': '/admin/DeliveryOrdersPage',
-    'Admin': '/admin' 
+    'Cocinero': '/admin/kitchen-orders',
+    'Cajero': '/admin/cash-orders',
+    'Delivery': '/admin/delivery-orders',
+    'Admin': '/admin/products'  
 };
 
 export const Sidebar: React.FC<SidebarProps> = () => {

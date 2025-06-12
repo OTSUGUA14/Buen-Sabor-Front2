@@ -75,9 +75,6 @@ export const EmployeesPage: React.FC = () => {
                     <Button variant="secondary" onClick={() => handleEdit(item)}>
                         Editar
                     </Button>
-                    <Button variant="danger" onClick={() => handleDelete(item.id)}>
-                        Eliminar
-                    </Button>
                 </div>
             ),
         },
@@ -98,7 +95,7 @@ export const EmployeesPage: React.FC = () => {
             name: 'rol',
             label: 'Rol',
             type: 'select',
-            options: roleOptions.filter(opt => opt.value !== 'TODOS'), // Excluir 'TODOS' para el formulario
+            options: roleOptions.filter(opt => opt.value !== 'TODOS'), 
             validation: { required: true }
         },
     ];

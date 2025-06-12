@@ -78,7 +78,7 @@ export default function MenuPages() {
     };
     const handlePayment = () => {
         alert('¡Gracias por su compra!');
-        setCart([]); // Vaciar carrito
+        setCart([]); 
         setIsCartModalOpen(false);
     };
     const handleDecrement = (productId: number) => {

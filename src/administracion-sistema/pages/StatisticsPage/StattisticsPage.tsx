@@ -81,7 +81,7 @@ export const StatisticsPage: React.FC = () => {
             statsMap.set(sale.productId, currentStats);
         });
 
-        // CORRECCIÓN IMPORTANTE: el cálculo de totalRevenue estaba mal.
+        //el cálculo de totalRevenue estaba mal.
         // Debería ser currentStats.totalRevenue += sale.quantity * sale.unitPrice;
         statsMap.forEach(stats => {
             // Este bucle es necesario si los precios de venta pueden variar por transacción

@@ -6,7 +6,7 @@ import type { ITableColumn } from '../../components/crud/GenericTable/GenericTab
 import { Button } from '../../components/common/Button/Button';
 import { useCrud } from '../../hooks/useCrud';
 import { supplyApi } from '../../api/supply';
-import type { IIngrediente } from '../../api/types/IArticle'; 
+import type { IArticle } from '../../api/types/IArticle'; 
 import { ConfirmationDialog } from '../../components/common/ConfirmationDialog/ConfirmationDialog';
 import { FormModal } from '../../components/common/FormModal/FormModal';
 import { GenericForm } from '../../components/crud/GenericForm/GenericForm';
@@ -24,7 +24,7 @@ export const SuppliesPage: React.FC = () => {
         deleteItem,
         createItem,
         updateItem,
-    } = useCrud<IIngrediente>(supplyApi); 
+    } = useCrud<IArticle>(supplyApi); 
 
     useEffect(() => {
         
@@ -33,7 +33,7 @@ export const SuppliesPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
     const [supplyToDeleteId, setSupplyToDeleteId] = useState<number | null>(null);
-    const [supplyToEdit, setSupplyToEdit] = useState<IIngrediente | null>(null);
+    const [supplyToEdit, setSupplyToEdit] = useState<IArticle | null>(null);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'TODOS' | 'Activo' | 'Inactivo'>('TODOS');
@@ -82,7 +82,7 @@ export const SuppliesPage: React.FC = () => {
         });
     }, [ingredientesAll, searchTerm, statusFilter, categoryFilter]);
 
-    const supplyColumns: ITableColumn<IIngrediente>[] = [
+    const supplyColumns: ITableColumn<IArticle>[] = [
         { id: 'idarticle', label: '#' },
         { id: 'denomination', label: 'Nombre' },
         {
@@ -111,9 +111,6 @@ export const SuppliesPage: React.FC = () => {
                 <div className="table-actions">
                     <Button variant="secondary" onClick={() => handleEdit(item)}>
                         Editar
-                    </Button>
-                    <Button variant="danger" onClick={() => handleDelete(item.idarticle)}>
-                        Eliminar
                     </Button>
                 </div>
             ),
@@ -157,7 +154,7 @@ export const SuppliesPage: React.FC = () => {
         setIsModalOpen(true);
     };
 
-    const handleEdit = (item: IIngrediente) => {
+    const handleEdit = (item: IArticle) => {
         setSupplyToEdit(item);
         setIsModalOpen(true);
     };
@@ -175,13 +172,13 @@ export const SuppliesPage: React.FC = () => {
             fetchData();
         }
     };
-    const handleFormSubmit = async (formData: Partial<IIngrediente>) => {
+    const handleFormSubmit = async (formData: Partial<IArticle>) => {
         const id = supplyToEdit?.id || Math.floor(Math.random() * 1e9);
 
         const unit = formData.measuringUnit as unknown as string;
         const categoriaNombre = formData.category as unknown as string;
 
-        const submitData: IIngrediente = {
+        const submitData: IArticle = {
             id,
             idarticle: id,
             denomination: formData.denomination!,
@@ -247,7 +244,7 @@ export const SuppliesPage: React.FC = () => {
                 onClose={() => setIsModalOpen(false)}
                 title={supplyToEdit ? 'Editar Insumo' : 'Crear Insumo'}
             >
-                <GenericForm<IIngrediente> 
+                <GenericForm<IArticle> 
                     initialData={supplyToEdit ?? undefined}
                     fieldsConfig={supplyFormFields}
                     onSubmit={handleFormSubmit}
