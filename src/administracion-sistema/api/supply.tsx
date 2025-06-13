@@ -1,6 +1,6 @@
 // src/administracion-sistema/api/supply.ts
 
-import type { IIngrediente } from './types/IArticle';
+import type { IArticle } from './types/IArticle';
 
 
 const BASE_URL = 'http://localhost:8080/article';
@@ -14,42 +14,42 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 export const supplyApi = {
-    getAll: async (): Promise<IIngrediente[]> => {
+    getAll: async (): Promise<IArticle[]> => {
         const res = await fetch(`${BASE_URL}/getAll`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
         });
-        return handleResponse<IIngrediente[]>(res);
+        return handleResponse<IArticle[]>(res);
     },
 
-    getById: async (id: number): Promise<IIngrediente> => {
+    getById: async (id: number): Promise<IArticle> => {
         const res = await fetch(`${BASE_URL}/getAll/${id}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
         });
-        return handleResponse<IIngrediente>(res);
+        return handleResponse<IArticle>(res);
     },
 
-    create: async (newItem: Omit<IIngrediente, 'id' | 'idArticulo'>): Promise<IIngrediente> => {
+    create: async (newItem: Omit<IArticle, 'id' | 'idArticulo'>): Promise<IArticle> => {
         const res = await fetch(`${BASE_URL}/add`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
             body: JSON.stringify(newItem),
         });
-        return handleResponse<IIngrediente>(res);
+        return handleResponse<IArticle>(res);
     },
 
-    update: async (updatedItem: IIngrediente): Promise<IIngrediente> => {
-        const res = await fetch(`${BASE_URL}/update/${updatedItem.idArticulo}`, {
+    update: async (updatedItem: IArticle): Promise<IArticle> => {
+        const res = await fetch(`${BASE_URL}/update/${updatedItem.idarticle}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
             body: JSON.stringify(updatedItem),
         });
-        return handleResponse<IIngrediente>(res);
+        return handleResponse<IArticle>(res);
     },
 
     delete: async (id: number): Promise<void> => {

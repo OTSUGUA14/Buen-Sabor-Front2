@@ -25,7 +25,7 @@ export interface OrderRequestDTO {
     orderTypeId: number;
     payMethod: PayMethod;
     orderDate: string;
-    isTakeAway: boolean;
+    takeAway: boolean;
     clientId: number;
     subsidiaryId: number;
     orderDetails: OrderDetailDTO[];

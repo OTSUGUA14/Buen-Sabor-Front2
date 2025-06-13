@@ -6,6 +6,8 @@ import CartModal from '../components/CartModal';
 import { getProductsAll } from '../administracion-sistema/utils/Api';
 import Menu from '../components/Menu';
 import type { IProductClient } from '../type/IProductClient';
+import { PayMethod, type OrderRequestDTO } from '../type/IOrderData';
+import { createOrder } from '../servicios/Api';
 
 export default function MenuPages() {
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
@@ -13,6 +15,9 @@ export default function MenuPages() {
     const [isProductModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
+    // Extraer clientId desde localStorage
+    const profile = JSON.parse(localStorage.getItem('profile') || '{}');
+    const clientId = profile.id ?? null; // null si no existe
 
     const handleProductClick = (productData: any) => {
         setSelectedProduct(productData);
@@ -40,13 +45,15 @@ export default function MenuPages() {
 
     // Guarda el carrito en localStorage cada vez que cambie
     useEffect(() => {
+        localStorage.removeItem('cart');
         const fetchProductos = async () => {
             const platos = await getProductsAll();
             setProductosAll(platos);
         };
         fetchProductos();
         const minimalCart = cart.map(item => ({
-            id: item.id,
+            id: item.idmanufacturedArticle,
+            name: item.name,
             quantity: item.quantity,
             price: item.price
         }));
@@ -59,13 +66,13 @@ export default function MenuPages() {
                 alert("El carrito es demasiado grande para guardar.");
             }
         } else {
-            localStorage.removeItem('cart');
+
         }
     }, [cart]);
 
     // Guarda el carrito solo si tiene productos, si no lo elimina
 
-    const handleAddToCart = (product:IProductClient , quantity: number) => {
+    const handleAddToCart = (product: IProductClient, quantity: number) => {
         setCart(prevCart => {
             const existingItem = prevCart.find(item => item.idmanufacturedArticle === product.idmanufacturedArticle);
             if (existingItem) {
@@ -80,10 +87,10 @@ export default function MenuPages() {
         });
         handleCloseModal();
     };
-    const handleIncrement = (productId: number) => {    
+    const handleIncrement = (productId: number) => {
         console.log(cart);
         setCart(prevCart =>
-            
+
             prevCart.map(item =>
                 item.idmanufacturedArticle === productId
                     ? { ...item, quantity: item.quantity + 1 }
@@ -91,16 +98,25 @@ export default function MenuPages() {
             )
         );
     };
-    const handlePayment = () => {
-        alert('¡Gracias por su compra!');
-        setCart([]);
-        setIsCartModalOpen(false);
+
+    const handlePayment = async (orderData: OrderRequestDTO | any, payMethod: PayMethod) => {
+
+        // orderData es un OrderRequestDTO
+        console.log(orderData);
+
+        const response = await createOrder(orderData as OrderRequestDTO);
+
+        // Aquí puedes limpiar el carrito, cerrar el modal, etc.
+        console.log(response);
+        localStorage.removeItem('cart');
+
+        if (payMethod === PayMethod.MERCADOPAGO) { }
     };
     const handleDecrement = (productId: number) => {
         setCart(prevCart => {
             const updatedCart = prevCart.map(item =>
                 item.idmanufacturedArticle
- === productId
+                    === productId
                     ? { ...item, quantity: item.quantity - 1 }
                     : item
             ).filter(item => item.quantity > 0);
@@ -135,7 +151,7 @@ export default function MenuPages() {
                                     <div className={styles.quantityControls}>
                                         <button
                                             onClick={() => handleDecrement(item.idmanufacturedArticle
-)}
+                                            )}
                                             className={styles.decrementButton}
                                         >
                                             -
@@ -143,7 +159,7 @@ export default function MenuPages() {
                                         <span>{item.quantity}</span>
                                         <button
                                             onClick={() => handleIncrement(item.idmanufacturedArticle
-)}
+                                            )}
                                             className={styles.incrementButton}
                                         >
                                             +
@@ -176,6 +192,7 @@ export default function MenuPages() {
                 product={selectedProduct}
                 onAddToCart={handleAddToCart}
             />
+
             <CartModal
                 isOpen={isCartModalOpen}
                 onClose={() => setIsCartModalOpen(false)}
@@ -183,7 +200,10 @@ export default function MenuPages() {
                 subtotal={subtotal}
                 deliveryFee={deliveryFee}
                 total={total}
+                subsidiaryId={1}
+                clientId={clientId}
                 onPayment={handlePayment}
+                
             />
 
         </main>

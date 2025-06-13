@@ -1,18 +1,17 @@
 import { useState } from 'react';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 
-import type { ProductoCarrito } from '../context/CarritoContext';
-import type { PedidoDetalle } from '../models/PedidoCart';
+
 import { createPreferenceMP } from '../servicios/Api';
 import type {UserPreferenceRequest} from '../type/IOrderData';
 type CheckoutMPProps = {
     montoCarrito: number;
     itemsCarrito: ProductoCarrito[];
-    payMethod: string; // Debe ser 'MERCADOPAGO' para mostrar el botón
+    payMethod: string; 
 };
 
 
-function CheckoutMP({ montoCarrito, itemsCarrito, payMethod }: CheckoutMPProps) {
+export function CheckoutMP({ montoCarrito, itemsCarrito, payMethod }: CheckoutMPProps) {
     const [idPreference, setIdPreference] = useState<string>('');
 
     const getPreferenceMP = async () => {

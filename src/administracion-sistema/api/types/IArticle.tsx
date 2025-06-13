@@ -13,5 +13,4 @@ export interface IArticle  {
         name: string;
         idcategory: number;
     };
-    estado: 'Activo' | 'Inactivo';
 }

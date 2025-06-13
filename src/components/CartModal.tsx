@@ -1,42 +1,83 @@
 // components/CartModalCheckout.tsx
 import { useState } from 'react';
 import styles from '../styles/CartModal.module.css';
-
-
-interface CartItem {
-    id: number;
-    name: string;
-    quantity: number;
-    price: number;
-}
-
+import type { OrderRequestDTO, OrderDetailDTO, UserPreferenceRequest } from '../type/IOrderData';
+import { PayMethod, OrderState } from '../type/IOrderData';
 interface CartModalProps {
     isOpen: boolean;
     onClose: () => void;
-    cart: CartItem[];
+    cart: any[];
     subtotal: number;
     deliveryFee: number;
     total: number;
-    onPayment: () => void;
+    subsidiaryId: number;
+    clientId: number;
+    onPayment: (orderData: OrderRequestDTO, payMethod: PayMethod, userPreference?: UserPreferenceRequest[]) => void;
+    onPayMercadoPago?: () => void; // ← Nuevo parámetro opcional
 }
 
-const CartModal: React.FC<CartModalProps> = ({
+export const CartModal: React.FC<CartModalProps> = ({
     isOpen,
     onClose,
     cart,
     subtotal,
     deliveryFee,
     total,
+    clientId,
+    subsidiaryId,
     onPayment
+
 }) => {
     const [deliveryMethod, setDeliveryMethod] = useState('Delivery');
     const [selectedAddress, setSelectedAddress] = useState('Casa');
     const [clarifications, setClarifications] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState('MercadoPago');
+    const [paymentMethod, setPaymentMethod] = useState<PayMethod>(PayMethod.MERCADOPAGO);
 
     if (!isOpen) return null;
 
     const calculatedTotal = deliveryMethod === 'Delivery' ? subtotal + deliveryFee : subtotal;
+    console.log(cart);
+
+    // Construir detalles del pedido para OrderRequestDTO
+    const orderDetails: OrderDetailDTO[] = cart.map(item => ({
+        manufacturedArticleId: item.idmanufacturedArticle,
+        quantity: item.quantity,
+        subTotal: item.price * item.quantity
+    }));
+
+    // Construir preferencia para MercadoPago
+    const userPreference: UserPreferenceRequest[] = cart.map(item => ({
+        title: item.name,
+        quantity: item.quantity,
+        price: item.price.toString()
+    }));
+    const today = new Date();
+    const orderDate = today.getFullYear() + '-' +
+        String(today.getMonth() + 1).padStart(2, '0') + '-' +
+        String(today.getDate()).padStart(2, '0');
+    // Enviar datos al backend según método de pago
+    const handlePayment = () => {
+        const order: OrderRequestDTO = {
+            estimatedFinishTime: "10:00:00",
+            total: calculatedTotal,
+            totalCost: subtotal,
+            orderState: OrderState.PENDING,
+            orderTypeId: 1,
+            payMethod: paymentMethod,
+            orderDate: orderDate,
+            takeAway: deliveryMethod !== 'Delivery',
+            clientId,
+            subsidiaryId,
+            orderDetails
+        };
+
+        if (paymentMethod === PayMethod.MERCADOPAGO) {
+            onPayment(order, PayMethod.MERCADOPAGO, userPreference); // 👈 envío adicional
+        } else {
+            onPayment(order, PayMethod.CASH);
+        }
+    };
+
 
     return (
         <div className={styles.modalOverlay}>
@@ -116,10 +157,10 @@ const CartModal: React.FC<CartModalProps> = ({
                     <label>Método de pago</label>
                     <select
                         value={paymentMethod}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        onChange={(e) => setPaymentMethod(e.target.value as PayMethod)}
                     >
-                        <option value="MercadoPago">MercadoPago</option>
-                        <option value="Efectivo">Efectivo</option>
+                        <option value={PayMethod.MERCADOPAGO}>MercadoPago</option>
+                        <option value={PayMethod.CASH}>Efectivo</option>
                     </select>
                 </div>
 
@@ -128,8 +169,8 @@ const CartModal: React.FC<CartModalProps> = ({
                     <button onClick={onClose} className={styles.cancelButton}>
                         CANCELAR
                     </button>
-                    <button onClick={onPayment} className={styles.payButton}>
-                        {paymentMethod === 'Efectivo' ? 'Reservar' : 'Pagar'}
+                    <button onClick={handlePayment} className={styles.payButton}>
+                        {paymentMethod === PayMethod.CASH ? 'Reservar' : 'Pagar'}
                     </button>
                 </div>
             </div>

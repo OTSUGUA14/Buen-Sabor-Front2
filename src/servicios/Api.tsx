@@ -125,9 +125,11 @@ export async function createPreferenceMP(pedido?: UserPreferenceRequest) {
     return await response.json()
 }
 
-export async function createOrder(pedido?:OrderRequestDTO ) {
+export async function createOrder(pedido?: OrderRequestDTO) {
     let urlServer = 'http://localhost:8080/api/orders';
     let method: string = "POST";
+    console.log(pedido);
+    
     const response = await fetch(urlServer, {
         "method": method,
         "body": JSON.stringify(pedido),
@@ -135,5 +137,9 @@ export async function createOrder(pedido?:OrderRequestDTO ) {
             "Content-Type": 'application/json'
         }
     });
+    if (!response.ok) {
+        throw new Error('Error al crear la orden');
+    }
+    alert("Su order se envio correctmante");
     return await response.json()
 }

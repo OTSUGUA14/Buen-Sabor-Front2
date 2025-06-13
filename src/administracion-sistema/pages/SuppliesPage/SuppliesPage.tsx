@@ -103,7 +103,6 @@ export const SuppliesPage: React.FC = () => {
             label: 'Categoría',
             render: i => i.category?.name ?? ''
         },
-        { id: 'estado', label: 'Estado' },
         {
             id: 'acciones',
             label: 'Acciones',
@@ -134,16 +133,6 @@ export const SuppliesPage: React.FC = () => {
             label: 'Categoría',
             type: 'select',
             options: categoryOptions.filter(opt => opt.value !== 'TODOS'),
-            validation: { required: true },
-        },
-        {
-            name: 'estado',
-            label: 'Estado',
-            type: 'select',
-            options: [
-                { value: 'Activo', label: 'Activo' },
-                { value: 'Inactivo', label: 'Inactivo' },
-            ],
             validation: { required: true },
         },
     ];
@@ -193,7 +182,6 @@ export const SuppliesPage: React.FC = () => {
                 name: categoriaNombre,
                 idcategory: 0,
             },
-            estado: formData.estado as 'Activo' | 'Inactivo',
         };
 
         if (supplyToEdit) {
