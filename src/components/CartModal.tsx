@@ -76,6 +76,7 @@ export const CartModal: React.FC<CartModalProps> = ({
         } else {
             onPayment(order, PayMethod.CASH);
         }
+     
     };
 
 

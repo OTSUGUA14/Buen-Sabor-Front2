@@ -44,7 +44,8 @@ export const loginUser = async (userToLogin: UserLogin): Promise<any> => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userToLogin),
         });
-
+        console.log(userToLogin);
+        
         if (!response.ok) {
             throw new Error('Error al iniciar sesión');
         }

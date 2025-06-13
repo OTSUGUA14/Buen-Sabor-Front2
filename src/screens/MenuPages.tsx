@@ -105,12 +105,11 @@ export default function MenuPages() {
         console.log(orderData);
 
         const response = await createOrder(orderData as OrderRequestDTO);
-
-        // Aquí puedes limpiar el carrito, cerrar el modal, etc.
-        console.log(response);
-        localStorage.removeItem('cart');
-
         if (payMethod === PayMethod.MERCADOPAGO) { }
+        handleCloseModal()
+        setIsCartModalOpen(false)
+        setCart([]); // Vacía el carrito
+        localStorage.removeItem('cart'); // Opcional: limpia el carrito en localStorage también
     };
     const handleDecrement = (productId: number) => {
         setCart(prevCart => {
@@ -203,7 +202,7 @@ export default function MenuPages() {
                 subsidiaryId={1}
                 clientId={clientId}
                 onPayment={handlePayment}
-                
+
             />
 
         </main>
