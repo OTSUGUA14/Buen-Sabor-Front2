@@ -1,7 +1,6 @@
-// src/administracion-sistema/components/crud/GenericTable/GenericTable.types.ts
 
 export interface ITableColumn<T> {
-  id: keyof T | 'acciones'; // <-- Importante: 'acciones' puede ser un ID de columna
+  id: keyof T | 'acciones'; 
   label: string;
   numeric?: boolean;
   disablePadding?: boolean;

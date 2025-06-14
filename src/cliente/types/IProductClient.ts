@@ -1,6 +1,4 @@
-import type { IArticle } from "../administracion-sistema/api/types/IArticle";
-
-
+import type { IArticle } from "../../administracion-sistema/api/types/IArticle";
 export interface IProductClient {
     id: number;
     idmanufacturedArticle?: number;

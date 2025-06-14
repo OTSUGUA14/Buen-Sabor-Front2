@@ -3,7 +3,7 @@ import {useNavigate } from "react-router-dom";
 import styles from "../../../styles/Login.module.css";
 import { loginUser } from "../../cliente/services/Api";
 import { useUser } from "../../cliente/components/UserContext";
-import type { UserLogin } from "../../../type/UserLogin";
+import type { UserLogin } from "../../cliente/types/UserLogin";
 
 
 export default function Login() {
@@ -15,16 +15,16 @@ export default function Login() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const userToLogin: UserLogin = {
-            username: username,
-            password: password
-        };
+        //  const userToLogin: UserLogin = {
+        //      username: username,
+        //      password: password
+        //  };
 
-        const profile = await loginUser(userToLogin);
-        if (profile) {
-            setProfile(profile);
-            navigate("/admin"); 
-        }
+        // const profile = await loginUser(userToLogin);
+        // if (profile) {
+        //     setProfile(profile);
+        //     navigate("/admin"); 
+        // }
     };
 
     return (

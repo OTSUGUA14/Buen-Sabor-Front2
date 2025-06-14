@@ -1,16 +1,13 @@
-// src/administracion-sistema/pages/SuppliesPage/SuppliesPage.tsx
-
 import { useState, useMemo, useEffect } from 'react';
-import { GenericTable } from '../../components/crud/GenericTable/GenericTable';
-import type { ITableColumn } from '../../components/crud/GenericTable/GenericTable.types';
+import { GenericTable } from '../components/crud/GenericTable';
+import type { ITableColumn } from '../components/crud/GenericTable.types';
 import { Button } from '../components/common/Button';
 import { useCrud } from '../hooks/useCrud';
 import { supplyApi } from '../api/supply';
 import type { IArticle } from '../api/types/IArticle'; 
-import { ConfirmationDialog } from '../../components/common/ConfirmationDialog/ConfirmationDialog';
 import { FormModal } from '../components/common/FormModal';
-import { GenericForm } from '../../components/crud/GenericForm/GenericForm';
-import type { IFormFieldConfig, ISelectOption } from '../../components/crud/GenericForm/GenericForm.types';
+import { GenericForm } from '../components/crud/GenericForm';
+import type { IFormFieldConfig, ISelectOption } from '../components/crud/GenericForm.types';
 import { InputField } from '../components/common/InputField';
 import { SelectField } from '../components/common/SelectField';
 import '../crud-pages.css';
@@ -62,7 +59,6 @@ export const SuppliesPage: React.FC = () => {
             const nombre = item.denomination?.toLowerCase() ?? '';
             const unidad = item.measuringUnit?.unit?.toLowerCase() ?? '';
             const categoria = item.category?.name?.toLowerCase() ?? '';
-            const estado = (item.estado ?? '').toLowerCase();
             const search = searchTerm.toLowerCase();
 
             const matchesSearch =
@@ -70,15 +66,11 @@ export const SuppliesPage: React.FC = () => {
                 unidad.includes(search) ||
                 categoria.includes(search);
 
-            const matchesStatus =
-                statusFilter === 'TODOS' ||
-                estado === statusFilter.toLowerCase();
-
             const matchesCategory =
                 categoryFilter === 'TODOS' ||
                 categoria === categoryFilter.toLowerCase();
 
-            return matchesSearch && matchesStatus && matchesCategory;
+            return matchesSearch && matchesCategory;
         });
     }, [ingredientesAll, searchTerm, statusFilter, categoryFilter]);
 

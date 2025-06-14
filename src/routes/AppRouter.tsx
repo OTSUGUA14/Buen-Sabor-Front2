@@ -5,19 +5,18 @@ import { Route, Routes } from "react-router-dom";
 import Home from "../cliente/screens/Home";
 import Menu from "../cliente/screens/MenuPages";
 
-import Login from "../screens/Login";
+import Login from "../cliente/screens/Login";
 import LoginEmployee from "../administracion-sistema/screens/LoginEmployee";
 import Navbar from "../cliente/components/Navbar";
 import Footer from "../cliente/components/Footer";
-import Perfil from "../screens/Profile";
-import RegisterPage from "../screens/RegisterPage";
+import Perfil from "../cliente/screens/Profile";
+import RegisterPage from "../cliente/screens/RegisterPage";
 
 import { AdminLayout } from "../administracion-sistema/components/layout/AdminLayout";
 import { ProductsPage } from "../administracion-sistema/screens/ProductsPage";
 import { SuppliesPage } from "../administracion-sistema/screens/SuppliesPage";
 import { CategoriesPage } from "../administracion-sistema/screens/CategoriesPage";
 import { EmployeesPage } from "../administracion-sistema/screens/EmployeesPage";
-// import { StatisticsPage } from "../administracion-sistema/pages/StatisticsPage/StattisticsPage";
 import { OrdersPage } from "../administracion-sistema/screens/CashOrdersPage";
 import { KitchenOrdersPage } from "../administracion-sistema/screens/KitchenOrdersPage";
 import { DeliveryOrdersPage } from "../administracion-sistema/screens/DeliveryOrdersPage";

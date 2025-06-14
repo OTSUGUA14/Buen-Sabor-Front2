@@ -1,13 +1,11 @@
-// src/administracion-sistema/components/common/ConfirmationDialog/ConfirmationDialog.tsx
 
-
-import { Button } from '../Button'; // Importamos nuestro Button genérico
-import './ConfirmationDialog.css'; // Estilos para el diálogo de confirmación
+import { Button } from './Button';
+import './ConfirmationDialog.css'; 
 
 interface ConfirmationDialogProps {
     isOpen: boolean;
-    onClose: () => void; // Función para cerrar el diálogo (cancelar)
-    onConfirm: () => void; // Función para confirmar la acción
+    onClose: () => void; 
+    onConfirm: () => void; 
     title: string;
     message: string;
 }

@@ -1,8 +1,6 @@
-// src/administracion-sistema/components/crud/GenericForm/GenericForm.tsx
 
-
-import { useForm } from '../../../hooks/useForm';
-import { Button } from '../../common/Button';
+import { useForm } from '../../hooks/useForm';
+import { Button } from '../common/Button';
 import type { IFormFieldConfig, FormData, ISelectOption } from './GenericForm.types';
 import './GenericForm.css';
 import { useMemo } from 'react';

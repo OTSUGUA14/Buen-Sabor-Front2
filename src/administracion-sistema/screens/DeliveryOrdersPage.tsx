@@ -1,8 +1,8 @@
 // src/administracion-sistema/pages/DeliveryOrdersPage/DeliveryOrdersPage.tsx
 
 import { useState, useMemo } from 'react';
-import { GenericTable } from '../../components/crud/GenericTable/GenericTable';
-import type { ITableColumn } from '../../components/crud/GenericTable/GenericTable.types';
+import { GenericTable } from '../components/crud/GenericTable';
+import type { ITableColumn } from '../components/crud/GenericTable.types';
 import { Button } from '../components/common/Button';
 import { SelectField } from '../components/common/SelectField';
 import type { SelectOption as ISelectOption } from '../components/common/SelectField.types';

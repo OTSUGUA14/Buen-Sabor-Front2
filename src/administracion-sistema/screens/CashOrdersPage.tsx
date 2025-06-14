@@ -1,4 +1,4 @@
-// src/administracion-sistema/pages/OrdersPage/OrdersPage.tsx
+
 import { useState, useMemo } from 'react';
 import { GenericTable } from '../components/crud/GenericTable';
 import type { ITableColumn } from '../components/crud/GenericTable.types';

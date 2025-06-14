@@ -1,7 +1,5 @@
-// src/administracion-sistema/components/common/FormModal/FormModal.tsx
 
-
-import './FormModal.css'; // Estilos para el modal del formulario
+import './FormModal.css'; 
 
 interface FormModalProps {
     isOpen: boolean;

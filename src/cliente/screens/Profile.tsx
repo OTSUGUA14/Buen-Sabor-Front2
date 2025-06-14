@@ -1,4 +1,4 @@
-import { useUser } from '../cliente/components/UserContext';
+import { useUser } from '../../cliente/components/UserContext';
 import '../styles/Profile.css';
 
 
@@ -24,7 +24,7 @@ const Profile = () => {
                     <div className="profile-avatar-circle">
                         <img src={avatarUrl} alt="Avatar de Usuario" className="profile-avatar-image" />
                     </div>
-                 
+
                 </div>
 
                 <div className="profile-details-section">

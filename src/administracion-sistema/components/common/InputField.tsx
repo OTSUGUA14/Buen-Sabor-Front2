@@ -1,4 +1,3 @@
-// src/administracion-sistema/components/common/InputField/InputField.tsx
 
 import './InputField.css';
 

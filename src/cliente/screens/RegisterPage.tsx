@@ -3,10 +3,9 @@ import styles from "../styles/Login.module.css";
 
 import "../index.css";
 import { regexPatterns } from "../validation/Validatios";
-import type { Domicile, UserRegister } from "../type/UserData";
-import { registerUser } from "../servicios/Api";
+import type { Domicile, UserRegister } from "../types/UserData";
+import { registerUser } from "../services/Api";
 import { Link } from "react-router-dom";
-
 
 export default function RegisterPage() {
     const [userData, setUserData] = useState({

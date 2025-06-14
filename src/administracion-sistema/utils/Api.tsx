@@ -1,4 +1,5 @@
-import type { Category, IProductClient } from "../../type/IProductClient";
+// Update the path below to the correct relative path to IProductClient
+import type { Category, IProductClient } from '../../cliente/types/IProductClient';
 import type { IArticle } from "../api/types/IArticle";
 
 import type { } from "../api/types/IProduct";

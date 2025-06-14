@@ -1,6 +1,3 @@
-// src/administracion-sistema/components/crud/GenericForm/GenericForm.types.ts
-
-// ISelectOption puede estar en otro archivo o aquí, asegúrate de que exista
 export interface ISelectOption {
     value: string | number;
     label: string;

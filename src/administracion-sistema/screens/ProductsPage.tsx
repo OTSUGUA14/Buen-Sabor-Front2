@@ -1,20 +1,19 @@
 // src/administracion-sistema/pages/ProductsPage/ProductsPage.tsx
 
 import { useState, useMemo, useEffect } from 'react';
-import { GenericTable } from '../../components/crud/GenericTable/GenericTable';
-import type { ITableColumn } from '../../components/crud/GenericTable/GenericTable.types';
+import { GenericTable } from '../components/crud/GenericTable';
+import type { ITableColumn } from '../components/crud/GenericTable.types';
 import { Button } from '../components/common/Button';
 import { useCrud } from '../hooks/useCrud';
 import { productApi } from '../api/product';
 import type { Category, InventoryImage, IProduct, ManufacturedArticleDetail } from '../api/types/IProduct';
-import { ConfirmationDialog } from '../../components/common/ConfirmationDialog/ConfirmationDialog';
 import { FormModal } from '../components/common/FormModal';
 import { InputField } from '../components/common/InputField';
 import { SelectField } from '../components/common/SelectField';
 import { getCategopryAll, getIngredientesAll } from '../utils/Api';
-import IngredienteDelProductoForm from '../../components/common/Producto/IngredienteDelProductoForm';
+import IngredienteDelProductoForm from '../components/common/IngredienteDelProductoForm';
 import type { IArticle } from '../api/types/IArticle';
-import type { IFormFieldConfig, ISelectOption } from '../../components/crud/GenericForm/GenericForm.types';
+import type { IFormFieldConfig, ISelectOption } from '../components/crud/GenericForm.types';
 
 export const ProductsPage: React.FC = () => {
     const {

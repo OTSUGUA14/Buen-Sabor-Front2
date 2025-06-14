@@ -1,10 +1,8 @@
-/* src/administracion-sistema/components/crud/GenericForm/GenericForm.css */
 
 .generic-form {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    /* Espacio entre grupos de formulario */
 }
 
 .form-group {

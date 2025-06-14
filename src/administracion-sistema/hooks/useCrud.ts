@@ -1,12 +1,6 @@
-// src/administracion-sistema/hooks/useCrud.ts
 
 import { useState, useEffect, useCallback } from 'react';
 
-/**
- * @interface CrudApi
- * @description Interfaz genérica para las operaciones CRUD de una API.
- * @template T El tipo de la entidad.
- */
 export interface CrudApi<T extends { id: number }> {
     getAll: () => Promise<T[]>;
     getById: (id: number) => Promise<T | undefined | null>; 

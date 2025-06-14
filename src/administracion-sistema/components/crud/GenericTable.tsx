@@ -1,8 +1,7 @@
-// src/administracion-sistema/components/crud/GenericTable/GenericTable.tsx
 
 import { useState, useEffect } from "react";
 import type { IGenericTableProps, ITableColumn } from "./GenericTable.types";
-import { Button } from "../../common/Button";
+import { Button } from "../common/Button";
 import './GenericTable.css';
 
 export const GenericTable = <T extends { id: number }>({

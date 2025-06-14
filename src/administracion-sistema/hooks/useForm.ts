@@ -1,7 +1,6 @@
-// src/administracion-sistema/hooks/useForm.ts
 
 import { useState, useEffect, useCallback } from 'react';
-import type { IFormFieldConfig, FormData } from '../components/crud/GenericForm/GenericForm.types';
+import type { IFormFieldConfig, FormData } from '../components/crud//GenericForm.types';
 
 // Hook personalizado para manejar formularios genéricos
 export const useForm = <T extends Record<string, any>>(

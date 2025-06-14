@@ -1,5 +1,5 @@
 
-import type { IArticle } from '../../../api/types/IArticle';
+import type { IArticle } from '../../api/types/IArticle';
 
 type IngredienteConCantidad = { ingrediente: IArticle; cantidad: number };
 

@@ -1,16 +1,15 @@
 // src/administracion-sistema/pages/CategoriesPage/CategoriesPage.tsx
 
 import { useState, useMemo } from 'react';
-import { GenericTable } from '../../components/crud/GenericTable/GenericTable';
-import type { ITableColumn } from '../../components/crud/GenericTable/GenericTable.types';
+import { GenericTable } from '../components/crud//GenericTable';
+import type { ITableColumn } from '../components/crud//GenericTable.types';
 import { Button } from '../components/common/Button';
 import { useCrud } from '../hooks/useCrud';
 import { categoryApi } from '../api/category';
 import type { ICategory } from '../api/types/ICategory';
-import { ConfirmationDialog } from '../../components/common/ConfirmationDialog/ConfirmationDialog';
 import { FormModal } from '../components/common/FormModal';
-import { GenericForm } from '../../components/crud/GenericForm/GenericForm';
-import type { IFormFieldConfig } from '../../components/crud/GenericForm/GenericForm.types';
+import { GenericForm } from '../components/crud/GenericForm';
+import type { IFormFieldConfig } from '../components/crud//GenericForm.types';
 import { InputField } from '../components/common/InputField';
 import '../crud-pages.css';
 
