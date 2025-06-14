@@ -7,8 +7,8 @@ import { SelectField } from '../components/common/SelectField';
 import type { SelectOption as ISelectOption } from '../components/common/SelectField.types'; 
 import { InputField } from '../components/common/InputField';
 
-import '../crud-pages.css';
-import './KitchenOrdersPge.css';
+import './styles/crud-pages.css';
+import './styles/KitchenOrdersPge.css';
 
 interface IDummyKitchenOrder {
     id: number;

@@ -8,8 +8,8 @@ import { SelectField } from '../components/common/SelectField';
 import type { SelectOption as ISelectOption } from '../components/common/SelectField.types';
 import { InputField } from '../components/common/InputField';
 
-import '../crud-pages.css';
-import './DeliveryOrdersPage.css'; 
+import './styles/crud-pages.css';
+import './styles/DeliveryOrdersPage.css'; 
 
 interface IDummyDeliveryOrder {
     id: number; 

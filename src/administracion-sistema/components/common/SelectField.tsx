@@ -1,5 +1,5 @@
 
-import './SelectField.css'; 
+import './styles/SelectField.css'; 
 
 interface SelectOption {
     value: string | number;

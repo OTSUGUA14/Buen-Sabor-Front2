@@ -10,7 +10,8 @@ import { GenericForm } from '../components/crud/GenericForm';
 import type { IFormFieldConfig, ISelectOption } from '../components/crud/GenericForm.types';
 import { InputField } from '../components/common/InputField';
 import { SelectField } from '../components/common/SelectField';
-import '../crud-pages.css';
+
+import './styles/crud-pages.css';
 
 export const SuppliesPage: React.FC = () => {
     const {

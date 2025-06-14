@@ -11,7 +11,8 @@ import { FormModal } from '../components/common/FormModal';
 import { GenericForm } from '../components/crud/GenericForm';
 import type { IFormFieldConfig } from '../components/crud//GenericForm.types';
 import { InputField } from '../components/common/InputField';
-import '../crud-pages.css';
+
+import './styles/crud-pages.css';
 
 export const CategoriesPage: React.FC = () => {
     const {

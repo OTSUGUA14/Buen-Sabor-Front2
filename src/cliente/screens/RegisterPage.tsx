@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styles from "../styles/Login.module.css";
 
-import "../index.css";
+import "../../index.css";
 import { regexPatterns } from "../validation/Validatios";
 import type { Domicile, UserRegister } from "../types/UserData";
 import { registerUser } from "../services/Api";

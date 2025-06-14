@@ -1,5 +1,5 @@
 
-import './InputField.css';
+import './styles/InputField.css';
 
 interface Option {
     value: string | number;

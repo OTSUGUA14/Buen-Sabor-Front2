@@ -1,6 +1,6 @@
 
 import { Button } from './Button';
-import './ConfirmationDialog.css'; 
+import './styles/ConfirmationDialog.css'; 
 
 interface ConfirmationDialogProps {
     isOpen: boolean;

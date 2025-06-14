@@ -1,13 +1,12 @@
 // src/administracion-sistema/components/common/Button/Button.tsx
 
-import './Button.css'; // Importamos los estilos del botón
+import './styles/Button.css'; 
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'primary' | 'secondary' | 'danger' | 'outline-primary' | 'outline-danger' | 'outline-info';
     size?: 'small' | 'medium' | 'large';
     children: React.ReactNode;
     onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-    // Puedes añadir más props si necesitas iconos, disabled, etc.
 }
 
 export const Button: React.FC<ButtonProps> = ({

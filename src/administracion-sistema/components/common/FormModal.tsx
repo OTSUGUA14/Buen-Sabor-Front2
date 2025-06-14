@@ -1,5 +1,5 @@
 
-import './FormModal.css'; 
+import './styles/FormModal.css'; 
 
 interface FormModalProps {
     isOpen: boolean;

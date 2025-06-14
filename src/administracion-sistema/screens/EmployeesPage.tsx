@@ -9,7 +9,7 @@ import { InputField } from '../components/common/InputField';
 import { employeeApi } from '../api/employee';
 import type { IEmployee } from '../api/types/IEmployee';
 
-import '../crud-pages.css';
+import './styles/crud-pages.css';
 
 export const EmployeesPage: React.FC = () => {
     const [employees, setEmployees] = useState<IEmployee[]>([]);

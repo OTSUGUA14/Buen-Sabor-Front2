@@ -7,8 +7,8 @@ import { SelectField } from '../components/common/SelectField';
 import type { ISelectOption } from '../components/crud/GenericForm.types'; 
 import { InputField } from '../components/common/InputField'; 
 
-import '../../pages/crud-pages.css';
-import './CashOrdersPage.css'; 
+import './styles/crud-pages.css';
+import './styles/CashOrdersPage.css'; 
 
 interface IDummyOrder {
     id: number;
