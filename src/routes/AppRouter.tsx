@@ -2,26 +2,26 @@
 
 import { Route, Routes } from "react-router-dom";
 
-import Home from "../screens/Home";
-import Menu from "../screens/MenuPages";
+import Home from "../cliente/screens/Home";
+import Menu from "../cliente/screens/MenuPages";
 
 import Login from "../screens/Login";
-import LoginEmployee from "../administracion-sistema/pages/LoginEmployee/LoginEmployee";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import LoginEmployee from "../administracion-sistema/screens/LoginEmployee";
+import Navbar from "../cliente/components/Navbar";
+import Footer from "../cliente/components/Footer";
 import Perfil from "../screens/Profile";
 import RegisterPage from "../screens/RegisterPage";
 
 import { AdminLayout } from "../administracion-sistema/components/layout/AdminLayout";
-import { ProductsPage } from "../administracion-sistema/pages/ProductsPage/ProductsPage";
-import { SuppliesPage } from "../administracion-sistema/pages/SuppliesPage/SuppliesPage";
-import { CategoriesPage } from "../administracion-sistema/pages/CategoriesPage/CategoriesPage";
-import { EmployeesPage } from "../administracion-sistema/pages/EmployeesPage/EmployeesPage";
+import { ProductsPage } from "../administracion-sistema/screens/ProductsPage";
+import { SuppliesPage } from "../administracion-sistema/screens/SuppliesPage";
+import { CategoriesPage } from "../administracion-sistema/screens/CategoriesPage";
+import { EmployeesPage } from "../administracion-sistema/screens/EmployeesPage";
 // import { StatisticsPage } from "../administracion-sistema/pages/StatisticsPage/StattisticsPage";
-import { OrdersPage } from "../administracion-sistema/pages/Cash/CashOrdersPage";
-import { KitchenOrdersPage } from "../administracion-sistema/pages/Kitchen/KitchenOrdersPage";
-import { DeliveryOrdersPage } from "../administracion-sistema/pages/Delivery/DeliveryOrdersPage";
-import MenuPages from "../screens/MenuPages";
+import { OrdersPage } from "../administracion-sistema/screens/CashOrdersPage";
+import { KitchenOrdersPage } from "../administracion-sistema/screens/KitchenOrdersPage";
+import { DeliveryOrdersPage } from "../administracion-sistema/screens/DeliveryOrdersPage";
+import MenuPages from "../cliente/screens/MenuPages";
 
 export function AppRouter() {
     return (
