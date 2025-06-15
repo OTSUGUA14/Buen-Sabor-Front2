@@ -17,7 +17,7 @@ import { ProductsPage } from "../administracion-sistema/screens/ProductsPage";
 import { SuppliesPage } from "../administracion-sistema/screens/SuppliesPage";
 import { CategoriesPage } from "../administracion-sistema/screens/CategoriesPage";
 import { EmployeesPage } from "../administracion-sistema/screens/EmployeesPage";
-import { OrdersPage } from "../administracion-sistema/screens/CashOrdersPage";
+import { CashOrdersPage } from "../administracion-sistema/screens/CashOrdersPage";
 import { KitchenOrdersPage } from "../administracion-sistema/screens/KitchenOrdersPage";
 import { DeliveryOrdersPage } from "../administracion-sistema/screens/DeliveryOrdersPage";
 import MenuPages from "../cliente/screens/MenuPages";
@@ -41,7 +41,7 @@ export function AppRouter() {
                     <Route path="category" element={<CategoriesPage />} />
                     <Route path="employees" element={<EmployeesPage />} />
                     {/* <Route path="statistics" element={<StatisticsPage />} /> */}
-                    <Route path="cash-orders" element={<OrdersPage />} />
+                    <Route path="cash-orders" element={<CashOrdersPage />} />
                     <Route path="kitchen-orders" element={<KitchenOrdersPage />} />
                     <Route path="delivery-orders" element={<DeliveryOrdersPage />} />
                 </Route>

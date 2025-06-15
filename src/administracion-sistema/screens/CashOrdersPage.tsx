@@ -14,7 +14,7 @@ import './styles/crud-pages.css';
 import './styles/CashOrdersPage.css';
 import { OrderState } from '../../cliente/types/IOrderData';
 
-export const OrdersPage: React.FC = () => {
+export const CashOrdersPage: React.FC = () => {
     const {
         data: orders,
         loading,
@@ -32,7 +32,7 @@ export const OrdersPage: React.FC = () => {
     }, [fetchData]);
 
     const statusOptions: ISelectOption[] = useMemo(() => [
-        { value: 'TODOS', label: 'TODOS' },
+        { value: 'TODOS', label: 'ESTADO' },
         { value: 'PENDING', label: 'PENDIENTE' },
         { value: 'PREPARING', label: 'EN COCINA' },
         { value: 'ARRIVED', label: 'LISTO PARA ENTREGAR' },
@@ -41,7 +41,7 @@ export const OrdersPage: React.FC = () => {
     ], []);
 
     const deliveryTypeOptions: ISelectOption[] = useMemo(() => [
-        { value: 'TODOS', label: 'TODOS' },
+        { value: 'TODOS', label: 'ENTREGA' },
         { value: 'DELIVERY', label: 'DELIVERY' },
         { value: 'LOCAL', label: 'LOCAL' },
     ], []);

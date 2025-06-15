@@ -1,138 +1,155 @@
-
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { GenericTable } from '../components/crud/GenericTable';
 import type { ITableColumn } from '../components/crud/GenericTable.types';
 import { Button } from '../components/common/Button';
-import { SelectField } from '../components/common/SelectField';
-import type { SelectOption as ISelectOption } from '../components/common/SelectField.types'; 
 import { InputField } from '../components/common/InputField';
+import { SelectField } from '../components/common/SelectField';
+import type { ISelectOption } from '../components/crud/GenericForm.types';
+
+import { orderApi } from '../api/order';
+import { useCrud } from '../hooks/useCrud';
+import { type IOrder } from '../api/types/IOrder';
 
 import './styles/crud-pages.css';
-import './styles/KitchenOrdersPge.css';
-
-interface IDummyKitchenOrder {
-    id: number;
-    horaPedido: string;
-    estado: 'PENDIENTE' | 'EN PREPARACION' | 'LISTO PARA ENTREGAR' | 'CANCELADO';
-    detallesProductos: string;
-    tipoEntrega: 'DELIVERY' | 'LOCAL';
-    notasCocina?: string;
-}
+import './styles/CashOrdersPage.css';
+import { OrderState } from '../../cliente/types/IOrderData';
 
 export const KitchenOrdersPage: React.FC = () => {
-    const dummyKitchenOrders: IDummyKitchenOrder[] = useMemo(() => [
-        { id: 1001, horaPedido: '17:00', estado: 'EN PREPARACION', detallesProductos: 'Hamburguesa clásica (2), Papas fritas (1)', tipoEntrega: 'DELIVERY' },
-        { id: 1002, horaPedido: '17:05', estado: 'PENDIENTE', detallesProductos: 'Pizza Muzzarella (1), Coca cola 500ml (1)', tipoEntrega: 'LOCAL', notasCocina: 'Extra queso' },
-        { id: 1003, horaPedido: '16:45', estado: 'LISTO PARA ENTREGAR', detallesProductos: 'Ensalada Caesar (1)', tipoEntrega: 'DELIVERY' },
-        { id: 1004, horaPedido: '17:10', estado: 'PENDIENTE', detallesProductos: 'Lomo completo (1), Cerveza (1)', tipoEntrega: 'LOCAL' },
-        { id: 1005, horaPedido: '16:00', estado: 'CANCELADO', detallesProductos: 'Tacos de carne (3)', tipoEntrega: 'DELIVERY' },
-        { id: 1006, horaPedido: '17:15', estado: 'PENDIENTE', detallesProductos: 'Sándwich de pollo (1), Jugo de naranja (1)', tipoEntrega: 'LOCAL' },
-        { id: 1007, horaPedido: '17:20', estado: 'PENDIENTE', detallesProductos: 'Sushi variado (1)', tipoEntrega: 'DELIVERY' },
+    const {
+        data: orders,
+        loading,
+        error,
+        fetchData,
+        updateItem,
+    } = useCrud<IOrder>(orderApi);
+
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('TODOS');
+    const [deliveryTypeFilter, setDeliveryTypeFilter] = useState('TODOS');
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    const statusOptions: ISelectOption[] = useMemo(() => [
+        { value: 'TODOS', label: 'ESTADO' },
+        { value: 'PENDING', label: 'PENDIENTE' },
+        { value: 'PREPARING', label: 'EN COCINA' },
+        { value: 'ARRIVED', label: 'LISTO PARA ENTREGAR' },
+        { value: 'CANCELED', label: 'CANCELADO' },
+        { value: 'REJECTED', label: 'RECHAZADO' },
     ], []);
 
-    const [searchTerm, setSearchTerm] = useState<string>('');
-    const [statusFilter, setStatusFilter] = useState<string>('TODOS');
-    const [priorityFilter, setPriorityFilter] = useState<string>('TODOS');
-
-    const kitchenStatusOptions: ISelectOption[] = useMemo(() => [
-        { value: 'TODOS', label: 'TODOS' },
-        { value: 'PENDIENTE', label: 'PENDIENTE' },
-        { value: 'EN PREPARACION', label: 'EN PREPARACIÓN' },
-        { value: 'LISTO PARA ENTREGAR', label: 'LISTO PARA ENTREGAR' },
-        { value: 'CANCELADO', label: 'CANCELADO' },
+    const deliveryTypeOptions: ISelectOption[] = useMemo(() => [
+        { value: 'TODOS', label: 'ENTREGA' },
+        { value: 'DELIVERY', label: 'DELIVERY' },
+        { value: 'LOCAL', label: 'LOCAL' },
     ], []);
 
-    const priorityOptions: ISelectOption[] = useMemo(() => [
-        { value: 'TODOS', label: 'TODOS' },
-        { value: 'ALTA', label: 'ALTA' },
-        { value: 'NORMAL', label: 'NORMAL' },
-    ], []);
+    const filteredOrders = useMemo(() => {
+        return orders.filter(order => {
+            const matchesSearch = order.clientName.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesStatus = statusFilter === 'TODOS' || order.orderState === statusFilter;
+            const matchesDelivery = deliveryTypeFilter === 'TODOS' || order.tipoEntrega === deliveryTypeFilter;
+            return matchesSearch && matchesStatus && matchesDelivery;
+        });
+    }, [orders, searchTerm, statusFilter, deliveryTypeFilter]);
 
-
-    const kitchenOrderColumns: ITableColumn<IDummyKitchenOrder>[] = useMemo(() => [
-        { id: 'id', label: 'Nro Orden', numeric: true },
-        { id: 'horaPedido', label: 'Hora Pedido' },
-
-        { id: 'estado', label: 'Estado' },
-        { id: 'detallesProductos', label: 'Productos a Preparar' },
-        { id: 'tipoEntrega', label: 'Entrega' },
+    const orderColumns: ITableColumn<IOrder>[] = useMemo(() => [
+        { id: 'id', label: 'ID Orden', numeric: true },
+        { id: 'clientName', label: 'Cliente' },
+        { id: 'orderDate', label: 'Fecha' },
+        {
+            id: 'total',
+            label: 'Total',
+            numeric: true,
+            render: (item) => `$${item.total.toFixed(2)}`
+        },
+        {
+            id: 'orderState',
+            label: 'Estado',
+            render: (item) => item.orderState
+        },
+        {
+            id: 'tipoEntrega',
+            label: 'Tipo Entrega',
+        },
         {
             id: 'acciones',
             label: 'Acciones',
             render: (item) => (
                 <div className="table-actions">
-                    {item.estado === 'PENDIENTE' && (
-                        <Button
-                            variant="primary"
-                            size="small"
-                            onClick={() => console.log('Iniciar preparación de:', item.id)}
-                        >
-                            Iniciar Preparación
-                        </Button>
-                    )}
-                    {item.estado === 'EN PREPARACION' && (
-                        <Button
-                            variant="secondary"
-                            size="small"
-                            onClick={() => console.log('Marcar como listo:', item.id)}
-                        >
-                            Marcar como Listo
-                        </Button>
-                    )}
                     <Button
-                        variant="outline-info"
+                        variant="outline-primary"
                         size="small"
-                        onClick={() => console.log('Ver detalles completos de:', item.id)}
+                        onClick={() => console.log('Ver detalles de:', item.id)}
                     >
                         Ver Detalles
                     </Button>
+
+                    {item.orderState === 'PENDING' && (
+                        <Button
+                            variant="primary"
+                            size="small"
+                            onClick={() =>
+                                updateItem({ ...item, orderState: OrderState.PREPARING })
+                            }
+                        >
+                            Aceptar Orden
+                        </Button>
+                    )}
+
+                    {item.orderState === OrderState.PREPARING && (
+                        <Button
+                            variant="secondary"
+                            size="small"
+                            onClick={() =>
+                                updateItem({ ...item, orderState: OrderState.ARRIVED })
+                            }
+                        >
+                            Lista p/ Entregar
+                        </Button>
+                    )}
                 </div>
             ),
         },
-    ], []);
+    ], [updateItem]);
+
+    if (loading) return <p>Cargando órdenes...</p>;
+    if (error) return <p>Error al cargar órdenes: {error}</p>;
 
     return (
         <div className="crud-page-container">
             <div className="page-header">
-                <h2>Órdenes en Cocina</h2>
+                <h2>Gestión de Órdenes</h2>
             </div>
 
             <div className="filter-controls">
                 <InputField
-                    name="searchOrdersKitchen"
+                    name="searchOrders"
                     type="search"
-                    placeholder="Buscar por Nro Orden, Producto..."
+                    placeholder="Buscar por cliente..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"
                 />
                 <SelectField
-                    name="statusFilterKitchen"
-                    label="Filtrar por Estado"
-                    options={kitchenStatusOptions}
+                    name="statusFilter"
+                    options={statusOptions}
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                     className="status-select"
                 />
+                <SelectField
+                    name="deliveryTypeFilter"
+                    options={deliveryTypeOptions}
+                    value={deliveryTypeFilter}
+                    onChange={(e) => setDeliveryTypeFilter(e.target.value)}
+                    className="status-select"
+                />
             </div>
 
-            <GenericTable
-                data={dummyKitchenOrders}
-                columns={kitchenOrderColumns}
-            />
-
-
-            {/* Placeholder para un modal de detalles de la orden para cocina */}
-            {/*
-            <FormModal
-                isOpen={false}
-                onClose={() => {}}
-                title="Detalles de la Orden para Cocina"
-            >
-                <div>Contenido con todos los detalles de los productos, alérgenos, etc.</div>
-            </FormModal>
-            */}
-
+            <GenericTable data={filteredOrders} columns={orderColumns} />
         </div>
     );
 };
