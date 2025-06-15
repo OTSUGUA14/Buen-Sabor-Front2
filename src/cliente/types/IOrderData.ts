@@ -30,7 +30,7 @@ export interface OrderRequestDTO {
     subsidiaryId: number;
     orderDetails: OrderDetailDTO[];
 }
-//Mandar mercado pago
+
 export interface UserPreferenceRequest {
     title: string;
     quantity: number;

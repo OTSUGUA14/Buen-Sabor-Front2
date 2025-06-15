@@ -20,7 +20,7 @@ export interface ManufacturedArticleDetail {
 
 export interface InventoryImage {
     imageData: string;
-    idinventoryImage?: number; // <-- Con signo ? es opcional
+    idinventoryImage?: number;
 }
 export interface MeasuringUnit {
     idmeasuringUnit: number;

@@ -1,100 +1,125 @@
-
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { GenericTable } from '../components/crud/GenericTable';
 import type { ITableColumn } from '../components/crud/GenericTable.types';
 import { Button } from '../components/common/Button';
+import { InputField } from '../components/common/InputField';
 import { SelectField } from '../components/common/SelectField';
-import type { ISelectOption } from '../components/crud/GenericForm.types'; 
-import { InputField } from '../components/common/InputField'; 
+import type { ISelectOption } from '../components/crud/GenericForm.types';
+
+import { orderApi } from '../api/order';
+import { useCrud } from '../hooks/useCrud';
+import { type IOrder } from '../api/types/IOrder';
 
 import './styles/crud-pages.css';
-import './styles/CashOrdersPage.css'; 
-
-interface IDummyOrder {
-    id: number;
-    cliente: string;
-    fecha: string; 
-    hora: string;
-    total: number;
-    estado: 'PENDIENTE' | 'EN COCINA' | 'LISTO PARA ENTREGAR' | 'EN CAMINO' | 'ENTREGADO' | 'CANCELADO';
-    tipoEntrega: 'DELIVERY' | 'LOCAL';
-}
+import './styles/CashOrdersPage.css';
+import { OrderState } from '../../cliente/types/IOrderData';
 
 export const OrdersPage: React.FC = () => {
-    const dummyOrders: IDummyOrder[] = useMemo(() => [
-        { id: 1001, cliente: 'Juan Pérez', fecha: '2025-06-05', hora: '14:00', total: 1500.50, estado: 'PENDIENTE', tipoEntrega: 'DELIVERY' },
-        { id: 1002, cliente: 'Ana Gómez', fecha: '2025-06-05', hora: '13:45', total: 800.00, estado: 'EN COCINA', tipoEntrega: 'LOCAL' },
-        { id: 1003, cliente: 'Pedro López', fecha: '2025-06-04', hora: '18:15', total: 2200.75, estado: 'LISTO PARA ENTREGAR', tipoEntrega: 'DELIVERY' },
-        { id: 1004, cliente: 'María Rodríguez', fecha: '2025-06-04', hora: '17:30', total: 1250.00, estado: 'ENTREGADO', tipoEntrega: 'LOCAL' },
-        { id: 1005, cliente: 'Luis García', fecha: '2025-06-03', hora: '11:00', total: 950.25, estado: 'CANCELADO', tipoEntrega: 'DELIVERY' },
-        { id: 1006, cliente: 'Sofía Martínez', fecha: '2025-06-05', hora: '14:10', total: 1800.00, estado: 'PENDIENTE', tipoEntrega: 'DELIVERY' },
-        { id: 1007, cliente: 'Carlos Sánchez', fecha: '2025-06-05', hora: '14:05', total: 650.00, estado: 'EN COCINA', tipoEntrega: 'LOCAL' },
-        { id: 1008, cliente: 'Laura Díaz', fecha: '2025-06-04', hora: '19:00', total: 3000.00, estado: 'EN CAMINO', tipoEntrega: 'DELIVERY' },
-        { id: 1009, cliente: 'Diego Morales', fecha: '2025-06-04', hora: '16:00', total: 720.00, estado: 'ENTREGADO', tipoEntrega: 'LOCAL' },
-        { id: 1010, cliente: 'Elena Torres', fecha: '2025-06-03', hora: '12:30', total: 1100.00, estado: 'PENDIENTE', tipoEntrega: 'DELIVERY' },
-        { id: 1011, cliente: 'Martín Blanco', fecha: '2025-06-05', hora: '15:00', total: 1950.00, estado: 'PENDIENTE', tipoEntrega: 'DELIVERY' },
-        { id: 1012, cliente: 'Paula Castro', fecha: '2025-06-05', hora: '14:30', total: 900.00, estado: 'EN COCINA', tipoEntrega: 'LOCAL' },
-    ], []);
+    const {
+        data: orders,
+        loading,
+        error,
+        fetchData,
+        updateItem,
+    } = useCrud<IOrder>(orderApi);
 
-    // Estados para los filtros (solo para la estructura, sin lógica de filtrado por ahora)
-    const [searchTerm, setSearchTerm] = useState<string>('');
-    const [statusFilter, setStatusFilter] = useState<string>('TODOS');
-    const [deliveryTypeFilter, setDeliveryTypeFilter] = useState<string>('TODOS');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('TODOS');
+    const [deliveryTypeFilter, setDeliveryTypeFilter] = useState('TODOS');
 
-    // Opciones para el filtro de estado (poner los que tenga en martin en el back)
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
     const statusOptions: ISelectOption[] = useMemo(() => [
         { value: 'TODOS', label: 'TODOS' },
-        { value: 'PENDIENTE', label: 'PENDIENTE' },
-        { value: 'EN COCINA', label: 'EN COCINA' },
-        { value: 'LISTO PARA ENTREGAR', label: 'LISTO PARA ENTREGAR' },
-        { value: 'EN CAMINO', label: 'EN CAMINO' },
-        { value: 'ENTREGADO', label: 'ENTREGADO' },
-        { value: 'CANCELADO', label: 'CANCELADO' },
+        { value: 'PENDING', label: 'PENDIENTE' },
+        { value: 'PREPARING', label: 'EN COCINA' },
+        { value: 'ARRIVED', label: 'LISTO PARA ENTREGAR' },
+        { value: 'CANCELED', label: 'CANCELADO' },
+        { value: 'REJECTED', label: 'RECHAZADO' },
     ], []);
 
-    // Opciones para el filtro de tipo de entrega
     const deliveryTypeOptions: ISelectOption[] = useMemo(() => [
         { value: 'TODOS', label: 'TODOS' },
         { value: 'DELIVERY', label: 'DELIVERY' },
         { value: 'LOCAL', label: 'LOCAL' },
     ], []);
 
-    // Definición de las columnas de la tabla (cambiar IDummyOrder por la interfaz de las ordenes cuando haya una (decirle al martin que la agregue))
-    const orderColumns: ITableColumn<IDummyOrder>[] = useMemo(() => [
+    const filteredOrders = useMemo(() => {
+        return orders.filter(order => {
+            const matchesSearch = order.clientName.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesStatus = statusFilter === 'TODOS' || order.orderState === statusFilter;
+            const matchesDelivery = deliveryTypeFilter === 'TODOS' || order.tipoEntrega === deliveryTypeFilter;
+            return matchesSearch && matchesStatus && matchesDelivery;
+        });
+    }, [orders, searchTerm, statusFilter, deliveryTypeFilter]);
+
+    const orderColumns: ITableColumn<IOrder>[] = useMemo(() => [
         { id: 'id', label: 'ID Orden', numeric: true },
-        { id: 'cliente', label: 'Cliente' },
-        { id: 'fecha', label: 'Fecha' },
-        { id: 'hora', label: 'Hora' },
-        { id: 'total', label: 'Total', numeric: true, render: (item) => `$${item.total.toFixed(2)}` },
-        { id: 'estado', label: 'Estado' },
-        { id: 'tipoEntrega', label: 'Tipo Entrega' },
+        { id: 'clientName', label: 'Cliente' },
+        { id: 'orderDate', label: 'Fecha' },
+        {
+            id: 'total',
+            label: 'Total',
+            numeric: true,
+            render: (item) => `$${item.total.toFixed(2)}`
+        },
+        {
+            id: 'orderState',
+            label: 'Estado',
+            render: (item) => item.orderState
+        },
+        {
+            id: 'tipoEntrega',
+            label: 'Tipo Entrega',
+        },
         {
             id: 'acciones',
             label: 'Acciones',
             render: (item) => (
                 <div className="table-actions">
-                    {/* El botón "Ver Detalles" podría abrir un modal con el detalle de la orden */}
-                    <Button variant="outline-primary" size="small" onClick={() => console.log('Ver detalles de:', item.id)}>
+                    <Button
+                        variant="outline-primary"
+                        size="small"
+                        onClick={() => console.log('Ver detalles de:', item.id)}
+                    >
                         Ver Detalles
                     </Button>
-                    {/* Un botón para cambiar el estado, quizás solo para estados "activos" */}
-                    {item.estado === 'PENDIENTE' && (
-                        <Button variant="primary" size="small" onClick={() => console.log('Cambiar estado de:', item.id)}>
+
+                    {item.orderState === 'PENDING' && (
+                        <Button
+                            variant="primary"
+                            size="small"
+                            onClick={() =>
+                                updateItem({ ...item, orderState: OrderState.PREPARING })
+                            }
+                        >
                             Aceptar Orden
                         </Button>
                     )}
-                    {item.estado === 'EN COCINA' && (
-                        <Button variant="secondary" size="small" onClick={() => console.log('Cambiar estado de:', item.id)}>
+
+                    {item.orderState === OrderState.PREPARING && (
+                        <Button
+                            variant="secondary"
+                            size="small"
+                            onClick={() =>
+                                updateItem({ ...item, orderState: OrderState.ARRIVED })
+                            }
+                        >
                             Lista p/ Entregar
                         </Button>
                     )}
                 </div>
             ),
         },
-    ], []);
+    ], [updateItem]);
+
+    if (loading) return <p>Cargando órdenes...</p>;
+    if (error) return <p>Error al cargar órdenes: {error}</p>;
 
     return (
-        <div className="crud-page-container"> 
+        <div className="crud-page-container">
             <div className="page-header">
                 <h2>Gestión de Órdenes</h2>
             </div>
@@ -103,28 +128,28 @@ export const OrdersPage: React.FC = () => {
                 <InputField
                     name="searchOrders"
                     type="search"
-                    placeholder="Buscar por ID, Cliente..."
+                    placeholder="Buscar por cliente..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"
                 />
                 <SelectField
-                    name="statusFilterOrders"
+                    name="statusFilter"
                     options={statusOptions}
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                     className="status-select"
                 />
+                <SelectField
+                    name="deliveryTypeFilter"
+                    options={deliveryTypeOptions}
+                    value={deliveryTypeFilter}
+                    onChange={(e) => setDeliveryTypeFilter(e.target.value)}
+                    className="status-select"
+                />
             </div>
 
-            <GenericTable
-                data={dummyOrders} 
-                columns={orderColumns}
-                
-            />
-
-            {/* Agregar el modal para ver los detalles o cambiar de estados*/}
-            
+            <GenericTable data={filteredOrders} columns={orderColumns} />
         </div>
     );
 };
