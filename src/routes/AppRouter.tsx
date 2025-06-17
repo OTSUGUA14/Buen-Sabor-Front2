@@ -20,6 +20,7 @@ import { EmployeesPage } from "../administracion-sistema/screens/EmployeesPage";
 import { CashOrdersPage } from "../administracion-sistema/screens/CashOrdersPage";
 import { KitchenOrdersPage } from "../administracion-sistema/screens/KitchenOrdersPage";
 import { DeliveryOrdersPage } from "../administracion-sistema/screens/DeliveryOrdersPage";
+import { OrderDashboard } from "../administracion-sistema/screens/OrdersDashboard";
 import MenuPages from "../cliente/screens/MenuPages";
 
 export function AppRouter() {
@@ -40,6 +41,7 @@ export function AppRouter() {
                     <Route path="supplies" element={<SuppliesPage />} />
                     <Route path="category" element={<CategoriesPage />} />
                     <Route path="employees" element={<EmployeesPage />} />
+                    <Route path="orders" element={<OrderDashboard />} />
                     {/* <Route path="statistics" element={<StatisticsPage />} /> */}
                     <Route path="cash-orders" element={<CashOrdersPage />} />
                     <Route path="kitchen-orders" element={<KitchenOrdersPage />} />
