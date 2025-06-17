@@ -5,12 +5,14 @@ interface UserContextType {
     profile: UserRegister | null;
     setProfile: (profile: UserRegister | null) => void;
     logout: () => void;
+    updateProfile: (newData: Partial<UserRegister>) => Promise<void>;
 }
 
 export const UserContext = createContext<UserContextType>({
     profile: null,
-    setProfile: () => { },
-    logout: () => { },
+    setProfile: () => {},
+    logout: () => {},
+    updateProfile: async () => {},
 });
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
@@ -34,13 +36,20 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         }
     };
 
+    // Función para actualizar el perfil
+    const updateProfile = async (newData: Partial<UserRegister>) => {
+        // Aquí deberías hacer la petición a tu backend si tienes uno.
+        // Por ahora, solo actualiza localmente:
+        setProfile(profile ? { ...profile, ...newData } : null);
+    };
+
     // Cerrar sesión
     const logout = () => {
         setProfile(null);
     };
 
     return (
-        <UserContext.Provider value={{ profile, setProfile, logout }}>
+        <UserContext.Provider value={{ profile, setProfile, logout, updateProfile }}>
             {children}
         </UserContext.Provider>
     );

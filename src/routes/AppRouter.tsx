@@ -14,6 +14,7 @@ import RegisterPage from "../cliente/screens/RegisterPage";
 
 import { AdminLayout } from "../administracion-sistema/components/layout/AdminLayout";
 import { ProductsPage } from "../administracion-sistema/screens/ProductsPage";
+import { SalesPage } from "../administracion-sistema/screens/SalesPage";
 import { SuppliesPage } from "../administracion-sistema/screens/SuppliesPage";
 import { CategoriesPage } from "../administracion-sistema/screens/CategoriesPage";
 import { EmployeesPage } from "../administracion-sistema/screens/EmployeesPage";
@@ -38,6 +39,7 @@ export function AppRouter() {
                 
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route path="products" element={<ProductsPage />} />
+                    <Route path="sales" element={<SalesPage />} />
                     <Route path="supplies" element={<SuppliesPage />} />
                     <Route path="category" element={<CategoriesPage />} />
                     <Route path="employees" element={<EmployeesPage />} />
