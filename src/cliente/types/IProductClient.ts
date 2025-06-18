@@ -29,6 +29,7 @@ export interface MeasuringUnit {
 
 export interface Category {
     idcategory: number;
+    forSale: boolean;
     name: string;
 }
 export interface ManufacturedArticleDetailInput {

@@ -33,7 +33,7 @@ export const productApi = {
             manufacInventoryImage 
         };
         console.log(body);
-        
+        console.log(idmanufacturedArticle);
         const response = await fetch(`http://localhost:8080/manufacturedArticle/update/${idmanufacturedArticle}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },

@@ -45,7 +45,7 @@ export default function Login() {
                         <input
                             type="text"
                             id="email"
-                            placeholder="otsu"  
+                            placeholder="ejemplo@email.com"  
                             className={styles.loginInput}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}

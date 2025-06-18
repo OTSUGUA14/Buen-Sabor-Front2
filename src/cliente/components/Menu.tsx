@@ -30,16 +30,15 @@ const Menu: React.FC<MenuProps> = ({ products, onProductClick }) => {
             <aside className={styles.sidebar}>
                 <ul className={styles.categoryList}>
                     <h2>CATEGORÍAS</h2>
-                    {categories.map((category) => (
-                        <li key={category.idcategory} className={styles.categoryListItem}>
-                            <a
-                                href={`#cat-${category.idcategory}`}
-                                className={styles.categoryButton}
-                            >
-                                {category.name}
-                            </a>
-                        </li>
-                    ))}
+                        {categories
+                            .filter((category) => category.forSale)
+                            .map((category) => (
+                                <li key={category.idcategory} className={styles.categoryListItem}>
+                                    <a href={`#cat-${category.idcategory}`} className={styles.categoryButton}>
+                                        {category.name}
+                                    </a>
+                                </li>
+                        ))}
                 </ul>
             </aside>
 

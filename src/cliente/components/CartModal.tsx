@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import styles from '../styles/CartModal.module.css';
 import type { OrderRequestDTO, OrderDetailDTO, UserPreferenceRequest } from '../types/IOrderData';
-import { PayMethod, OrderState } from '../types/IOrderData';
+import { PayMethod, OrderState, OrderType } from '../types/IOrderData';
 
 interface CartModalProps {
     isOpen: boolean;
@@ -63,7 +63,8 @@ export const CartModal: React.FC<CartModalProps> = ({
             total: calculatedTotal,
             totalCost: subtotal,
             orderState: OrderState.PENDING,
-            orderTypeId: 1,
+            // Cambiar para que agarre ordertype
+            orderType: OrderType.DELIVERY, 
             payMethod: paymentMethod,
             orderDate: orderDate,
             takeAway: deliveryMethod !== 'Delivery',

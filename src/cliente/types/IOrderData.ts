@@ -22,13 +22,19 @@ export interface OrderRequestDTO {
     total: number;
     totalCost: number;
     orderState: OrderState;
-    orderTypeId: number;
+    orderType: OrderType;
     payMethod: PayMethod;
     orderDate: string;
     takeAway: boolean;
     clientId: number;
     subsidiaryId: number;
     orderDetails: OrderDetailDTO[];
+}
+
+export enum OrderType {
+  DELIVERY = "DELIVERY",
+  TAKEAWAY = "TAKEAWAY",
+  ON_SITE = "ON_SITE"
 }
 
 export interface UserPreferenceRequest {
