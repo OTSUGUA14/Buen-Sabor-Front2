@@ -45,31 +45,29 @@ export default function MenuPages() {
 
     // Guarda el carrito en localStorage cada vez que cambie
     useEffect(() => {
-        localStorage.removeItem('cart');
-        const fetchProductos = async () => {
-            const platos = await getProductsAll();
-            setProductosAll(platos);
-        };
-        fetchProductos();
-        const minimalCart = cart.map(item => ({
-            id: item.idmanufacturedArticle,
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price
-        }));
-        const cartString = JSON.stringify(minimalCart);
+    localStorage.removeItem('cart');
+    const fetchProductos = async () => {
+        const platos = await getProductsAll();
+        setProductosAll(platos);
+    };
+    fetchProductos();
 
-        if (minimalCart.length > 0) {
-            if (cartString.length < 5000000) {
-                localStorage.setItem('cart', cartString);
-            } else {
-                alert("El carrito es demasiado grande para guardar.");
-            }
+    const minimalCart = cart.map(item => ({
+        idmanufacturedArticle: item.idmanufacturedArticle, // <-- aquí el id del producto
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price
+    }));
+    const cartString = JSON.stringify(minimalCart);
+
+    if (minimalCart.length > 0) {
+        if (cartString.length < 5000000) {
+            localStorage.setItem('cart', cartString);
         } else {
-
+            alert("El carrito es demasiado grande para guardar.");
         }
-    }, [cart]);
-
+    }
+}, [cart]);
     // Guarda el carrito solo si tiene productos, si no lo elimina
 
     const handleAddToCart = (product: IProductClient, quantity: number) => {

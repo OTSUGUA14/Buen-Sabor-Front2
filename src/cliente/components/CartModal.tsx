@@ -64,7 +64,7 @@ export const CartModal: React.FC<CartModalProps> = ({
             totalCost: subtotal,
             orderState: OrderState.PENDING,
             // Cambiar para que agarre ordertype
-            orderType: OrderType.DELIVERY, 
+            orderType: OrderType.DELIVERY,
             payMethod: paymentMethod,
             orderDate: orderDate,
             takeAway: deliveryMethod !== 'Delivery',
@@ -78,7 +78,7 @@ export const CartModal: React.FC<CartModalProps> = ({
         } else {
             onPayment(order, PayMethod.CASH);
         }
-     
+
     };
 
 
@@ -92,23 +92,35 @@ export const CartModal: React.FC<CartModalProps> = ({
                     <label>Método de entrega</label>
                     <select
                         value={deliveryMethod}
-                        onChange={(e) => setDeliveryMethod(e.target.value)}
+                        onChange={(e) => setDeliveryMethod(e.target.value as OrderType)}
                     >
-                        <option value="Delivery">Delivery</option>
-                        <option value="Retiro en local">Retiro en local</option>
+                        <option value={OrderType.DELIVERY}>Delivery</option>
+                        <option value={OrderType.TAKEAWAY}>Retiro en local</option>
+                        <option value={OrderType.ON_SITE}>En el local</option>
                     </select>
                 </div>
 
                 {/* Dirección de entrega (solo si es Delivery) */}
-                {deliveryMethod === 'Delivery' && (
+                {deliveryMethod === 'DELIVERY' && (
                     <div className={styles.section}>
                         <label>Dirección de entrega</label>
                         <select
                             value={selectedAddress}
                             onChange={(e) => setSelectedAddress(e.target.value)}
                         >
-                            <option value="Casa">Casa</option>
-                            <option value="Trabajo">Trabajo</option>
+                            {/* Cargar direcciones desde localStorage */}
+                            {(() => {
+                                const profile = JSON.parse(localStorage.getItem('profile') || '{}');
+                                const domiciles = profile.domiciles ?? [];
+                                if (domiciles.length === 0) {
+                                    return <option value="">No hay direcciones registradas</option>;
+                                }
+                                return domiciles.map((dom: any) => (
+                                    <option key={dom.iddomicile} value={dom.iddomicile}>
+                                        {dom.street} {dom.number}, {dom.location?.name}, {dom.location?.province?.name}
+                                    </option>
+                                ));
+                            })()}
                         </select>
                     </div>
                 )}

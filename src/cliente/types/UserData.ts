@@ -19,7 +19,7 @@ export interface Domicile {
 
 export interface UserRegister {
     id?: number;
-    name: string;
+    firstName: string;
     lastName: string;
     phoneNumber: string;
     email: string;
@@ -28,5 +28,11 @@ export interface UserRegister {
     password: string;
     auth0Id?: string | null;
     userImage?: string | null;
-    domiciles?: Domicile[];
+    domiciles?: SimpleDomicile[];
+}
+export interface SimpleDomicile {
+    street: string;
+    zipCode: string;
+    number: number;
+    location: number; // solo el id de la location
 }

@@ -12,7 +12,8 @@ export const registerUser = async (userToSend: UserRegister): Promise<void> => {
             birthDate: new Date(userToSend.birthDate).toISOString()
         };
 
-
+        console.log(userWithFormattedDate);
+        
         const response = await fetch('http://localhost:8080/client/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

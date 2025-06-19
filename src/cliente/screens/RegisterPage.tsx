@@ -6,7 +6,12 @@ import { regexPatterns } from "../validation/Validatios";
 import type { Domicile, UserRegister } from "../types/UserData";
 import { registerUser } from "../services/Api";
 import { Link } from "react-router-dom";
-
+export interface SimpleDomicile {
+    street: string;
+    zipCode: string;
+    number: number;
+    location: number; // solo el id de la location
+}
 export default function RegisterPage() {
     const [userData, setUserData] = useState({
         firstName: "",
@@ -19,7 +24,14 @@ export default function RegisterPage() {
         repeat_password: "",
         auth0Id: null,
         userImage: null,
-        domiciles: [] as Domicile[],
+        domiciles: [] as SimpleDomicile[],
+    });
+
+    const [domicile, setDomicile] = useState<SimpleDomicile>({
+        street: "",
+        zipCode: "",
+        number: 0,
+        location: 1
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,7 +62,7 @@ export default function RegisterPage() {
         e.preventDefault();
 
         const keysToValidate = [
-            "name",
+            "firstName",
             "lastName",
             "phoneNumber",
             "email",
@@ -60,9 +72,13 @@ export default function RegisterPage() {
             "repeat_password",
         ];
         const allValid = keysToValidate.every((key) => {
+            console.log(key);
+
             const value = userData[key as keyof typeof userData];
             const pattern = regexPatterns[key as keyof typeof regexPatterns];
             // Solo valida si value es string y pattern existe
+            console.log(value, pattern);
+
             return pattern && typeof value === "string" ? pattern.test(value) : false;
         });
 
@@ -79,7 +95,7 @@ export default function RegisterPage() {
         }
 
         const userToSend: UserRegister = {
-            name: userData.firstName,
+            firstName: userData.firstName,
             lastName: userData.lastName,
             phoneNumber: userData.phoneNumber,
             email: userData.email,
@@ -92,7 +108,7 @@ export default function RegisterPage() {
         };
 
 
-        registerUser(userToSend);
+        await registerUser(userToSend);
     };
 
     return (
@@ -172,14 +188,14 @@ export default function RegisterPage() {
                         <label htmlFor="birthDate" className={styles.inputLabel}>Fecha de Nacimiento*</label>
                         <input
                             type="date"
-                            id="birthDate"  
+                            id="birthDate"
                             name="birthDate"
                             className={styles.loginInput}
                             onChange={handleChange}
                             value={userData.birthDate}
                         />
                         <p className="warning hide" data-name="birthDate"># Ingrese una fecha válida (YYYY-MM-DD)</p>
-                    </div> 
+                    </div>
 
                     {/* username */}
                     <div className={styles.inputGroup}>
@@ -225,7 +241,52 @@ export default function RegisterPage() {
                         />
                         <p className="warning hide" data-name="repeat_password"># Las contraseñas deben coincidir</p>
                     </div>
+                    <div className={styles.inputGroup}>
+                        <label className={styles.inputLabel}>Agregar domicilio</label>
+                        <input
+                            type="text"
+                            placeholder="Calle"
+                            className={styles.loginInput}
+                            value={domicile.street}
+                            onChange={e => setDomicile({ ...domicile, street: e.target.value })}
+                        />
+                        <input
+                            type="number"
+                            className={styles.loginInput}
+                            placeholder="Número"
+                            value={domicile.number}
+                            onChange={e => setDomicile({ ...domicile, number: Number(e.target.value) })}
+                        />
+                        <input
+                            type="text"
+                            className={styles.loginInput}
+                            placeholder="Código Postal"
+                            value={domicile.zipCode}
+                            onChange={e => setDomicile({ ...domicile, zipCode: e.target.value })}
+                        />
 
+
+
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setUserData(prev => ({
+                                ...prev,
+                                domiciles: [domicile] // o [...prev.domiciles, domicile] si permites varios
+                            }));
+                            alert("Domicilio guardado");
+                            // Limpia los campos del domicilio
+                            setDomicile({
+                                street: "",
+                                zipCode: "",
+                                number: 0,
+                                location: 1
+                            });
+                        }}
+                    >
+                        Agregar domicilio
+                    </button>
                     <button type="submit" className={styles.loginButton}>REGISTRARSE</button>
 
                     <p className={styles.orSeparator}>O INGRESA CON</p>
