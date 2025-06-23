@@ -54,7 +54,16 @@ export default function Navbar() {
                                             className={styles.dropdownItem}
                                             onClick={() => setOpen(false)}
                                         >
-                                            PERFIL
+                                            Perfil
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            to="/ordenes"
+                                            className={styles.dropdownItem}
+                                            onClick={() => setOpen(false)}
+                                        >
+                                            Pedidos
                                         </Link>
                                     </li>
                                     <li>
@@ -63,7 +72,7 @@ export default function Navbar() {
                                             className={styles.dropdownItem}
                                             style={{ background: "none", border: "none", cursor: "pointer" }}
                                         >
-                                            CERRAR SESIÓN
+                                            Cerrar sesión
                                         </button>
                                     </li>
                                 </ul>

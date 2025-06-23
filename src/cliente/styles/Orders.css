@@ -1,0 +1,42 @@
+.client-orders-container {
+    margin-top: 100px;
+    padding: 20px;
+    min-height: 100dvh;
+}
+
+.client-orders-container .client-orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.client-orders-container h2 {
+    font-size: 28px;
+    color: #333;
+    margin: 0;
+}
+
+.client-orders-container .client-orders-filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.client-orders-container .client-orders-filters .client-orders-search {
+    flex-grow: 0;
+    max-width: 300px;
+    margin-left: auto;
+}
+
+.client-orders-container .client-orders-filters .client-orders-select {
+    width: 150px;
+    flex-shrink: 0;
+}
+
+.client-orders-container .table-actions {
+    display: flex;
+    gap: 8px;
+}

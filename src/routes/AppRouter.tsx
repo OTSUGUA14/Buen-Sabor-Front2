@@ -3,13 +3,13 @@
 import { Route, Routes } from "react-router-dom";
 
 import Home from "../cliente/screens/Home";
-import Menu from "../cliente/screens/MenuPages";
 
 import Login from "../cliente/screens/Login";
 import LoginEmployee from "../administracion-sistema/screens/LoginEmployee";
 import Navbar from "../cliente/components/Navbar";
 import Footer from "../cliente/components/Footer";
 import Perfil from "../cliente/screens/Profile";
+import { Orders } from "../cliente/screens/Orders";
 import RegisterPage from "../cliente/screens/RegisterPage";
 
 import { AdminLayout } from "../administracion-sistema/components/layout/AdminLayout";
@@ -36,7 +36,8 @@ export function AppRouter() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/loginEmployee" element={<LoginEmployee />} />
                 <Route path="/profile" element={<Perfil />} />
-                
+                <Route path="/ordenes" element={<Orders />} />
+
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route path="products" element={<ProductsPage />} />
                     <Route path="sales" element={<SalesPage />} />
