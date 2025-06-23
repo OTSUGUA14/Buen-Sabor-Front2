@@ -1,4 +1,7 @@
 import { useState } from "react";
+// Justo después de importar React y hooks
+import { useEffect } from "react";
+import { fetchAndStoreOAuthUser } from "../services/Api";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "../styles/Login.module.css";
 import type { UserLogin } from "../types/UserLogin";
@@ -26,6 +29,8 @@ export default function Login() {
 
         const profile = await loginUser(userToLogin);
         if (profile) {
+            console.log(profile);
+
             setProfile(profile);
             navigate("/menu"); // Redirige solo después de guardar el perfil
         }
@@ -45,7 +50,7 @@ export default function Login() {
                         <input
                             type="text"
                             id="email"
-                            placeholder="ejemplo@email.com"  
+                            placeholder="ejemplo@email.com"
                             className={styles.loginInput}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -72,7 +77,11 @@ export default function Login() {
 
                     <p className={styles.orSeparator}>O INGRESA CON</p>
 
-                    <button type="button" className={styles.googleLoginButton}>
+                    <button
+                        type="button"
+                        className={styles.googleLoginButton}
+                        onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/google"}
+                    >
                         <img src="/icons/google-icon.svg" alt="Google" className={styles.googleIcon} />
                         Entrar con Google
                     </button>

@@ -19,6 +19,7 @@ export interface Domicile {
 
 export interface UserRegister {
     id?: number;
+    name?:string
     firstName: string;
     lastName: string;
     phoneNumber: string;

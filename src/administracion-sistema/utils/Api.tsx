@@ -64,3 +64,17 @@ export const getCategopryAll = async (): Promise<[Category]> => {
 	return await response.json();
 }
 
+
+
+export const loginEmploye = async (employee: any): Promise<string> => {
+	const urlServer = 'http://localhost:8080/employee/login';
+	const response = await fetch(urlServer, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(employee),
+		mode: 'cors'
+	});
+	return await response.text(); // <-- aquí el cambio
+}

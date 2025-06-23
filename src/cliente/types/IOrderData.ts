@@ -27,14 +27,15 @@ export interface OrderRequestDTO {
     orderDate: string;
     takeAway: boolean;
     clientId: number;
+    direction: string
     subsidiaryId: number;
     orderDetails: OrderDetailDTO[];
 }
 
 export enum OrderType {
-  DELIVERY = "DELIVERY",
-  TAKEAWAY = "TAKEAWAY",
-  ON_SITE = "ON_SITE"
+    DELIVERY = "DELIVERY",
+    TAKEAWAY = "TAKEAWAY",
+    ON_SITE = "ON_SITE"
 }
 
 export interface UserPreferenceRequest {

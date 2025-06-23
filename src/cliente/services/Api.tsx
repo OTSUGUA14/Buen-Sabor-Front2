@@ -13,7 +13,7 @@ export const registerUser = async (userToSend: UserRegister): Promise<void> => {
         };
 
         console.log(userWithFormattedDate);
-        
+
         const response = await fetch('http://localhost:8080/client/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -40,7 +40,7 @@ export const loginUser = async (userToLogin: UserLogin): Promise<any> => {
             body: JSON.stringify(userToLogin),
         });
         console.log(userToLogin);
-        
+
         if (!response.ok) {
             throw new Error('Error al iniciar sesión');
         }
@@ -125,7 +125,7 @@ export async function createOrder(pedido?: OrderRequestDTO) {
     let urlServer = 'http://localhost:8080/api/orders';
     let method: string = "POST";
     console.log(pedido);
-    
+
     const response = await fetch(urlServer, {
         "method": method,
         "body": JSON.stringify(pedido),
@@ -139,3 +139,19 @@ export async function createOrder(pedido?: OrderRequestDTO) {
     alert("Su order se envio correctmante");
     return await response.json()
 }
+
+export const fetchAndStoreOAuthUser = async () => {
+    const response = await fetch('http://localhost:8080/oauth2/me', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include' // 👈 necesario para enviar la sesión
+    });
+
+    if (!response.ok) {
+        console.error('Error al obtener usuario:', response.status);
+        return;
+    }
+
+    const user = await response.json();
+    localStorage.setItem('profile', JSON.stringify(user));
+};

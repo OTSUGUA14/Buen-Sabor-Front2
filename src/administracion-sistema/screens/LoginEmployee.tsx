@@ -1,30 +1,42 @@
 import { useState } from "react";
-import {useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styles from "../../cliente/styles/Login.module.css";
-import { loginUser } from "../../cliente/services/Api";
-import { useUser } from "../../cliente/components/UserContext";
-import type { UserLogin } from "../../cliente/types/UserLogin";
+import { loginEmploye } from "../utils/Api"; // Asegúrate de importar tu función correcta
 
-
-export default function Login() {
+export default function LoginEmployee() {
     const [username, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const { setProfile } = useUser();
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        //  const userToLogin: UserLogin = {
-        //      username: username,
-        //      password: password
-        //  };
+        const employeeToLogin = {
+            email: username,
+            password: password
+        };
 
-        // const profile = await loginUser(userToLogin);
-        // if (profile) {
-        //     setProfile(profile);
-        //     navigate("/admin"); 
-        // }
+        try {
+            const response = await loginEmploye(employeeToLogin);
+            // response es un string como "Login OK, Rol: CASHIER"
+            const match = response.match(/Rol:\s*(\w+)/i);
+            if (match) {
+                const role = match[1];
+                localStorage.setItem("employeeRole", role);
+                alert(`Inicio de sesión exitoso como ${role}`);
+
+                if (role === "ADMIN" || role === "CASHIER" || role === "CHEF") {
+                    navigate("/admin/products");
+                } else if (role === "DRIVER") {
+                    navigate("/admin/orders");
+                }
+            } else {
+                alert("No se pudo obtener el rol del empleado.");
+            }
+        } catch (error) {
+            alert("Error al iniciar sesión.");
+            console.error(error);
+        }
     };
 
     return (
@@ -41,7 +53,7 @@ export default function Login() {
                         <input
                             type="text"
                             id="username"
-                            placeholder="juanperez@buensabor.com"  
+                            placeholder="juanperez@buensabor.com"
                             className={styles.loginInput}
                             value={username}
                             onChange={(e) => setEmail(e.target.value)}

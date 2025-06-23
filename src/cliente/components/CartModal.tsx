@@ -29,7 +29,7 @@ export const CartModal: React.FC<CartModalProps> = ({
     onPayment
 
 }) => {
-    const [deliveryMethod, setDeliveryMethod] = useState('Delivery');
+    const [deliveryMethod, setDeliveryMethod] = useState('DELIVERY');
     const [selectedAddress, setSelectedAddress] = useState('Casa');
     const [clarifications, setClarifications] = useState('');
     const [paymentMethod, setPaymentMethod] = useState<PayMethod>(PayMethod.MERCADOPAGO);
@@ -37,7 +37,7 @@ export const CartModal: React.FC<CartModalProps> = ({
     if (!isOpen) return null;
 
     const calculatedTotal = deliveryMethod === 'Delivery' ? subtotal + deliveryFee : subtotal;
-    console.log(cart);
+   
 
     // Construir detalles del pedido para OrderRequestDTO
     const orderDetails: OrderDetailDTO[] = cart.map(item => ({
@@ -64,11 +64,12 @@ export const CartModal: React.FC<CartModalProps> = ({
             totalCost: subtotal,
             orderState: OrderState.PENDING,
             // Cambiar para que agarre ordertype
-            orderType: OrderType.DELIVERY,
+            orderType: deliveryMethod as OrderType,
             payMethod: paymentMethod,
             orderDate: orderDate,
-            takeAway: deliveryMethod !== 'Delivery',
+            takeAway: deliveryMethod !== 'DELIVERY',
             clientId,
+            direction:selectedAddress,
             subsidiaryId,
             orderDetails
         };
@@ -81,7 +82,8 @@ export const CartModal: React.FC<CartModalProps> = ({
 
     };
 
-
+    console.log(deliveryMethod);
+    
     return (
         <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>

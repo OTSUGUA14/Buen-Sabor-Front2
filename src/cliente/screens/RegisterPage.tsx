@@ -3,15 +3,10 @@ import styles from "../styles/Login.module.css";
 
 import "../../index.css";
 import { regexPatterns } from "../validation/Validatios";
-import type { Domicile, UserRegister } from "../types/UserData";
+import type { Domicile, SimpleDomicile, UserRegister } from "../types/UserData";
 import { registerUser } from "../services/Api";
 import { Link } from "react-router-dom";
-export interface SimpleDomicile {
-    street: string;
-    zipCode: string;
-    number: number;
-    location: number; // solo el id de la location
-}
+
 export default function RegisterPage() {
     const [userData, setUserData] = useState({
         firstName: "",
@@ -276,7 +271,6 @@ export default function RegisterPage() {
                                 domiciles: [domicile] // o [...prev.domiciles, domicile] si permites varios
                             }));
                             alert("Domicilio guardado");
-                            // Limpia los campos del domicilio
                             setDomicile({
                                 street: "",
                                 zipCode: "",

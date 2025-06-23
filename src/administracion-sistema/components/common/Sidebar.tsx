@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './styles/Sidebar.css';
 import { SelectField } from './SelectField';
@@ -17,73 +17,67 @@ const statusOptions: ISelectOption[] = [
     { value: 'Delivery', label: 'Delivery' },
 ];
 
-// Mapa de rutas 
-const roleRoutes: { [key: string]: string } = {
-    'Cocinero': '/admin/kitchen-orders',
-    'Cajero': '/admin/cash-orders',
-    'Delivery': '/admin/delivery-orders',
-    'Admin': '/admin/products'
+// Mapeo de roles del backend a español
+const roleMap: Record<string, string> = {
+    ADMIN: 'Admin',
+    CHEF: 'Cocinero',
+    CASHIER: 'Cajero',
+    DRIVER: 'Delivery'
 };
 
 export const Sidebar: React.FC<SidebarProps> = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [statusFilter, setStatusFilter] = useState('Seleccionar Rol');
 
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const value = e.target.value;
-        setStatusFilter(value);
+    // Obtener el rol del localStorage y mapearlo a español
+    const backendRole = localStorage.getItem('employeeRole');
+    if (!backendRole) return null; // No mostrar nada si no hay rol
 
-        const path = roleRoutes[value];
-        if (path) {
-            navigate(path);
-        }
-    };
+    const role = roleMap[backendRole] || 'Admin';
+
+    // Opciones de menú según el rol
+    let menuOptions: { to: string; label: string }[] = [];
+
+    if (role === 'Admin') {
+        menuOptions = [
+            { to: '/admin/products', label: 'Productos' },
+            { to: '/admin/supplies', label: 'Insumos' },
+            { to: '/admin/category', label: 'Categorias' },
+            { to: '/admin/employees', label: 'Personal' },
+            { to: '/admin/orders', label: 'Ordenes' },
+            { to: '/admin/statistics', label: 'Estadisticas' }
+        ];
+    } else if (role === 'Cajero') {
+        menuOptions = [
+            { to: '/admin/products', label: 'Productos' }
+        ];
+    } else if (role === 'Cocinero') {
+        menuOptions = [
+            { to: '/admin/products', label: 'Productos' },
+            { to: '/admin/supplies', label: 'Insumos' },
+            { to: '/admin/category', label: 'Categorias' },
+            { to: '/admin/orders', label: 'Ordenes' }
+        ];
+    } else if (role === 'Delivery') {
+        menuOptions = [
+            { to: '/admin/orders', label: 'Ordenes' }
+        ];
+    }
 
     return (
         <aside className="sidebar">
             <nav className="nav-menu">
                 <ul>
-                    <li className="status-filter">
-                        <SelectField
-                            name="statusFilter"
-                            options={statusOptions}
-                            value={statusFilter}
-                            onChange={handleChange}
-                            className="status-select"
-                        />
-                    </li>
-                    <li>
-                        <Link to="/admin/products" className={location.pathname === '/admin/products' ? 'active' : ''}>
-                            Productos
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/admin/supplies" className={location.pathname === '/admin/supplies' ? 'active' : ''}>
-                            Insumos
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/admin/category" className={location.pathname === '/admin/category' ? 'active' : ''}>
-                            Categorias
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/admin/employees" className={location.pathname === '/admin/employees' ? 'active' : ''}>
-                            Personal
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/admin/orders" className={location.pathname === '/admin/orders' ? 'active' : ''}>
-                            Ordenes
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/admin/statistics" className={location.pathname === '/admin/statistics' ? 'active' : ''}>
-                            Estadisticas
-                        </Link>
-                    </li>
-
+                    {menuOptions.map(option => (
+                        <li key={option.to}>
+                            <Link
+                                to={option.to}
+                                className={location.pathname === option.to ? 'active' : ''}
+                            >
+                                {option.label}
+                            </Link>
+                        </li>
+                    ))}
                 </ul>
             </nav>
         </aside>

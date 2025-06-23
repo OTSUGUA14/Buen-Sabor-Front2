@@ -17,7 +17,7 @@ const Profile = () => {
 
     const avatarUrl = profile.userImage || "https://images.steamusercontent.com/ugc/18200902477657540315/C8CBD823EF42E1F4E8368E5D56A9FC289B18DA32/?imw=512&&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false";
     const address = profile.domiciles && profile.domiciles.length > 0
-        ? `${profile.domiciles[0].street} ${profile.domiciles[0].number}, ${profile.domiciles[0].location.name}, ${profile.domiciles[0].location.province.name}`
+        ? `${profile.domiciles[0].street} ${profile.domiciles[0].number},`
         : "No registrado";
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,9 +29,9 @@ const Profile = () => {
     const handleCancel = () => {
         setIsEditing(false);
         setForm({
-            name: profile.name,
-            phoneNumber: profile.phoneNumber,
-            email: profile.email,
+            name: profile.name || '',
+            phoneNumber: profile.phoneNumber || '',
+            email: profile.email || '',
         });
     };
 

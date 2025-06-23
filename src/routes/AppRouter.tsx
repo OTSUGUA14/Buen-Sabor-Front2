@@ -1,6 +1,6 @@
 // src/routes/AppRouter.tsx
 
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 
 import Home from "../cliente/screens/Home";
 
@@ -25,20 +25,24 @@ import { OrderDashboard } from "../administracion-sistema/screens/OrdersDashboar
 import MenuPages from "../cliente/screens/MenuPages";
 
 export function AppRouter() {
+    const location = useLocation();
+    // Oculta el Navbar si la ruta comienza con /admin
+    const hideNavbar = location.pathname.startsWith("/admin");
+
     return (
         <>
-            <Navbar />
+            {!hideNavbar && <Navbar />}
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/menu" element={<MenuPages />} />
                 <Route path="/registro" element={<RegisterPage />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/loginEmployee" element={<LoginEmployee />} />
                 <Route path="/profile" element={<Perfil />} />
                 <Route path="/ordenes" element={<Orders />} />
 
                 <Route path="/admin" element={<AdminLayout />}>
+                    <Route path="loginEmployee" element={<LoginEmployee />} />
                     <Route path="products" element={<ProductsPage />} />
                     <Route path="sales" element={<SalesPage />} />
                     <Route path="supplies" element={<SuppliesPage />} />
@@ -50,9 +54,8 @@ export function AppRouter() {
                     <Route path="kitchen-orders" element={<KitchenOrdersPage />} />
                     <Route path="delivery-orders" element={<DeliveryOrdersPage />} />
                 </Route>
-
             </Routes>
-            <Footer></Footer>
+            <Footer />
         </>
     );
 }
