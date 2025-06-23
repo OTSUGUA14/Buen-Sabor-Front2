@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 export interface CrudApi<T extends { id: number }> {
     getAll: () => Promise<T[]>;
-    getById: (id: number) => Promise<T | undefined | null>; 
+    getById: (id: number) => Promise<T | undefined | null>;
     create: (item: Omit<T, 'id'>) => Promise<T>;
     update: (item: T) => Promise<T>;
     delete: (id: number) => Promise<void>;
@@ -42,7 +42,7 @@ export const useCrud = <T extends { id: number }>(
         setLoading(true);
         setError(null);
         console.log(item);
-        
+
         try {
             const newItem = await api.create(item);
             setData((prevData) => [...prevData, newItem]);
@@ -50,7 +50,7 @@ export const useCrud = <T extends { id: number }>(
         } catch (err: any) {
             setError(err.message || 'Error al crear el elemento.');
             console.error("Error creating item:", err);
-            throw err; 
+            throw err;
         } finally {
             setLoading(false);
         }
@@ -99,7 +99,7 @@ export const useCrud = <T extends { id: number }>(
         } catch (err: any) {
             setError(err.message || 'Error al obtener el elemento por ID.');
             console.error("Error fetching item by ID:", err);
-            return undefined; 
+            return undefined;
         } finally {
             setLoading(false);
         }
@@ -113,6 +113,6 @@ export const useCrud = <T extends { id: number }>(
         createItem,
         updateItem,
         deleteItem,
-        getItemById 
+        getItemById
     };
 };

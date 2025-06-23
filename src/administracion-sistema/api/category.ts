@@ -21,7 +21,7 @@ export const categoryApi = {
     },
 
     getById: async (id: number): Promise<ICategory> => {
-        const res = await fetch(`${BASE_URL}/getById/${id}`, { // <-- corregido aquí
+        const res = await fetch(`${BASE_URL}/getById/${id}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
@@ -29,22 +29,30 @@ export const categoryApi = {
         return handleResponse<ICategory>(res);
     },
 
-    create: async (newItem: Omit<ICategory, 'id'>): Promise<ICategory> => { // <-- corregido aquí
+    create: async (newItem: Omit<ICategory, 'id' | 'IDCategory'>): Promise<ICategory> => {
+        const body = {
+            name: newItem.name,
+            isForSale: newItem.forSale,
+        };
         const res = await fetch(`${BASE_URL}/add`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
-            body: JSON.stringify(newItem),
+            body: JSON.stringify(body),
         });
         return handleResponse<ICategory>(res);
     },
 
     update: async (updatedItem: ICategory): Promise<ICategory> => {
-        const res = await fetch(`${BASE_URL}/update/${updatedItem.id}`, { // <-- corregido aquí
+        const body = {
+            name: updatedItem.name,
+            isForSale: updatedItem.forSale,
+        };
+        const res = await fetch(`${BASE_URL}/update/${updatedItem.IDCategory}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
-            body: JSON.stringify(updatedItem),
+            body: JSON.stringify(body),
         });
         return handleResponse<ICategory>(res);
     },
@@ -61,3 +69,26 @@ export const categoryApi = {
         }
     },
 };
+
+// @RestController
+// @CrossOrigin(origins = "*")
+// @RequestMapping("/category")
+// public class CategoryController {
+//     @Autowired
+//     private CategoryServiceImpl categoryServiceImpl;
+
+//     @GetMapping("/getAll")
+//     public List<Category> findAll(){
+//         return categoryServiceImpl.getAllCategories();
+//     }
+
+//     @PostMapping("/add")
+//     public ResponseEntity<Category> addCategory(@RequestBody CategoryDTO categoryDTO){
+//         return ResponseEntity.status(HttpStatus.OK).body(categoryServiceImpl.addCategory(categoryDTO));
+//     }
+
+//     @PatchMapping("/update/{ID}")
+//     public ResponseEntity<Category> updateCategory(@PathVariable("ID") Long ID, @RequestBody CategoryDTO categoryDTO){
+//         return ResponseEntity.status(HttpStatus.OK).body(categoryServiceImpl.updateCategory(ID, categoryDTO));
+//     }
+// }

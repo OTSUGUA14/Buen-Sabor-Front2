@@ -32,14 +32,30 @@ export const CategoriesPage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const filteredCategories = useMemo(() => {
-        return categories.filter(c =>
-            c.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        return categories
+            .map((c: any) => ({
+                ...c,
+                id: c.idcategory,
+                IDCategory: c.idcategory,
+                isForSale: c.forSale,
+            }))
+            .filter(c =>
+                c.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
     }, [categories, searchTerm]);
 
     const categoryColumns: ITableColumn<ICategory>[] = [
-        { id: 'id', label: '#' },
+        {
+            id: 'IDCategory',
+            label: '#',
+            render: item => item.IDCategory,
+        },
         { id: 'name', label: 'Nombre de Categoría' },
+        {
+            id: 'forSale',
+            label: '¿En venta?',
+            render: item => item.forSale ? 'Sí' : 'No',
+        },
         {
             id: 'acciones',
             label: 'Acciones',
@@ -55,6 +71,7 @@ export const CategoriesPage: React.FC = () => {
 
     const categoryFormFields: IFormFieldConfig[] = [
         { name: 'name', label: 'Nombre de la Categoría', type: 'text', validation: { required: true, minLength: 2 } },
+        { name: 'isForSale', label: '¿En venta?', type: 'checkbox' },
     ];
 
     const handleCreate = () => {
@@ -67,30 +84,23 @@ export const CategoriesPage: React.FC = () => {
         setIsModalOpen(true);
     };
 
-    const handleDelete = (id: number) => {
-        setCategoryToDeleteId(id);
-        setIsConfirmDialogOpen(true);
-    };
-
-    const handleConfirmDelete = async () => {
-        if (categoryToDeleteId !== null) {
-            await deleteItem(categoryToDeleteId);
-            setIsConfirmDialogOpen(false);
-            setCategoryToDeleteId(null);
-            fetchData();
-        }
-    };
-
     const handleFormSubmit = async (formData: Partial<ICategory>) => {
         const submitData: ICategory = {
-            id: categoryToEdit?.id ?? 0, 
+            id: categoryToEdit?.id ?? 0,
+            IDCategory: categoryToEdit?.IDCategory ?? 0,
             name: formData.name ?? '',
+            forSale: formData.forSale ?? false,
         };
 
         if (categoryToEdit) {
             await updateItem(submitData);
         } else {
-            await createItem(submitData);
+            const createData = {
+                IDCategory: 0, 
+                name: formData.name ?? '',
+                forSale: formData.forSale ?? false,
+            };
+            await createItem(createData);
         }
 
         setIsModalOpen(false);
