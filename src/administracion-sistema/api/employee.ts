@@ -16,11 +16,21 @@ export const employeeApi = {
     },
 
     create: async (employee: Omit<IEmployee, 'id' | 'domiciles'>): Promise<IEmployee> => {
-        const res = await fetch('http://localhost:8080/employee/add', {
+        // Cambia 'name' por 'firstName' y 'employeeRole' por 'role'
+        const { name, employeeRole, ...rest } = employee as any;
+        const employeeToSend = {
+            ...rest,
+            firstName: name,
+            ...(employeeRole && { role: employeeRole }) // solo agrega 'role' si existe 'employeeRole'
+        };
+
+        const res = await fetch('http://localhost:8080/employee/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(employee),
+            body: JSON.stringify(employeeToSend),
         });
+        
+
         if (!res.ok) throw new Error('Error al crear empleado');
         return res.json();
     },

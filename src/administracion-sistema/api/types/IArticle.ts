@@ -1,6 +1,6 @@
 export interface IArticle  {
     id: number; 
-    idarticle: number;
+    idarticle?: number;
     denomination: string;
     currentStock: number;
     maxStock: number;

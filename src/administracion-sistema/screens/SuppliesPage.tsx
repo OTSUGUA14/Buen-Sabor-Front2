@@ -3,15 +3,17 @@ import { GenericTable } from '../components/crud/GenericTable';
 import type { ITableColumn } from '../components/crud/GenericTable.types';
 import { Button } from '../components/common/Button';
 import { useCrud } from '../hooks/useCrud';
-import { supplyApi } from '../api/supply';
-import type { IArticle } from '../api/types/IArticle'; 
+import { supplyApi, type SimpleArticle } from '../api/supply';
+import type { IArticle } from '../api/types/IArticle';
 import { FormModal } from '../components/common/FormModal';
 import { GenericForm } from '../components/crud/GenericForm';
 import type { IFormFieldConfig, ISelectOption } from '../components/crud/GenericForm.types';
 import { InputField } from '../components/common/InputField';
 import { SelectField } from '../components/common/SelectField';
+import { getCategopryAll, getMeasuringUnitsAll } from '../utils/Api';
 
 import './styles/crud-pages.css';
+import type { Category } from '../api/types/IProduct';
 
 export const SuppliesPage: React.FC = () => {
     const {
@@ -22,10 +24,10 @@ export const SuppliesPage: React.FC = () => {
         deleteItem,
         createItem,
         updateItem,
-    } = useCrud<IArticle>(supplyApi); 
+    } = useCrud(supplyApi);
 
     useEffect(() => {
-        
+
     }, [ingredientesAll]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,6 +38,17 @@ export const SuppliesPage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'TODOS' | 'Activo' | 'Inactivo'>('TODOS');
     const [categoryFilter, setCategoryFilter] = useState<'TODOS' | string>('TODOS');
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [measuringUnits, setMeasuringUnits] = useState<{ unit: string; idmeasuringUnit: number }[]>([]);
+
+    useEffect(() => {
+        getCategopryAll().then(data => {
+            setCategories(data.filter(cat => cat.forSale === false));
+        });
+        getMeasuringUnitsAll().then(data => {
+            setMeasuringUnits(data);
+        });
+    }, []);
 
     const statusOptions: ISelectOption[] = [
         { value: 'TODOS', label: 'TODOS' },
@@ -50,10 +63,22 @@ export const SuppliesPage: React.FC = () => {
         'Panificados',
     ];
 
+    // Opciones de categoría para el select
     const categoryOptions: ISelectOption[] = useMemo(() => [
         { value: 'TODOS', label: 'TODOS' },
-        ...supplyCategoryValues.map(cat => ({ value: cat, label: cat })),
-    ], [supplyCategoryValues]); 
+        ...categories.map(cat => ({
+            value: cat.idcategory,
+            label: cat.name
+        })),
+    ], [categories]);
+
+    // Opciones para el select de unidades de medida
+    const measuringUnitOptions: ISelectOption[] = useMemo(() =>
+        measuringUnits.map(mu => ({
+            value: mu.idmeasuringUnit,
+            label: mu.unit
+        })),
+    [measuringUnits]);
 
     const filteredSupplies = useMemo(() => {
         return ingredientesAll.filter(item => {
@@ -112,17 +137,17 @@ export const SuppliesPage: React.FC = () => {
     const supplyFormFields: IFormFieldConfig[] = [
         { name: 'denomination', label: 'Nombre', type: 'text', validation: { required: true, minLength: 3 } },
         {
-            name: 'unidadMedicion', 
+            name: 'measuringUnit',
             label: 'Unidad de Medida',
             type: 'select',
-            options: [{ value: 'Kg', label: 'Kg' }, { value: 'L', label: 'L' }],
+            options: measuringUnitOptions,
             validation: { required: true },
         },
         { name: 'currentStock', label: 'Stock Actual', type: 'number', validation: { required: true, min: 0 } },
         { name: 'maxStock', label: 'Stock Máximo', type: 'number', validation: { required: true, min: 0 } },
         { name: 'buyingPrice', label: 'Precio Compra', type: 'number', validation: { required: true, min: 0 } },
         {
-            name: 'categoria', 
+            name: 'category',
             label: 'Categoría',
             type: 'select',
             options: categoryOptions.filter(opt => opt.value !== 'TODOS'),
@@ -132,6 +157,8 @@ export const SuppliesPage: React.FC = () => {
 
     // 7. Handlers CRUD
     const handleCreate = () => {
+        
+        
         setSupplyToEdit(null);
         setIsModalOpen(true);
     };
@@ -141,45 +168,48 @@ export const SuppliesPage: React.FC = () => {
         setIsModalOpen(true);
     };
 
-    const handleDelete = (id: number) => {
-        setSupplyToDeleteId(id);
-        setIsConfirmDialogOpen(true);
-    };
-
-    const handleConfirmDelete = async () => {
-        if (supplyToDeleteId !== null) {
-            await deleteItem(supplyToDeleteId);
-            setIsConfirmDialogOpen(false);
-            setSupplyToDeleteId(null);
-            fetchData();
-        }
-    };
     const handleFormSubmit = async (formData: Partial<IArticle>) => {
         const id = supplyToEdit?.id || Math.floor(Math.random() * 1e9);
-
-        const unit = formData.measuringUnit as unknown as string;
-        const categoriaNombre = formData.category as unknown as string;
-
-        const submitData: IArticle = {
-            id,
-            idarticle: id,
-            denomination: formData.denomination!,
-            measuringUnit: {
-                unit,
-                idmeasuringUnit: 0,
-            },
-            currentStock: Number(formData.currentStock),
-            maxStock: Number(formData.maxStock),
-            buyingPrice: Number(formData.buyingPrice),
-            category: {
-                name: categoriaNombre,
-                idcategory: 0,
-            },
-        };
+  
+        
+        const unit = formData.measuringUnit as unknown as number; // Debe ser el id de la unidad
+        const categoriaId = formData.category as unknown as number; // Debe ser el id de la categoría
 
         if (supplyToEdit) {
+            // Si se edita, envía el objeto completo como antes
+            const submitData: IArticle = {
+                id,
+                idarticle: formData.idarticle,
+                denomination: formData.denomination!,
+                measuringUnit: {
+                    unit: typeof unit === "string" ? unit : "",
+                    idmeasuringUnit: typeof unit === "number" ? unit : 0,
+                },
+                currentStock: Number(formData.currentStock),
+                maxStock: Number(formData.maxStock),
+                buyingPrice: Number(formData.buyingPrice),
+                category: {
+                    name: "",
+                    idcategory: typeof categoriaId === "number" ? categoriaId : 0,
+                },
+            };
             await updateItem(submitData);
         } else {
+            // Si es creación, solo envía los valores simples
+            const submitData: Omit<IArticle, "id"> = {
+                denomination: formData.denomination!,
+                currentStock: Number(formData.currentStock),
+                maxStock: Number(formData.maxStock),
+                buyingPrice: Number(formData.buyingPrice),
+                measuringUnit: {
+                    unit: "", // o el valor real si lo tienes
+                    idmeasuringUnit: unit,
+                },
+                category: {
+                    name: "", // o el valor real si lo tienes
+                    idcategory: categoriaId,
+                },
+            };
             await createItem(submitData);
         }
         setIsModalOpen(false);
@@ -225,7 +255,7 @@ export const SuppliesPage: React.FC = () => {
                 onClose={() => setIsModalOpen(false)}
                 title={supplyToEdit ? 'Editar Insumo' : 'Crear Insumo'}
             >
-                <GenericForm<IArticle> 
+                <GenericForm<IArticle>
                     initialData={supplyToEdit ?? undefined}
                     fieldsConfig={supplyFormFields}
                     onSubmit={handleFormSubmit}

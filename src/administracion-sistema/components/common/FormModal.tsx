@@ -1,5 +1,5 @@
 
-import './styles/FormModal.css'; 
+import './styles/FormModal.css';
 
 interface FormModalProps {
     isOpen: boolean;
@@ -37,10 +37,10 @@ export const FormModal: React.FC<FormModalProps> = ({
                     </button>
                 </div>
                 <div className="form-modal-body">
-                    
-                    <form onSubmit={handleSubmit}>
+                    {children}
+                    {/* <form onSubmit={handleSubmit}>
                         {children}
-                    </form>
+                    </form> */}
                 </div>
             </div>
         </div>

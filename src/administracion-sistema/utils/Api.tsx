@@ -27,6 +27,8 @@ export const setIngredientes = async (ingredientes: any): Promise<IArticle> => {
 		body: JSON.stringify(ingredientes),
 		mode: 'cors'
 	});
+	console.log(ingredientes);
+
 	return await response.json();
 }
 
@@ -63,6 +65,18 @@ export const getCategopryAll = async (): Promise<[Category]> => {
 
 	return await response.json();
 }
+export const getMeasuringUnitsAll = async (): Promise<any[]> => {
+	const urlServer = 'http://localhost:8080/measuringUnit/getAll';
+	const response = await fetch(urlServer, {
+		method: 'GET',
+		headers: {
+			'Content-type': 'application/json',
+			'Access-Control-Allow-Origin': '*'
+		},
+		mode: 'cors'
+	});
+	return await response.json();
+};
 
 
 

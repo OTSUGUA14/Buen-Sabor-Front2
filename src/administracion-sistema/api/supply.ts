@@ -12,6 +12,14 @@ async function handleResponse<T>(response: Response): Promise<T> {
     }
     return response.json();
 }
+export type SimpleArticle = {
+    denomination: string;
+    currentStock: number;
+    maxStock: number;
+    buyingPrice: number;
+    measuringUnit: number; // id de la unidad
+    category: number;      // id de la categoría
+};
 
 export const supplyApi = {
     getAll: async (): Promise<IArticle[]> => {
@@ -32,17 +40,35 @@ export const supplyApi = {
         return handleResponse<IArticle>(res);
     },
 
-    create: async (newItem: Omit<IArticle, 'id' | 'idArticulo'>): Promise<IArticle> => {
+
+    create: async (item: Omit<IArticle, "id">): Promise<IArticle> => {
+        console.log(item);
+        
+        // Transforma el objeto a SimpleArticle
+        const simple: SimpleArticle = {
+            denomination: item.denomination,
+            currentStock: item.currentStock,
+            maxStock: item.maxStock,
+            buyingPrice: item.buyingPrice,
+            measuringUnit: Number(item.measuringUnit.idmeasuringUnit),
+            category:Number( item.category.idcategory),
+        };
         const res = await fetch(`${BASE_URL}/add`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
-            body: JSON.stringify(newItem),
+            body: JSON.stringify(simple),
         });
+        console.log(simple);
+
         return handleResponse<IArticle>(res);
     },
 
     update: async (updatedItem: IArticle): Promise<IArticle> => {
+
+        console.log(updatedItem);
+
+
         const res = await fetch(`${BASE_URL}/update/${updatedItem.idarticle}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
