@@ -82,7 +82,7 @@ export default function Login() {
                         className={styles.googleLoginButton}
                         onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/google"}
                     >
-                        <img src="/icons/google-icon.svg" alt="Google" className={styles.googleIcon} />
+                        <img src="../public/icons/icons8-logo-de-google-48.svg" alt="Google" className={styles.googleIcon} />
                         Entrar con Google
                     </button>
 

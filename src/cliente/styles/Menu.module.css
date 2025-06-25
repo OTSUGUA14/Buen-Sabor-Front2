@@ -10,9 +10,10 @@
 /* Contenedor principal del menú */
 .menuContainer {
     width: 100%;
+    min-height: 100dvh;
     display: flex;
     padding: 2rem 0;
-    margin-top: 2.4rem;
+    margin-top: 1rem;
     gap: 2rem;
     background-color: #fff;
     position: relative;
@@ -21,6 +22,7 @@
 /* Sidebar izquierdo */
 .sidebar {
     width: 220px;
+    margin-left: 1rem;
     border-radius: 0.6rem;
     position: sticky;
     top: 4.3rem;
@@ -35,20 +37,6 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-}
-
-.categoryListItem {
-    display: flex;
-    align-items: center;
-    padding-left: 1rem;
-    justify-content: space-around;
-}
-
-.categoryListItem img {
-    width: 24px;
-    height: 24px;
-    filter: invert(77%) sepia(85%) saturate(1919%) hue-rotate(359deg) brightness(102%) contrast(107%);
-    flex-shrink: 0;
 }
 
 .categoryButton {
@@ -69,11 +57,13 @@
     min-width: 140px;
     max-width: 160px;
     text-wrap: nowrap;
+    text-decoration: none;
+    color: inherit;
 }
 
 .categoryButton:hover {
     background-color: #ffad20;
-    color: #333;
+    color: #111;
     transform: translateY(-2px);
 }
 
@@ -91,7 +81,7 @@
     margin: auto;
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #FFA101;
     margin-bottom: 2.5rem;
     padding-bottom: 0.8rem;
     width: 50%;
@@ -107,17 +97,14 @@
     color: #555;
 }
 
-.searchInput::placeholder {
-    color: #aaa;
-}
-
 .searchIcon {
     width: 20px;
     height: 20px;
     position: absolute;
     right: 0;
     cursor: pointer;
-    filter: invert(50%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(50%) contrast(100%);
+    filter: invert(53%) sepia(94%) saturate(5380%) hue-rotate(1deg) brightness(103%) contrast(103%);
+
 }
 
 /* Secciones de productos */
@@ -139,7 +126,7 @@
 
 .productCard {
     background-color: #fff;
-    border: 1px solid #aaa;
+    border: 1px solid #888;
     border-radius: 0.8rem;
     padding: 1.2rem;
     text-align: center;
@@ -175,9 +162,11 @@
 
 /* Carrito */
 .cartSidebar {
-    width: 280px;
+    margin-right: .5rem;
+    border: 1px solid #6666;
+    width: 320px;
     background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px #3336;
     border-radius: 0.6rem;
     padding: 1.5rem;
     text-align: center;
@@ -194,6 +183,7 @@
     margin-bottom: 1.5rem;
     font-weight: 700;
     text-transform: uppercase;
+    border-bottom: 2px solid #FFA101;
 }
 
 .emptyCart {
@@ -212,7 +202,105 @@
     opacity: 0.6;
 }
 
+/* items del carrito */
+.cartItems {
+    border-radius: 16px;
+    max-width: 400px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', sans-serif;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    margin-bottom: 1rem;
+    scroll-behavior: smooth;
+}
 
+.cartItem {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+    border-bottom: 1px solid #666;
+}
+
+.cartItem:last-child {
+    border-bottom: none;
+}
+
+.cartItem p {
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+    font-size: 1rem;
+}
+
+.cartItem span {
+    color: #555;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-top: 0.2rem;
+}
+
+/* estilos del scroll */
+.cartItems::-webkit-scrollbar {
+    width: 4px;
+}
+
+.cartItems::-webkit-scrollbar-thumb {
+    background-color: #3339;
+    border-radius: 4px;
+}
+
+.cartItems::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.quantityControls {
+    margin-left: 33%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.incrementButton,
+.decrementButton {
+    padding: 3px 0;
+    width: 20px;
+    font-size: 16px;
+    background-color: #FFA101;
+    color: #333;
+    font-weight: 700;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+
+hr {
+    border: none;
+    border-top: 1px solid #FFA101;
+    margin: .5rem 0;
+}
+
+.cartTotal {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #FFA500;
+    text-align: center;
+
+}
+
+.openCartButton {
+    background-color: #ff9900;
+    color: #333;
+    font-weight: 700;
+    border: none;
+    padding: 5px;
+    border-radius: 8px;
+    width: 70%;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
 
 /* --- Estilos Modal --- */
 
@@ -399,109 +487,6 @@
 
 .addToCartButton:hover {
     background-color: #e69100;
-}
-
-.cartItems {
-    background-color: #fff;
-    padding: 1.5rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    margin: 0 auto;
-    font-family: 'Segoe UI', sans-serif;
-    max-height: 500px;
-    /* ajusta según lo que te parezca */
-    overflow-y: auto;
-    padding-right: 0.5rem;
-    /* espacio para scrollbar */
-    margin-bottom: 1rem;
-    scroll-behavior: smooth;
-}
-
-.cartItems ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.cartItem {
-    display: flex;
-    flex-direction: column;
-    padding: 1rem 0;
-    border-bottom: 1px solid #eee;
-}
-
-.cartItem:last-child {
-    border-bottom: none;
-}
-
-.cartItem p {
-    font-weight: 600;
-    margin: 0;
-    color: #333;
-    font-size: 1rem;
-}
-
-.cartItem span {
-    color: #555;
-    font-size: 0.9rem;
-    margin-top: 0.2rem;
-}
-
-hr {
-    border: none;
-    border-top: 1px solid #ccc;
-    margin: 1rem 0;
-}
-
-.cartTotal {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #FFA500;
-    text-align: center;
-
-}
-
-.cartItems::-webkit-scrollbar {
-    width: 6px;
-}
-
-.cartItems::-webkit-scrollbar-thumb {
-    background-color: #ff8800;
-    /* color del scroll */
-    border-radius: 4px;
-}
-
-.cartItems::-webkit-scrollbar-track {
-    background-color: transparent;
-}
-
-.quantityControls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.incrementButton,
-.decrementButton {
-    padding: 4px 8px;
-    font-size: 16px;
-    background-color: #eee;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.continueButton {
-    background-color: #ff9900;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    width: 100%;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 10px;
 }
 
 /* Esto asegura que el scroll no tape el título */

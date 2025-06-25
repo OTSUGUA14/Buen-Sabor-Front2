@@ -194,7 +194,7 @@ export default function RegisterPage() {
 
                     {/* username */}
                     <div className={styles.inputGroup}>
-                        <label htmlFor="username" className={styles.inputLabel}>Usuario*</label>
+                        <label htmlFor="username" className={styles.inputLabel}>Nombre de usuario*</label>
                         <input
                             type="text"
                             id="username"
@@ -265,10 +265,11 @@ export default function RegisterPage() {
                     </div>
                     <button
                         type="button"
+                        className={styles["btn-guardar-domicilio"]}
                         onClick={() => {
                             setUserData(prev => ({
                                 ...prev,
-                                domiciles: [domicile] // o [...prev.domiciles, domicile] si permites varios
+                                domiciles: [domicile] // o [...prev.domiciles, domicile] si permitís varios
                             }));
                             alert("Domicilio guardado");
                             setDomicile({
@@ -279,14 +280,15 @@ export default function RegisterPage() {
                             });
                         }}
                     >
-                        Agregar domicilio
+                        Guardar Domicilio
                     </button>
+
                     <button type="submit" className={styles.loginButton}>REGISTRARSE</button>
 
                     <p className={styles.orSeparator}>O INGRESA CON</p>
 
                     <button type="button" className={styles.googleLoginButton}>
-                        <img src="/icons/google-icon.svg" alt="Google" className={styles.googleIcon} />
+                        <img src="../public/icons/icons8-logo-de-google-48.svg" alt="Google" className={styles.googleIcon} />
                         Entrar con Google
                     </button>
 

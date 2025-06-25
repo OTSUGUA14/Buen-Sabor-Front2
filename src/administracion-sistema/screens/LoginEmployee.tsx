@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../../cliente/styles/Login.module.css";
+import styles from "./styles/LoginEmployee.module.css";
 import { loginEmploye } from "../utils/Api"; // Asegúrate de importar tu función correcta
 
 export default function LoginEmployee() {

@@ -163,7 +163,7 @@ export default function MenuPages() {
                                         </button>
                                     </div>
                                     <span>{item.quantity} x ${item.price.toLocaleString('es-AR')}</span>
-                                    <span>Total: ${(item.quantity * item.price).toLocaleString('es-AR')}</span>
+                                    <span>Subtotal: ${(item.quantity * item.price).toLocaleString('es-AR')}</span>
                                 </li>
                             ))}
                         </ul>
@@ -175,7 +175,7 @@ export default function MenuPages() {
                             className={styles.openCartButton}
                             onClick={() => setIsCartModalOpen(true)}
                         >
-                            Ver Carrito
+                            Ir a pagar
                         </button>
 
                     </div>

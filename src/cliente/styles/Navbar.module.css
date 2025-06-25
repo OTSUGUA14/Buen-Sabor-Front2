@@ -9,7 +9,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: .7rem 0;
+    padding: .9rem 0;
     padding-left: 1rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     font-family: 'Montserrat';
@@ -54,6 +54,8 @@
     background-color: #ffa101;
     border-radius: 0.75rem;
     transition: background-color 0.3s ease;
+    text-decoration: none;
+    color: inherit;
 }
 
 .profileButton:hover {

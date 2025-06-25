@@ -40,7 +40,7 @@ export default function Navbar() {
                                 to="/login"
                                 className={styles.profileButton}
                             >
-                                Iniciar sesión
+                                INGRESAR
                             </Link>
                         )}
 

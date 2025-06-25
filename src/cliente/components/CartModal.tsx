@@ -187,7 +187,7 @@ export const CartModal: React.FC<CartModalProps> = ({
                         CANCELAR
                     </button>
                     <button onClick={handlePayment} className={styles.payButton}>
-                        {paymentMethod === PayMethod.CASH ? 'Reservar' : 'Pagar'}
+                        {paymentMethod === PayMethod.CASH ? 'Reservar' : 'PAGAR'}
                     </button>
                 </div>
             </div>
