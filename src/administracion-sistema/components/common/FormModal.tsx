@@ -37,10 +37,10 @@ export const FormModal: React.FC<FormModalProps> = ({
                     </button>
                 </div>
                 <div className="form-modal-body">
-                    {children}
-                    {/* <form onSubmit={handleSubmit}>
+                 
+                    <form onSubmit={handleSubmit}>
                         {children}
-                    </form> */}
+                    </form>
                 </div>
             </div>
         </div>

@@ -2,11 +2,10 @@
 import { useState, useEffect, useCallback } from 'react';
 
 export interface CrudApi<T extends { id: number }> {
-    getAll: () => Promise<T[]>;
-    getById: (id: number) => Promise<T | undefined | null>;
-    create: (item: Omit<T, 'id'>) => Promise<T>;
-    update: (item: T) => Promise<T>;
-    delete: (id: number) => Promise<void>;
+    getAll : () => Promise<T[]>;
+    getById : (id: number) => Promise<T | undefined | null>;
+    create : (item: Omit<T, 'id'>) => Promise<T>;
+    update  : (item: T) => Promise<T>;
 }
 
 
@@ -74,20 +73,7 @@ export const useCrud = <T extends { id: number }>(
         }
     }, [api]);
 
-    const deleteItem = useCallback(async (id: number) => {
-        setLoading(true);
-        setError(null);
-        try {
-            await api.delete(id);
-            setData((prevData) => prevData.filter((d) => d.id !== id));
-        } catch (err: any) {
-            setError(err.message || 'Error al eliminar el elemento.');
-            console.error("Error deleting item:", err);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, [api]);
+ 
 
     // Función para obtener un elemento por ID (utilizada en FormModal)
     const getItemById = useCallback(async (id: number): Promise<T | undefined> => {
@@ -112,7 +98,7 @@ export const useCrud = <T extends { id: number }>(
         fetchData,
         createItem,
         updateItem,
-        deleteItem,
+        
         getItemById
     };
 };

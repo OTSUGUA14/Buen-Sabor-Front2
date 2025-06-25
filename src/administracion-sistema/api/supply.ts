@@ -78,15 +78,5 @@ export const supplyApi = {
         return handleResponse<IArticle>(res);
     },
 
-    delete: async (id: number): Promise<void> => {
-        const res = await fetch(`${BASE_URL}/delete/${id}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            mode: 'cors',
-        });
-        if (!res.ok) {
-            const text = await res.text();
-            throw new Error(`Error ${res.status}: ${text}`);
-        }
-    },
+  
 };

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import type { IGenericTableProps, ITableColumn } from "./GenericTable.types";
 import { Button } from "../common/Button";
@@ -64,7 +63,7 @@ export const GenericTable = <T extends { id: number }>({
                             rows
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row, index) => (
-                                    <tr key={row.id ?? index}>
+                                    <tr key={`${row.id}-${index}`}>
                                         {columns.map((column) => (
                                             <td
                                                 key={String(column.id)}

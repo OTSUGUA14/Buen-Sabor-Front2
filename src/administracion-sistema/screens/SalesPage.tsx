@@ -7,7 +7,11 @@ import { SaleType, type ISale } from '../api/types/ISale';
 import { saleApi } from '../api/sale';
 import { FormModal } from '../components/common/FormModal';
 import { InputField } from '../components/common/InputField';
-import { SelectField } from '../components/common/SelectField';
+
+import { getProductsAll, getIngredientesAll } from '../utils/Api'; // Ajusta la ruta si es necesario
+import type { IProduct } from '../api/types/IProduct';
+import type { IArticle } from '../api/types/IArticle';
+
 
 export const SalesPage: React.FC = () => {
     const {
@@ -15,7 +19,7 @@ export const SalesPage: React.FC = () => {
         loading,
         error,
         fetchData,
-        deleteItem,
+
         createItem,
         updateItem,
     } = useCrud<ISale>(saleApi);
@@ -24,31 +28,79 @@ export const SalesPage: React.FC = () => {
     const [saleToEdit, setSaleToEdit] = useState<ISale | null>(null);
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [products, setProducts] = useState<IProduct[]>([]);
+    const [selectedProducts, setSelectedProducts] = useState<IProduct[]>([]);
+    const [articles, setArticles] = useState<IArticle[]>([]);
+    const [selectedArticles, setSelectedArticles] = useState<IArticle[]>([]);
+    // Mapa de traducción para SaleType
+
+    const saleTypeLabels: Record<string, string> = {
+        HAPPYHOUR: "Hora Feliz",
+        SPRINGSALE: "Oferta de Primavera",
+        SUMMERSALE: "Oferta de Verano",
+        WINTERSALE: "Oferta de Invierno",
+        FALLSALE: "Oferta de Otoño",
+        CHRISTMASSALE: "Oferta de Navidad"
+    };
+    useEffect(() => {
+        getProductsAll().then(setProducts);
+        getIngredientesAll().then(data => {
+            setArticles(data.filter((a: IArticle) => a.forSale));
+        });
+    }, []);
 
     // Opciones para el select de tipo de oferta
     const saleTypeOptions = Object.values(SaleType).map(type => ({
         value: type,
-        label: type
+        label: saleTypeLabels[type] ?? type
     }));
+
+    // Opciones para el select de productos
+    const productOptions = useMemo(() =>
+        products
+            .filter(prod => typeof prod.idmanufacturedArticle === 'number')
+            .map(prod => ({
+                value: prod.idmanufacturedArticle as number,
+                label: prod.name
+            })),
+        [products]);
 
     // Columnas de la tabla
     const saleColumns: ITableColumn<ISale>[] = [
-        { id: 'IDSale', label: '#', numeric: true },
+        { id: 'idsale', label: '#', numeric: true },
         { id: 'denomination', label: 'Nombre' },
         { id: 'saleDescription', label: 'Descripción' },
-        { id: 'salePrice', label: 'Precio Oferta', numeric: true, render: (item) => `$${item.salePrice.toFixed(2)}` },
-        { id: 'saleType', label: 'Tipo', render: (item) => item.saleType },
+        { id: 'salePrice', label: 'Precio Oferta', numeric: true, render: (item) => `$${item.salePrice}` },
+        {
+            id: 'saleType',
+            label: 'Tipo',
+            render: (item) => saleTypeLabels[item.saleType] ?? item.saleType
+        },
         { id: 'startDate', label: 'Fecha Inicio' },
         { id: 'endDate', label: 'Fecha Fin' },
         { id: 'startTime', label: 'Hora Inicio' },
         { id: 'endTime', label: 'Hora Fin' },
+        {
+            id: 'saleDetails',
+            label: 'Productos',
+            render: (item) =>
+                Array.isArray(item.saleDetails)
+                    ? item.saleDetails
+                        .map((detail: any) =>
+                            detail.manufacturedArticle?.name
+                                ? detail.manufacturedArticle.name
+                                : detail.article?.denomination
+                        )
+                        .filter(Boolean)
+                        .join(', ')
+                    : '',
+        },
         {
             id: 'acciones',
             label: 'Acciones',
             render: (item) => (
                 <div className="table-actions">
                     <Button variant="secondary" onClick={() => handleEdit(item)}>Editar</Button>
-                    <Button variant="danger" onClick={() => handleDelete(item.IDSale)}>Eliminar</Button>
                 </div>
             ),
         },
@@ -110,18 +162,36 @@ export const SalesPage: React.FC = () => {
             label: 'Imagen',
             type: 'file',
             accept: 'image/*',
-        }
-    ], [saleTypeOptions]);
+        },
+
+    ], [saleTypeOptions, productOptions]);
 
     // Handlers
     const handleCreate = () => {
         setSaleToEdit(null);
         setFormValues({});
         setImagePreview(null);
+        setSelectedProducts([]);
         setIsModalOpen(true);
     };
 
     const handleEdit = (sale: ISale) => {
+        // Para productos
+        const manufacturedProducts = sale.saleDetails
+            ? sale.saleDetails
+                .filter((d: any) => d.manufacturedArticle && d.manufacturedArticle.idmanufacturedArticle)
+                .map((d: any) => products.find(p => p.idmanufacturedArticle === d.manufacturedArticle.idmanufacturedArticle))
+                .filter(Boolean)
+            : [];
+
+        // Para artículos
+        const promoArticles = sale.saleDetails
+            ? sale.saleDetails
+                .filter((d: any) => d.article && d.article.idarticle)
+                .map((d: any) => articles.find(a => a.idarticle === d.article.idarticle))
+                .filter(Boolean)
+            : [];
+
         setSaleToEdit(sale);
         setFormValues({
             denomination: sale.denomination,
@@ -134,6 +204,8 @@ export const SalesPage: React.FC = () => {
             endTime: sale.endTime,
             inventoryImage: null,
         });
+        setSelectedProducts(manufacturedProducts as IProduct[]);
+        setSelectedArticles(promoArticles as IArticle[]);
         if (sale.inventoryImage?.imageData) {
             setImagePreview(`data:image/jpeg;base64,${sale.inventoryImage.imageData}`);
         } else {
@@ -145,14 +217,13 @@ export const SalesPage: React.FC = () => {
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
-        const { name, type } = e.target;
+        const target = e.target;
+        const { name } = target;
         let value: any;
 
-        if (type === 'file') {
-            const files = (e.target as HTMLInputElement).files;
+        if (target instanceof HTMLInputElement && target.type === 'file') {
+            const files = target.files;
             value = files && files.length > 0 ? files[0] : null;
-
-            // Mostrar previsualización
             if (value) {
                 const reader = new FileReader();
                 reader.onload = (ev) => setImagePreview(ev.target?.result as string);
@@ -160,8 +231,12 @@ export const SalesPage: React.FC = () => {
             } else {
                 setImagePreview(null);
             }
+        } else if (target instanceof HTMLSelectElement && target.multiple) {
+            value = Array.from(target.options)
+                .filter(option => option.selected)
+                .map(option => Number(option.value));
         } else {
-            value = e.target.value;
+            value = target.value;
         }
 
         setFormValues((prev) => ({
@@ -170,10 +245,7 @@ export const SalesPage: React.FC = () => {
         }));
     };
 
-    const handleDelete = async (id: number) => {
-        await deleteItem(id);
-        fetchData();
-    };
+
 
     // Convertir File a Base64
     const convertFileToBase64 = (file: File): Promise<string> => {
@@ -190,7 +262,10 @@ export const SalesPage: React.FC = () => {
 
     const handleFormSubmit = async () => {
         // Validar campos requeridos
-        const requiredFields = ['denomination', 'saleDescription', 'salePrice', 'saleType', 'startDate', 'endDate', 'startTime', 'endTime'];
+        const requiredFields = [
+            'denomination', 'saleDescription', 'salePrice', 'saleType',
+            'startDate', 'endDate', 'startTime', 'endTime'
+        ];
         for (const field of requiredFields) {
             if (!formValues[field] || (typeof formValues[field] === 'string' && formValues[field].trim() === '')) {
                 alert(`El campo "${field}" es obligatorio.`);
@@ -207,6 +282,20 @@ export const SalesPage: React.FC = () => {
                 inventoryImage = { imageData: saleToEdit.inventoryImage.imageData };
             }
 
+            // Construir saleDetails
+            const saleDetails = [
+                ...selectedProducts.map(p => ({
+                    id: p.idmanufacturedArticle,
+                    quantity: 1, // Puedes cambiar esto si quieres permitir editar la cantidad
+                    type: "MANUFACTURED"
+                })),
+                ...selectedArticles.map(a => ({
+                    id: a.idarticle,
+                    quantity: 1, // Puedes cambiar esto si quieres permitir editar la cantidad
+                    type: "ARTICLE"
+                }))
+            ];
+
             const newSale: any = {
                 denomination: formValues.denomination,
                 saleDescription: formValues.saleDescription,
@@ -216,12 +305,14 @@ export const SalesPage: React.FC = () => {
                 endDate: formValues.endDate,
                 startTime: formValues.startTime,
                 endTime: formValues.endTime,
+                isActive: true,
                 inventoryImage,
-                manufacturedArticle: saleToEdit ? saleToEdit.manufacturedArticle : [], // Puedes agregar selección de productos aquí
+                saleDetails,
             };
-
+            console.log(newSale);
+            
             if (saleToEdit) {
-                newSale.IDSale = saleToEdit.IDSale;
+                newSale.idsale = saleToEdit.idsale;
                 await updateItem(newSale);
             } else {
                 await createItem(newSale);
@@ -247,7 +338,7 @@ export const SalesPage: React.FC = () => {
             </div>
 
             <GenericTable
-                data={sales.map(sale => ({ ...sale, id: sale.IDSale }))}
+                data={sales.map(sale => ({ ...sale, id: sale.idsale }))}
                 columns={saleColumns}
             />
 
@@ -265,7 +356,6 @@ export const SalesPage: React.FC = () => {
                             label={field.label}
                             name={field.name}
                             type={field.type as any}
-                            placeholder={field.placeholder}
                             onChange={handleInputChange}
                             options={field.type === 'select' ? field.options || [] : undefined}
                             {...(!isFileInput ? { value: formValues[field.name] ?? '' } : {})}
@@ -284,6 +374,80 @@ export const SalesPage: React.FC = () => {
                         />
                     </div>
                 )}
+
+                {/* Productos de la promo */}
+                <div style={{ marginBottom: 16 }}>
+                    <label>Productos en la promo:</label>
+                    {selectedProducts.map((prod, idx) => (
+                        <div key={prod.idmanufacturedArticle} style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+                            <span style={{ marginRight: 8 }}>{prod.name}</span>
+                            <Button
+                                variant="danger"
+                                type="button"
+                                onClick={() => setSelectedProducts(selectedProducts.filter((_, i) => i !== idx))}
+                            >
+                                Quitar
+                            </Button>
+                        </div>
+                    ))}
+                    <select
+                        style={{ marginRight: 8, marginTop: 8 }}
+                        defaultValue=""
+                        onChange={e => {
+                            const prod = products.find(p => p.idmanufacturedArticle === Number(e.target.value));
+                            if (prod && !selectedProducts.some(p => p.idmanufacturedArticle === prod.idmanufacturedArticle)) {
+                                setSelectedProducts([...selectedProducts, prod]);
+                            }
+                            e.target.value = "";
+                        }}
+                    >
+                        <option value="" disabled>Agregar producto...</option>
+                        {products
+                            .filter(p => !selectedProducts.some(sp => sp.idmanufacturedArticle === p.idmanufacturedArticle))
+                            .map(p => (
+                                <option key={p.idmanufacturedArticle} value={p.idmanufacturedArticle}>
+                                    {p.name}
+                                </option>
+                            ))}
+                    </select>
+                </div>
+
+                {/* Artículos de la promo */}
+                <div style={{ marginBottom: 16 }}>
+                    <label>Artículos en la promo:</label>
+                    {selectedArticles.map((art, idx) => (
+                        <div key={art.idarticle} style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+                            <span style={{ marginRight: 8 }}>{art.denomination}</span>
+                            <Button
+                                variant="danger"
+                                type="button"
+                                onClick={() => setSelectedArticles(selectedArticles.filter((_, i) => i !== idx))}
+                            >
+                                Quitar
+                            </Button>
+                        </div>
+                    ))}
+                    <select
+                        style={{ marginRight: 8, marginTop: 8 }}
+                        defaultValue=""
+                        onChange={e => {
+                            const art = articles.find(a => a.idarticle === Number(e.target.value));
+                            if (art && !selectedArticles.some(a => a.idarticle === art.idarticle)) {
+                                setSelectedArticles([...selectedArticles, art]);
+                            }
+                            e.target.value = "";
+                        }}
+                    >
+                        <option value="" disabled>Agregar artículo...</option>
+                        {articles
+                            .filter(a => !selectedArticles.some(sa => sa.idarticle === a.idarticle))
+                            .map(a => (
+                                <option key={a.idarticle} value={a.idarticle}>
+                                    {a.denomination}
+                                </option>
+                            ))}
+                    </select>
+                </div>
 
                 <Button variant="primary" type="submit">
                     {saleToEdit ? 'Actualizar' : 'Crear'}

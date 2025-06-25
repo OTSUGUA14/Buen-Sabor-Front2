@@ -1,8 +1,8 @@
 // Update the path below to the correct relative path to IProductClient
-import type { Category, IProductClient } from '../../cliente/types/IProductClient';
+
 import type { IArticle } from "../api/types/IArticle";
 
-import type { } from "../api/types/IProduct";
+import type { Category, IProduct } from "../api/types/IProduct";
 
 export const getIngredientesAll = async (): Promise<[]> => {
 	const urlServer = 'http://localhost:8080/article/getAll';
@@ -33,7 +33,7 @@ export const setIngredientes = async (ingredientes: any): Promise<IArticle> => {
 }
 
 
-export const getProductsAll = async (): Promise<IProductClient[]> => {
+export const getProductsAll = async (): Promise<IProduct[]> => {
 	const urlServer = 'http://localhost:8080/manufacturedArticle/getAll';
 	const response = await fetch(urlServer, {
 		method: 'GET',

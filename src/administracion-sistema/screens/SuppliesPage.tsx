@@ -21,7 +21,6 @@ export const SuppliesPage: React.FC = () => {
         loading,
         error,
         fetchData,
-        deleteItem,
         createItem,
         updateItem,
     } = useCrud(supplyApi);
@@ -31,8 +30,6 @@ export const SuppliesPage: React.FC = () => {
     }, [ingredientesAll]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-    const [supplyToDeleteId, setSupplyToDeleteId] = useState<number | null>(null);
     const [supplyToEdit, setSupplyToEdit] = useState<IArticle | null>(null);
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -40,6 +37,8 @@ export const SuppliesPage: React.FC = () => {
     const [categoryFilter, setCategoryFilter] = useState<'TODOS' | string>('TODOS');
     const [categories, setCategories] = useState<Category[]>([]);
     const [measuringUnits, setMeasuringUnits] = useState<{ unit: string; idmeasuringUnit: number }[]>([]);
+    const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     useEffect(() => {
         getCategopryAll().then(data => {
@@ -71,15 +70,14 @@ export const SuppliesPage: React.FC = () => {
             label: cat.name
         })),
     ], [categories]);
-
     // Opciones para el select de unidades de medida
     const measuringUnitOptions: ISelectOption[] = useMemo(() =>
         measuringUnits.map(mu => ({
             value: mu.idmeasuringUnit,
             label: mu.unit
         })),
-    [measuringUnits]);
-
+        [measuringUnits]);
+        
     const filteredSupplies = useMemo(() => {
         return ingredientesAll.filter(item => {
             const nombre = item.denomination?.toLowerCase() ?? '';
@@ -122,6 +120,11 @@ export const SuppliesPage: React.FC = () => {
             render: i => i.category?.name ?? ''
         },
         {
+            id: 'forSale',
+            label: 'Para venta',
+            render: i => i.forSale ? 'Sí' : 'No'
+        },
+        {
             id: 'acciones',
             label: 'Acciones',
             render: item => (
@@ -134,7 +137,7 @@ export const SuppliesPage: React.FC = () => {
         },
     ];
 
-    const supplyFormFields: IFormFieldConfig[] = [
+    const supplyFormFields = useMemo(() => [
         { name: 'denomination', label: 'Nombre', type: 'text', validation: { required: true, minLength: 3 } },
         {
             name: 'measuringUnit',
@@ -153,12 +156,28 @@ export const SuppliesPage: React.FC = () => {
             options: categoryOptions.filter(opt => opt.value !== 'TODOS'),
             validation: { required: true },
         },
-    ];
+        {
+            name: 'forSale',
+            label: '¿Para venta?',
+            type: 'select',
+            options: [
+                { value: "true", label: 'Sí' },
+                { value: "false", label: 'No' }
+            ],
+            validation: { required: true },
+        },
+        {
+            name: 'inventoryImage',
+            label: 'Imagen',
+            type: 'file',
+            accept: 'image/*'
+        }
+    ], [measuringUnitOptions, categoryOptions]);
 
     // 7. Handlers CRUD
     const handleCreate = () => {
-        
-        
+
+
         setSupplyToEdit(null);
         setIsModalOpen(true);
     };
@@ -170,10 +189,32 @@ export const SuppliesPage: React.FC = () => {
 
     const handleFormSubmit = async (formData: Partial<IArticle>) => {
         const id = supplyToEdit?.id || Math.floor(Math.random() * 1e9);
-  
-        
+
+
         const unit = formData.measuringUnit as unknown as number; // Debe ser el id de la unidad
         const categoriaId = formData.category as unknown as number; // Debe ser el id de la categoría
+        const forSale = String(formData.forSale) === "true"; // Puede venir como string
+        let inventoryImage = null;
+        if (formData.inventoryImage) {
+            const img = formData.inventoryImage;
+            if (img instanceof File) {
+                // Si es un archivo nuevo, conviértelo a base64 y arma el objeto esperado
+                const imageData = await new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(img);
+                });
+                inventoryImage = { IDInventoryImage: 0, imageData };
+            } else if (
+                typeof img === 'object' &&
+                img !== null &&
+                'imageData' in img
+            ) {
+                // Si viene del backend, ya tiene imageData
+                inventoryImage = img;
+            }
+        }
 
         if (supplyToEdit) {
             // Si se edita, envía el objeto completo como antes
@@ -192,6 +233,8 @@ export const SuppliesPage: React.FC = () => {
                     name: "",
                     idcategory: typeof categoriaId === "number" ? categoriaId : 0,
                 },
+                forSale,
+                inventoryImage,
             };
             await updateItem(submitData);
         } else {
@@ -209,12 +252,28 @@ export const SuppliesPage: React.FC = () => {
                     name: "", // o el valor real si lo tienes
                     idcategory: categoriaId,
                 },
+                forSale,
+                inventoryImage,
             };
             await createItem(submitData);
         }
         setIsModalOpen(false);
         setSupplyToEdit(null);
         fetchData();
+    };
+
+    const handleInputChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    ) => {
+        const { name, type, files, value } = e.target as HTMLInputElement;
+        if (type === 'file' && files && files.length > 0) {
+            setFormValues(prev => ({ ...prev, [name]: files[0] }));
+            const reader = new FileReader();
+            reader.onload = (ev) => setImagePreview(ev.target?.result as string);
+            reader.readAsDataURL(files[0]);
+        } else {
+            setFormValues(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     if (loading && ingredientesAll.length === 0) return <p>Cargando insumos...</p>;
@@ -255,12 +314,37 @@ export const SuppliesPage: React.FC = () => {
                 onClose={() => setIsModalOpen(false)}
                 title={supplyToEdit ? 'Editar Insumo' : 'Crear Insumo'}
             >
-                <GenericForm<IArticle>
-                    initialData={supplyToEdit ?? undefined}
-                    fieldsConfig={supplyFormFields}
-                    onSubmit={handleFormSubmit}
-                    submitButtonText={supplyToEdit ? 'Actualizar Insumo' : 'Crear Insumo'}
-                />
+                {/* Campos del formulario */}
+                {supplyFormFields.map(field => {
+                    const isFileInput = field.type === 'file';
+                    return (
+                        <InputField
+                            key={field.name}
+                            label={field.label}
+                            name={field.name}
+                            type={field.type as any}
+                            onChange={handleInputChange}
+                            options={field.type === 'select' ? field.options || [] : undefined}
+                            {...(!isFileInput ? { value: formValues[field.name] ?? '' } : {})}
+                        />
+                    );
+                })}
+
+                {/* Previsualización de la imagen */}
+                {imagePreview && (
+                    <div style={{ marginBottom: 16 }}>
+                        <label>Vista previa de la imagen:</label>
+                        <img
+                            src={imagePreview}
+                            alt="Vista previa"
+                            style={{ maxWidth: 200, maxHeight: 200, display: 'block', marginTop: 8 }}
+                        />
+                    </div>
+                )}
+
+                <Button variant="primary" type="submit">
+                    {supplyToEdit ? 'Actualizar Insumo' : 'Crear Insumo'}
+                </Button>
             </FormModal>
 
         </div>

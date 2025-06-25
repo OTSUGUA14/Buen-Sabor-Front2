@@ -3,17 +3,17 @@ import styles from "../styles/Home.module.css";
 import { fetchAndStoreOAuthUser } from "../services/Api";
 
 export default function Home() {
-    // useEffect(() => {
+    useEffect(() => {
 
-    //     // Si tienes una forma de saber que el usuario volvió de Google, llama a la función:
-    //     // Por ejemplo, si hay un query param como ?oauth2=success
+        // Si tienes una forma de saber que el usuario volvió de Google, llama a la función:
+        // Por ejemplo, si hay un query param como ?oauth2=success
 
   
 
-    //         fetchAndStoreOAuthUser();
+            fetchAndStoreOAuthUser();
         
 
-    // }, []);
+    }, []);
     return (
         <>
             <section className={styles.homeSection}>

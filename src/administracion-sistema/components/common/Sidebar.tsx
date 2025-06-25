@@ -41,6 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
     if (role === 'Admin') {
         menuOptions = [
             { to: '/admin/products', label: 'Productos' },
+            { to: '/admin/sales', label: 'Promos' },
             { to: '/admin/supplies', label: 'Insumos' },
             { to: '/admin/category', label: 'Categorias' },
             { to: '/admin/employees', label: 'Personal' },
@@ -49,11 +50,13 @@ export const Sidebar: React.FC<SidebarProps> = () => {
         ];
     } else if (role === 'Cajero') {
         menuOptions = [
-            { to: '/admin/products', label: 'Productos' }
+            { to: '/admin/products', label: 'Productos' },
+            { to: '/admin/sales', label: 'Promos' }
         ];
     } else if (role === 'Cocinero') {
         menuOptions = [
             { to: '/admin/products', label: 'Productos' },
+            { to: '/admin/sales', label: 'Promos' },
             { to: '/admin/supplies', label: 'Insumos' },
             { to: '/admin/category', label: 'Categorias' },
             { to: '/admin/orders', label: 'Ordenes' }

@@ -21,7 +21,7 @@ export const ProductsPage: React.FC = () => {
         loading,
         error,
         fetchData,
-        deleteItem,
+        
         createItem,
         updateItem,
     } = useCrud<IProduct>(productApi);
@@ -250,19 +250,7 @@ export const ProductsPage: React.FC = () => {
         }));
     };
 
-    const handleDelete = (id: number) => {
-        setProductToDeleteId(id);
-        setIsConfirmDialogOpen(true);
-    };
-
-    const handleConfirmDelete = async () => {
-        if (productToDeleteId !== null) {
-            await deleteItem(productToDeleteId);
-            setIsConfirmDialogOpen(false);
-            setProductToDeleteId(null);
-            fetchData();
-        }
-    };
+  
     // Función auxiliar para convertir File a Base64
     const convertFileToBase64 = (file: File): Promise<string> => {
         return new Promise((resolve, reject) => {

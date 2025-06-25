@@ -1,5 +1,5 @@
-export interface IArticle  {
-    id: number; 
+export interface IArticle {
+    id: number;
     idarticle?: number;
     denomination: string;
     currentStock: number;
@@ -13,4 +13,9 @@ export interface IArticle  {
         name: string;
         idcategory: number;
     };
+    inventoryImage?: {
+        IDInventoryImage: number;
+        imageData: string;
+    } | null;
+    forSale: boolean; // Opcional, si no se maneja en el frontend
 }

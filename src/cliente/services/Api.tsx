@@ -62,7 +62,16 @@ export const loginUser = async (userToLogin: UserLogin): Promise<any> => {
     }
 };
 export const getProfileById = async (id: string | number) => {
-    const response = await fetch(`http://localhost:8080/client/${id}`, {
+    const response = await fetch(`http://localhost:8080/client/ID/${id}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    if (!response.ok) throw new Error('Error al obtener el perfil');
+    return await response.json();
+};
+
+export const getProfileBygmail = async (gmail: string) => {
+    const response = await fetch(`http://localhost:8080/client/email/${gmail}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
     });
@@ -151,7 +160,8 @@ export const fetchAndStoreOAuthUser = async () => {
         console.error('Error al obtener usuario:', response.status);
         return;
     }
-
-    const user = await response.json();
-    localStorage.setItem('profile', JSON.stringify(user));
+    console.log(response);
+    
+    // const user = await response.json();
+    // localStorage.setItem('profile', JSON.stringify(user));
 };

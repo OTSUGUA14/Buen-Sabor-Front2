@@ -1,4 +1,5 @@
 
+import type { IArticle } from './IArticle';
 import { type IProduct } from './IProduct';
 
 export enum SaleType {
@@ -17,7 +18,8 @@ export interface InventoryImage {
 
 
 export interface ISale {
-    IDSale: number;
+    id:number;
+    idsale: number;
     denomination: string;
     startDate: string; 
     endDate: string; 
@@ -27,9 +29,14 @@ export interface ISale {
     salePrice: number;
     saleType: SaleType;
     inventoryImage: InventoryImage;
-    manufacturedArticle: IProduct[]; //nose si es asi 
+    saleDetails: ISaleDetail[];
 }
-
+export interface ISaleDetail {
+    IDSaleDetail: number;
+    quantity: number;
+    article?: IArticle | null; // Puede ser null
+    manufacturedArticle?: IProduct | null; // Puede ser null
+}
 
 
 // public enum SaleType {
