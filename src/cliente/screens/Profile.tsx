@@ -1,15 +1,36 @@
 import { useState } from 'react';
+import { useEffect } from 'react';
 import { useUser } from '../../cliente/components/UserContext';
 import '../styles/Profile.css';
 
 const Profile = () => {
-    const { profile, updateProfile } = useUser(); // Asegúrate de tener updateProfile en tu contexto
+
+    const [showPassword, setShowPassword] = useState(false);
+
+    const { profile, updateProfile } = useUser();
     const [isEditing, setIsEditing] = useState(false);
+
     const [form, setForm] = useState({
         name: profile?.name || '',
+        lastName: profile?.lastName || '',
+        username: profile?.username || '',
         phoneNumber: profile?.phoneNumber || '',
         email: profile?.email || '',
+        password: profile?.password || '',
     });
+
+    useEffect(() => {
+        if (profile) {
+            setForm({
+                name: profile.name || '',
+                lastName: profile.lastName || '',
+                username: profile.username || '',
+                phoneNumber: profile.phoneNumber || '',
+                email: profile.email || '',
+                password: profile.password || '',
+            });
+        }
+    }, [profile]);
 
     if (!profile) {
         return <div className="profile-container">Cargando perfil...</div>;
@@ -30,8 +51,11 @@ const Profile = () => {
         setIsEditing(false);
         setForm({
             name: profile.name || '',
+            lastName: profile?.lastName || '',
+            username: profile?.username || '',
             phoneNumber: profile.phoneNumber || '',
             email: profile.email || '',
+            password: profile?.password || '',
         });
     };
 
@@ -64,6 +88,35 @@ const Profile = () => {
                             <p className="profile-value">{profile.name}</p>
                         )}
                     </div>
+
+                    <div className="profile-detail-item">
+                        <label className="profile-label">Apellido</label>
+                        {isEditing ? (
+                            <input
+                                name="lastName"
+                                value={form.lastName}
+                                onChange={handleChange}
+                                className="profile-input"
+                            />
+                        ) : (
+                            <p className="profile-value">{profile.lastName}</p>
+                        )}
+                    </div>
+
+                    <div className="profile-detail-item">
+                        <label className="profile-label">Nombre de usuario</label>
+                        {isEditing ? (
+                            <input
+                                name="username"
+                                value={form.username}
+                                onChange={handleChange}
+                                className="profile-input"
+                            />
+                        ) : (
+                            <p className="profile-value">{profile.username}</p>
+                        )}
+                    </div>
+
                     <div className="profile-detail-item">
                         <label className="profile-label">Teléfono</label>
                         {isEditing ? (
@@ -92,7 +145,35 @@ const Profile = () => {
                     </div>
                     <div className="profile-detail-item">
                         <label className="profile-label">Contraseña</label>
-                        <p className="profile-value">*************</p>
+                        {isEditing ? (
+                            <div className="container-password-edit">
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    value={form.password}
+                                    onChange={handleChange}
+                                    className='password-input'
+                                />
+
+                                <span onClick={() => setShowPassword(prev => !prev)} style={{ cursor: 'pointer' }}>
+                                    <img
+                                        src={showPassword ? 'public/icons/eye-on.svg' : 'public/icons/eye-off.svg'}
+                                        alt={showPassword ? 'hide password' : 'show password'}
+                                        style={{ filter: 'brightness(0) saturate(100%) invert(65%) sepia(85%) saturate(447%) hue-rotate(-13deg) brightness(105%) contrast(101%)' }}
+                                    />
+                                </span>
+                            </div>
+                        ) : (
+                            <p className="profile-value">
+                                {showPassword ? profile.password : '•'.repeat(profile.password.length)}
+                                <span onClick={() => setShowPassword(prev => !prev)} style={{ cursor: 'pointer' }}>
+                                    <img
+                                        src={showPassword ? 'public/icons/eye-on.svg' : 'public/icons/eye-off.svg'}
+                                        alt={showPassword ? 'hide password' : 'show password'}
+                                    />
+                                </span>
+                            </p>
+                        )}
                     </div>
                     <div className="profile-detail-item">
                         <label className="profile-label">Dirección</label>
@@ -101,13 +182,13 @@ const Profile = () => {
                 </div>
             </div>
             {isEditing ? (
-                <div>
-                    <button className="profile-edit-button" onClick={handleSave}>Guardar</button>
-                    <button className="profile-edit-button" onClick={handleCancel}>Cancelar</button>
+                <div className='buttons-container'>
+                    <button className="profile-cancel-button" onClick={handleCancel}>Cancelar</button>
+                    <button className="profile-save-button" onClick={handleSave}>Guardar</button>
                 </div>
             ) : (
                 <button className="profile-edit-button" onClick={handleEdit}>
-                    <span className="profile-edit-icon">✏️</span> Editar
+                    Editar
                 </button>
             )}
         </div>
