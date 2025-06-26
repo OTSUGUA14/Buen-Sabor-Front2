@@ -161,7 +161,36 @@ export const fetchAndStoreOAuthUser = async () => {
         return;
     }
     console.log(response);
-    
+
     // const user = await response.json();
     // localStorage.setItem('profile', JSON.stringify(user));
+};
+
+
+
+//Funcion para editar datos del cliente
+export const updateUser = async (id: number, updatedData: any) => {
+    try {
+        if (updatedData.birthDate) {
+            updatedData.birthDate = new Date(updatedData.birthDate).toISOString();
+        }
+
+        console.log("BODY A ENVIAR:", JSON.stringify(updatedData, null, 2)); 
+
+        const response = await fetch(`http://localhost:8080/client/update/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedData),
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al actualizar el usuario');
+        }
+
+        const updatedUser = await response.json();
+        return updatedUser;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };

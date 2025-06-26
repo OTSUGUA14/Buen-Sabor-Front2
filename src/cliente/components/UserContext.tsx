@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { updateUser } from '../services/Api';
+import type { SimpleDomicile } from "../types/UserData";
 import type { UserRegister } from "../types/UserData";
 
 interface UserContextType {
@@ -10,9 +12,9 @@ interface UserContextType {
 
 export const UserContext = createContext<UserContextType>({
     profile: null,
-    setProfile: () => {},
-    logout: () => {},
-    updateProfile: async () => {},
+    setProfile: () => { },
+    logout: () => { },
+    updateProfile: async () => { },
 });
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
@@ -37,11 +39,42 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     // Función para actualizar el perfil
-    const updateProfile = async (newData: Partial<UserRegister>) => {
-        // Aquí deberías hacer la petición a tu backend si tienes uno.
-        // Por ahora, solo actualiza localmente:
-        setProfile(profile ? { ...profile, ...newData } : null);
+    const updateProfile = async (formData: any) => {
+        if (!profile?.id || !profile.domiciles || profile.domiciles.length === 0) {
+            console.error("Faltan datos del usuario o del domicilio.");
+            return;
+        }
+
+        // Obtener el id de location correctamente
+        let locationId: number = 1;
+        const loc = profile.domiciles[0].location;
+        if (typeof loc === "object" && loc !== null && "idlocation" in loc) {
+            locationId = (loc as any).idlocation;
+        } else if (typeof loc === "number") {
+            locationId = loc;
+        }
+
+        const domicilio: SimpleDomicile = {
+            street: profile.domiciles[0].street,
+            zipcode: (profile.domiciles[0] as any).zipcode ?? "M0000",
+            number: profile.domiciles[0].number,
+            location: locationId
+        };
+
+        const updated = await updateUser(profile.id, {
+            firstName: formData.name,
+            lastName: formData.lastName,
+            username: formData.username,
+            phoneNumber: formData.phoneNumber,
+            email: formData.email,
+            password: formData.password,
+            birthDate: profile.birthDate,
+            domiciles: [domicilio]
+        });
+        setProfile(updated);
     };
+
+
 
     // Cerrar sesión
     const logout = () => {

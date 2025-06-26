@@ -33,7 +33,7 @@ export interface UserRegister {
 }
 export interface SimpleDomicile {
     street: string;
-    zipCode: string;
+    zipcode: string;
     number: number;
     location: number; // solo el id de la location
 }

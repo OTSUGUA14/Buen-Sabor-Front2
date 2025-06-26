@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { useUser } from '../../cliente/components/UserContext';
+import { updateUser } from '../services/Api';
 import '../styles/Profile.css';
 
 const Profile = () => {
@@ -60,9 +61,14 @@ const Profile = () => {
     };
 
     const handleSave = async () => {
-        // Aquí deberías llamar a tu API o contexto para actualizar el perfil
-        await updateProfile(form); // Asegúrate de implementar esto en tu contexto
-        setIsEditing(false);
+        try {
+            await updateProfile(form);
+            alert('Perfil actualizado correctamente ✅');
+            setIsEditing(false);
+        } catch (error) {
+            alert('Ocurrió un error al actualizar el perfil ❌');
+            console.error(error);
+        }
     };
 
     return (

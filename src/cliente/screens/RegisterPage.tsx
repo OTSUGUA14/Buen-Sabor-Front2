@@ -24,7 +24,7 @@ export default function RegisterPage() {
 
     const [domicile, setDomicile] = useState<SimpleDomicile>({
         street: "",
-        zipCode: "",
+        zipcode: "",
         number: 0,
         location: 1
     });
@@ -101,7 +101,6 @@ export default function RegisterPage() {
             userImage: userData.userImage,
             domiciles: userData.domiciles,
         };
-
 
         await registerUser(userToSend);
     };
@@ -256,8 +255,8 @@ export default function RegisterPage() {
                             type="text"
                             className={styles.loginInput}
                             placeholder="Código Postal"
-                            value={domicile.zipCode}
-                            onChange={e => setDomicile({ ...domicile, zipCode: e.target.value })}
+                            value={domicile.zipcode}
+                            onChange={e => setDomicile({ ...domicile, zipcode: e.target.value })}
                         />
 
 
@@ -274,7 +273,7 @@ export default function RegisterPage() {
                             alert("Domicilio guardado");
                             setDomicile({
                                 street: "",
-                                zipCode: "",
+                                zipcode: "",
                                 number: 0,
                                 location: 1
                             });
