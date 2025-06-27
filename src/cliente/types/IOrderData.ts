@@ -9,8 +9,12 @@ export enum OrderState {
     PENDING = "PENDING",
     CANCELED = "CANCELED",
     REJECTED = "REJECTED",
-    ARRIVED = "ARRIVED"
-}
+    ARRIVED = "ARRIVED",
+    BILLED= "BILLED",
+    READY_FOR_DELIVERY= "READY_FOR_DELIVERY",
+    ON_THE_WAY= "ON_THE_WAY"
+} 
+
 
 export enum PayMethod {
     CASH = "CASH",

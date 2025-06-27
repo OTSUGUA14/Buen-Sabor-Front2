@@ -26,6 +26,9 @@ export const OrderDashboard: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('TODOS');
     const [deliveryTypeFilter, setDeliveryTypeFilter] = useState('TODOS');
+    const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editState, setEditState] = useState<string>('');
 
     useEffect(() => {
         fetchData();
@@ -36,6 +39,9 @@ export const OrderDashboard: React.FC = () => {
         { value: 'PENDING', label: 'PENDIENTE' },
         { value: 'PREPARING', label: 'EN COCINA' },
         { value: 'ARRIVED', label: 'LISTO PARA ENTREGAR' },
+        { value: 'BILLED', label: 'FACTURADO' },
+        { value: 'READY_FOR_DELIVERY', label: 'LISTO PARA DELIVERY' },
+        { value: 'ON_THE_WAY', label: 'EN CAMINO' },
         { value: 'CANCELED', label: 'CANCELADO' },
         { value: 'REJECTED', label: 'RECHAZADO' },
     ], []);
@@ -57,7 +63,6 @@ export const OrderDashboard: React.FC = () => {
 
     const orderColumns: ITableColumn<IOrder>[] = useMemo(() => [
         { id: 'id', label: 'ID Orden', numeric: true },
-        { id: 'clientName', label: 'Cliente' },
         { id: 'orderDate', label: 'Fecha' },
         {
             id: 'total',
@@ -75,45 +80,22 @@ export const OrderDashboard: React.FC = () => {
             label: 'Tipo Entrega',
         },
         {
-            id: 'acciones',
-            label: 'Acciones',
+            id: "acciones" as const,
+            label: "Acciones",
             render: (item) => (
-                <div className="table-actions">
-                    <Button
-                        variant="outline-primary"
-                        size="small"
-                        onClick={() => console.log('Ver detalles de:', item.id)}
-                    >
-                        Ver Detalles
-                    </Button>
-
-                    {item.orderState === 'PENDING' && (
-                        <Button
-                            variant="primary"
-                            size="small"
-                            onClick={() =>
-                                updateItem({ ...item, orderState: OrderState.PREPARING })
-                            }
-                        >
-                            Aceptar Orden
-                        </Button>
-                    )}
-
-                    {item.orderState === OrderState.PREPARING && (
-                        <Button
-                            variant="secondary"
-                            size="small"
-                            onClick={() =>
-                                updateItem({ ...item, orderState: OrderState.ARRIVED })
-                            }
-                        >
-                            Lista p/ Entregar
-                        </Button>
-                    )}
-                </div>
-            ),
-        },
-    ], [updateItem]);
+                <button
+                    className="client-orders-detail-btn"
+                    onClick={() => {
+                        setSelectedOrder(item);
+                        setEditState(item.orderState);
+                        setIsModalOpen(true);
+                    }}
+                >
+                    Ver Detalles
+                </button>
+            )
+        }
+    ], []);
 
     if (loading) return <p>Cargando órdenes...</p>;
     if (error) return <p>Error al cargar órdenes: {error}</p>;
@@ -150,6 +132,61 @@ export const OrderDashboard: React.FC = () => {
             </div>
 
             <GenericTable data={filteredOrders} columns={orderColumns} />
+
+            {isModalOpen && selectedOrder && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h3>Detalle de Orden #{selectedOrder.id}</h3>
+                        <p><b>Cliente:</b> {selectedOrder.client?.firstName} {selectedOrder.client?.lastName}</p>
+                        <p><b>Teléfono:</b> {selectedOrder.client?.phoneNumber}</p>
+                        <p><b>Email:</b> {selectedOrder.client?.email}</p>
+                        <p><b>Fecha:</b> {selectedOrder.orderDate}</p>
+                        <p><b>Estado:</b>
+                            <select
+                                value={editState}
+                                onChange={e => setEditState(e.target.value)}
+                            >
+                                <option value="PENDING">PENDIENTE</option>
+                                <option value="PREPARING">EN COCINA</option>
+                                <option value="ARRIVED">LISTO PARA ENTREGAR</option>
+                                <option value="BILLED">FACTURADO</option>
+                                <option value="READY_FOR_DELIVERY">LISTO PARA DELIVERY</option>
+                                <option value="ON_THE_WAY">EN CAMINO</option>
+                                <option value="CANCELED">CANCELADO</option>
+                                <option value="REJECTED">RECHAZADO</option>
+                            </select>
+                        </p>
+                        <p><b>Tipo de Entrega:</b> {selectedOrder.orderType}</p>
+                        <p><b>Método de Pago:</b> {selectedOrder.payMethod}</p>
+                        <p><b>Total:</b> ${selectedOrder.total}</p>
+                        <p><b>Dirección:</b> {selectedOrder.directionToSend ?? '-'}</p>
+                        <p><b>Hora estimada de entrega:</b> {selectedOrder.estimatedFinishTime}</p>
+                        <hr />
+                        <h4>Detalles:</h4>
+                        <ul>
+                            {selectedOrder.orderDetails?.map((detail: any, idx: number) => (
+                                <li key={idx}>
+                                    Artículo ID: {detail.manufacturedArticleId} | Cantidad: {detail.quantity} | Subtotal: ${detail.subTotal}
+                                </li>
+                            ))}
+                        </ul>
+                        <div style={{marginTop: 16}}>
+                            <button
+                                onClick={async () => {
+                                    await orderApi.update({ ...selectedOrder, orderState: editState });
+                                    setIsModalOpen(false);
+                                    fetchData();
+                                }}
+                            >
+                                Guardar Estado
+                            </button>
+                            <button style={{marginLeft: 8}} onClick={() => setIsModalOpen(false)}>
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

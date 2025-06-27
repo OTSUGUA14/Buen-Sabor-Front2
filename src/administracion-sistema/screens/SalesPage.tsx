@@ -12,6 +12,8 @@ import { getProductsAll, getIngredientesAll } from '../utils/Api'; // Ajusta la 
 import type { IProduct } from '../api/types/IProduct';
 import type { IArticle } from '../api/types/IArticle';
 
+const isAdmin = !localStorage.getItem("employeeRole");
+
 
 export const SalesPage: React.FC = () => {
     const {
@@ -95,15 +97,17 @@ export const SalesPage: React.FC = () => {
                         .join(', ')
                     : '',
         },
-        {
-            id: 'acciones',
-            label: 'Acciones',
-            render: (item) => (
-                <div className="table-actions">
-                    <Button variant="secondary" onClick={() => handleEdit(item)}>Editar</Button>
-                </div>
-            ),
-        },
+        ...(isAdmin
+            ? [{
+                id: "acciones" as const,
+                label: 'Acciones',
+                render: (item: ISale) => (
+                    <div className="table-actions">
+                        <Button variant="secondary" onClick={() => handleEdit(item)}>Editar</Button>
+                    </div>
+                ),
+            }]
+            : [])
     ];
 
     // Campos del formulario
@@ -334,7 +338,11 @@ export const SalesPage: React.FC = () => {
         <div className="crud-page-container">
             <div className="page-header">
                 <h2>Gestión de Ofertas</h2>
-                <Button variant="primary" onClick={handleCreate}>Nueva Oferta</Button>
+                {isAdmin && (
+                    <Button variant="primary" onClick={handleCreate}>
+                        Nueva Oferta
+                    </Button>
+                )}
             </div>
 
             <GenericTable

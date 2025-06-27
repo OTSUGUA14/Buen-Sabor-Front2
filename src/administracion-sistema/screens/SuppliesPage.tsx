@@ -3,7 +3,7 @@ import { GenericTable } from '../components/crud/GenericTable';
 import type { ITableColumn } from '../components/crud/GenericTable.types';
 import { Button } from '../components/common/Button';
 import { useCrud } from '../hooks/useCrud';
-import { supplyApi, type SimpleArticle } from '../api/supply';
+import { supplyApi} from '../api/supply';
 import type { IArticle } from '../api/types/IArticle';
 import { FormModal } from '../components/common/FormModal';
 import { GenericForm } from '../components/crud/GenericForm';
@@ -55,12 +55,7 @@ export const SuppliesPage: React.FC = () => {
         { value: 'Inactivo', label: 'Inactivo' },
     ];
 
-    const supplyCategoryValues: string[] = [
-        'Proteinas',
-        'Vegetales',
-        'Lacteos',
-        'Panificados',
-    ];
+
 
     // Opciones de categoría para el select
     const categoryOptions: ISelectOption[] = useMemo(() => [
@@ -184,6 +179,33 @@ export const SuppliesPage: React.FC = () => {
 
     const handleEdit = (item: IArticle) => {
         setSupplyToEdit(item);
+
+        // Llena los campos del formulario
+        setFormValues({
+            idarticle: item.idarticle,
+            denomination: item.denomination,
+            measuringUnit: item.measuringUnit?.idmeasuringUnit,
+            currentStock: item.currentStock,
+            maxStock: item.maxStock,
+            buyingPrice: item.buyingPrice,
+            category: item.category?.idcategory,
+            forSale: String(item.forSale),
+            inventoryImage: item.inventoryImage ?? undefined,
+        });
+
+        // Previsualiza la imagen si existe
+        if (item.inventoryImage && item.inventoryImage.imageData) {
+            // Si ya es base64, úsalo directamente
+            let imageData = item.inventoryImage.imageData;
+            if (!imageData.startsWith('data:image')) {
+                // Si solo es base64, agrega el prefijo para previsualización
+                imageData = `data:image/jpeg;base64,${imageData}`;
+            }
+            setImagePreview(imageData);
+        } else {
+            setImagePreview(null);
+        }
+
         setIsModalOpen(true);
     };
 
@@ -313,9 +335,19 @@ export const SuppliesPage: React.FC = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title={supplyToEdit ? 'Editar Insumo' : 'Crear Insumo'}
+                onSubmit={async (e) => {
+                    e.preventDefault();
+                    await handleFormSubmit(formValues);
+                }}
             >
-                {/* Campos del formulario */}
                 {supplyFormFields.map(field => {
+                    // Oculta el campo de imagen si no es para venta
+                    if (
+                        field.name === 'inventoryImage' &&
+                        String(formValues.forSale) !== "true"
+                    ) {
+                        return null;
+                    }
                     const isFileInput = field.type === 'file';
                     return (
                         <InputField
@@ -330,8 +362,8 @@ export const SuppliesPage: React.FC = () => {
                     );
                 })}
 
-                {/* Previsualización de la imagen */}
-                {imagePreview && (
+                {/* Previsualización de la imagen solo si es para venta */}
+                {String(formValues.forSale) === "true" && imagePreview && (
                     <div style={{ marginBottom: 16 }}>
                         <label>Vista previa de la imagen:</label>
                         <img

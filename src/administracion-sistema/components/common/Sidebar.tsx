@@ -10,12 +10,6 @@ interface ISelectOption {
 
 interface SidebarProps { }
 
-const statusOptions: ISelectOption[] = [
-    { value: 'Admin', label: 'Admin' },
-    { value: 'Cocinero', label: 'Cocinero' },
-    { value: 'Cajero', label: 'Cajero' },
-    { value: 'Delivery', label: 'Delivery' },
-];
 
 // Mapeo de roles del backend a español
 const roleMap: Record<string, string> = {
@@ -51,7 +45,8 @@ export const Sidebar: React.FC<SidebarProps> = () => {
     } else if (role === 'Cajero') {
         menuOptions = [
             { to: '/admin/products', label: 'Productos' },
-            { to: '/admin/sales', label: 'Promos' }
+            { to: '/admin/sales', label: 'Promos' },
+            { to: '/admin/orders', label: 'Ordenes' }
         ];
     } else if (role === 'Cocinero') {
         menuOptions = [

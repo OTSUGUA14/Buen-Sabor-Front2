@@ -18,16 +18,19 @@ import { SalesPage } from "../administracion-sistema/screens/SalesPage";
 import { SuppliesPage } from "../administracion-sistema/screens/SuppliesPage";
 import { CategoriesPage } from "../administracion-sistema/screens/CategoriesPage";
 import { EmployeesPage } from "../administracion-sistema/screens/EmployeesPage";
-import { CashOrdersPage } from "../administracion-sistema/screens/CashOrdersPage";
+
 import { KitchenOrdersPage } from "../administracion-sistema/screens/KitchenOrdersPage";
 import { DeliveryOrdersPage } from "../administracion-sistema/screens/DeliveryOrdersPage";
 import { OrderDashboard } from "../administracion-sistema/screens/OrdersDashboard";
 import MenuPages from "../cliente/screens/MenuPages";
+import { AdminRouteGuard } from "../administracion-sistema/components/common/AdminRouteGuard";
+
 
 export function AppRouter() {
     const location = useLocation();
-    // Oculta el Navbar si la ruta comienza con /admin
+    // Oculta el Navbar y Footer si la ruta comienza con /admin
     const hideNavbar = location.pathname.startsWith("/admin");
+    const hideFooter = location.pathname.startsWith("/admin");
 
     return (
         <>
@@ -40,22 +43,23 @@ export function AppRouter() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/profile" element={<Perfil />} />
                 <Route path="/ordenes" element={<Orders />} />
-
-                <Route path="/admin" element={<AdminLayout />}>
-                    <Route path="loginEmployee" element={<LoginEmployee />} />
-                    <Route path="products" element={<ProductsPage />} />
-                    <Route path="sales" element={<SalesPage />} />
-                    <Route path="supplies" element={<SuppliesPage />} />
-                    <Route path="category" element={<CategoriesPage />} />
-                    <Route path="employees" element={<EmployeesPage />} />
-                    <Route path="orders" element={<OrderDashboard />} />
-                    {/* <Route path="statistics" element={<StatisticsPage />} /> */}
-                    <Route path="cash-orders" element={<CashOrdersPage />} />
-                    <Route path="kitchen-orders" element={<KitchenOrdersPage />} />
-                    <Route path="delivery-orders" element={<DeliveryOrdersPage />} />
+                <Route path="/admin/loginEmployee" element={<LoginEmployee />} />
+                <Route path="/admin" element={<AdminRouteGuard />}>
+                    <Route element={<AdminLayout />}>
+                        <Route path="products" element={<ProductsPage />} />
+                        <Route path="sales" element={<SalesPage />} />
+                        <Route path="supplies" element={<SuppliesPage />} />
+                        <Route path="category" element={<CategoriesPage />} />
+                        <Route path="employees" element={<EmployeesPage />} />
+                        <Route path="orders" element={<OrderDashboard />} />
+                        {/* <Route path="statistics" element={<StatisticsPage />} /> */}
+                        <Route path="cash-orders" element={<OrderDashboard />} />
+                        <Route path="kitchen-orders" element={<KitchenOrdersPage />} />
+                        <Route path="delivery-orders" element={<DeliveryOrdersPage />} />
+                    </Route>
                 </Route>
             </Routes>
-            <Footer />
+            {!hideFooter && <Footer />}
         </>
     );
 }

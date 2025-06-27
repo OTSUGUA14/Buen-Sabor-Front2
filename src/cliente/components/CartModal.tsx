@@ -37,7 +37,7 @@ export const CartModal: React.FC<CartModalProps> = ({
     if (!isOpen) return null;
 
     const calculatedTotal = deliveryMethod === 'Delivery' ? subtotal + deliveryFee : subtotal;
-   
+
 
     // Construir detalles del pedido para OrderRequestDTO
     const orderDetails: OrderDetailDTO[] = cart.map(item => ({
@@ -59,7 +59,7 @@ export const CartModal: React.FC<CartModalProps> = ({
     // Enviar datos al backend según método de pago
     const handlePayment = () => {
         const order: OrderRequestDTO = {
-            estimatedFinishTime: "10:00:00",
+            estimatedFinishTime,
             total: calculatedTotal,
             totalCost: subtotal,
             orderState: OrderState.PENDING,
@@ -69,7 +69,7 @@ export const CartModal: React.FC<CartModalProps> = ({
             orderDate: orderDate,
             takeAway: deliveryMethod !== 'DELIVERY',
             clientId,
-            direction:selectedAddress,
+            direction: selectedAddress,
             subsidiaryId,
             orderDetails
         };
@@ -82,8 +82,24 @@ export const CartModal: React.FC<CartModalProps> = ({
 
     };
 
-    console.log(deliveryMethod);
-    
+    // Encuentra el mayor tiempo estimado del carrito
+    const maxEstimatedTime = cart.reduce((max, item) => {
+        const time = item.estimatedTimeMinutes ?? 0;
+        return time > max ? time : max;
+    }, 0);
+
+    // Ya NO sumes 10 minutos extra
+    const totalEstimatedMinutes = maxEstimatedTime;
+
+    // Convierte a HH:mm:ss
+    const hours = Math.floor(totalEstimatedMinutes / 60);
+    const minutes = totalEstimatedMinutes % 60;
+    const estimatedFinishTime = `${hours.toString().padStart(2, '0')}:${minutes
+        .toString()
+        .padStart(2, '0')}:00`;
+
+
+
     return (
         <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>

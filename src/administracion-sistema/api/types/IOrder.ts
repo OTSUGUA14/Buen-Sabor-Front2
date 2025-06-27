@@ -1,4 +1,4 @@
-import { type OrderDetailDTO, OrderState, PayMethod } from '../../../cliente/types/IOrderData.ts'; 
+
 
 export interface IOrder {
     id: number;                       
@@ -17,4 +17,32 @@ export interface IOrder {
 
     // Agregado útil para mostrarlo fácil en la tabla
     tipoEntrega: 'DELIVERY' | 'LOCAL';
+}
+
+export enum OrderState {
+    PREPARING = "PREPARING",
+    PENDING = "PENDING",
+    CANCELED = "CANCELED",
+    REJECTED = "REJECTED",
+    ARRIVED = "ARRIVED",
+    BILLED="BILLED",
+    READY_FOR_DELIVERY ="READY_FOR_DELIVERY",   
+    ON_THE_WAY = "ON_THE_WAY",
+}
+
+export enum PayMethod {
+    CASH = "CASH",
+    MERCADOPAGO = "MERCADOPAGO"
+}
+
+
+export enum OrderType {
+    DELIVERY = "DELIVERY",
+    TAKEAWAY = "TAKEAWAY",
+    ON_SITE = "ON_SITE"
+}
+export interface OrderDetailDTO {
+    manufacturedArticleId: number;
+    quantity: number;
+    subTotal: number;
 }

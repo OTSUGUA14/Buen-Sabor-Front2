@@ -30,8 +30,6 @@ export const ProductsPage: React.FC = () => {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-    const [productToDeleteId, setProductToDeleteId] = useState<number | null>(null);
     const [productToEdit, setProductToEdit] = useState<IProduct | null>(null);
     type IngredienteConCantidad = { ingrediente: IArticle; cantidad: number };
     const [selectedIngredientes, setSelectedIngredientes] = useState<IngredienteConCantidad[]>([]);
@@ -41,6 +39,11 @@ export const ProductsPage: React.FC = () => {
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
     const [categories, setCategories] = useState<Category[]>([]);
 
+    const role = localStorage.getItem("employeeRole");
+    const isAdmin = role === 'ADMIN';
+
+    
+    
     const statusOptions: ISelectOption[] = [
         { value: 'TODOS', label: 'TODOS' },
         { value: 'Activo', label: 'Activo' },
@@ -103,15 +106,17 @@ export const ProductsPage: React.FC = () => {
             render: (item) => item.isAvailable ? 'Activo' : 'Desactivado'
         },
         { id: 'estimatedTimeMinutes', label: 'Tiempo estimado', render: (item) => item.estimatedTimeMinutes },
-        {
-            id: 'acciones',
-            label: 'Acciones',
-            render: (item) => (
-                <div className="table-actions">
-                    <Button variant="secondary" onClick={() => handleEdit(item)}>Editar</Button>
-                </div>
-            ),
-        },
+        ...(isAdmin
+            ? [{
+                id: "acciones" as const, // <-- así TypeScript lo acepta
+                label: 'Acciones',
+                render: (item: IProduct) => (
+                    <div className="table-actions">
+                        <Button variant="secondary" onClick={() => handleEdit(item)}>Editar</Button>
+                    </div>
+                ),
+            }]
+            : [])
     ];
 
     // Campos del formulario
@@ -346,7 +351,11 @@ export const ProductsPage: React.FC = () => {
         <div className="crud-page-container">
             <div className="page-header">
                 <h2>Gestión de Productos</h2>
-                <Button variant="primary" onClick={handleCreate}>Nuevo Producto</Button>
+                {isAdmin && (
+                    <Button variant="primary" onClick={handleCreate}>
+                        Nuevo Producto
+                    </Button>
+                )}
             </div>
 
             <div className="filter-controls">

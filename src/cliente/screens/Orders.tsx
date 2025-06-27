@@ -34,6 +34,9 @@ export const Orders: React.FC = () => {
         { value: 'PENDING', label: 'PENDIENTE' },
         { value: 'PREPARING', label: 'EN COCINA' },
         { value: 'ARRIVED', label: 'LISTO PARA ENTREGAR' },
+        { value: 'BILLED', label: 'FACTURADO' },
+        { value: 'READY_FOR_DELIVERY', label: 'LISTO PARA DELIVERY' },
+        { value: 'ON_THE_WAY', label: 'EN CAMINO' },
         { value: 'CANCELED', label: 'CANCELADO' },
         { value: 'REJECTED', label: 'RECHAZADO' },
     ], []);
