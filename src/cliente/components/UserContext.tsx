@@ -55,9 +55,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         const domicilio: SimpleDomicile = {
-            street: profile.domiciles[0].street,
-            zipcode: (profile.domiciles[0] as any).zipcode ?? "M0000",
-            number: profile.domiciles[0].number,
+            street: formData.street,
+            zipcode: formData.zipcode,
+            number: Number(formData.number),
             location: locationId
         };
 

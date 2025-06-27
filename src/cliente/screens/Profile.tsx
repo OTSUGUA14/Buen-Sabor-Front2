@@ -1,11 +1,8 @@
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '../../cliente/components/UserContext';
-import { updateUser } from '../services/Api';
 import '../styles/Profile.css';
 
 const Profile = () => {
-
     const [showPassword, setShowPassword] = useState(false);
 
     const { profile, updateProfile } = useUser();
@@ -18,6 +15,9 @@ const Profile = () => {
         phoneNumber: profile?.phoneNumber || '',
         email: profile?.email || '',
         password: profile?.password || '',
+        street: profile?.domiciles?.[0]?.street || '',
+        number: profile?.domiciles?.[0]?.number?.toString() || '',
+        zipcode: profile?.domiciles?.[0]?.zipcode || '',
     });
 
     useEffect(() => {
@@ -29,6 +29,9 @@ const Profile = () => {
                 phoneNumber: profile.phoneNumber || '',
                 email: profile.email || '',
                 password: profile.password || '',
+                street: profile.domiciles?.[0]?.street || '',
+                number: profile.domiciles?.[0]?.number?.toString() || '',
+                zipcode: profile.domiciles?.[0]?.zipcode || '',
             });
         }
     }, [profile]);
@@ -38,9 +41,6 @@ const Profile = () => {
     }
 
     const avatarUrl = profile.userImage || "https://images.steamusercontent.com/ugc/18200902477657540315/C8CBD823EF42E1F4E8368E5D56A9FC289B18DA32/?imw=512&&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false";
-    const address = profile.domiciles && profile.domiciles.length > 0
-        ? `${profile.domiciles[0].street} ${profile.domiciles[0].number},`
-        : "No registrado";
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -52,11 +52,14 @@ const Profile = () => {
         setIsEditing(false);
         setForm({
             name: profile.name || '',
-            lastName: profile?.lastName || '',
-            username: profile?.username || '',
+            lastName: profile.lastName || '',
+            username: profile.username || '',
             phoneNumber: profile.phoneNumber || '',
             email: profile.email || '',
-            password: profile?.password || '',
+            password: profile.password || '',
+            street: profile.domiciles?.[0]?.street || '',
+            number: profile.domiciles?.[0]?.number?.toString() || '',
+            zipcode: profile.domiciles?.[0]?.zipcode || '',
         });
     };
 
@@ -181,9 +184,47 @@ const Profile = () => {
                             </p>
                         )}
                     </div>
+
                     <div className="profile-detail-item">
-                        <label className="profile-label">Dirección</label>
-                        <p className="profile-value">{address}</p>
+                        <label className="profile-label">Nombre calle</label>
+                        {isEditing ? (
+                            <input
+                                name="street"
+                                value={form.street}
+                                onChange={handleChange}
+                                className="profile-input"
+                            />
+                        ) : (
+                            <p className="profile-value">{profile.domiciles?.[0]?.street || "No registrado"}</p>
+                        )}
+                    </div>
+
+                    <div className="profile-detail-item">
+                        <label className="profile-label">Numero de casa</label>
+                        {isEditing ? (
+                            <input
+                                name="number"
+                                value={form.number}
+                                onChange={handleChange}
+                                className="profile-input"
+                            />
+                        ) : (
+                            <p className="profile-value">{profile.domiciles?.[0]?.number || ""}</p>
+                        )}
+                    </div>
+
+                    <div className="profile-detail-item">
+                        <label className="profile-label">Codigo postal</label>
+                        {isEditing ? (
+                            <input
+                                name="zipcode"
+                                value={form.zipcode}
+                                onChange={handleChange}
+                                className="profile-input"
+                            />
+                        ) : (
+                            <p className="profile-value">{profile.domiciles?.[0]?.zipcode || ""}</p>
+                        )}
                     </div>
                 </div>
             </div>

@@ -19,7 +19,7 @@ export interface Domicile {
 
 export interface UserRegister {
     id?: number;
-    name?:string
+    name?: string
     firstName: string;
     lastName: string;
     phoneNumber: string;
@@ -37,3 +37,4 @@ export interface SimpleDomicile {
     number: number;
     location: number; // solo el id de la location
 }
+
