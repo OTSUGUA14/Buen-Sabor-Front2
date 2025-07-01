@@ -304,15 +304,15 @@ export const SuppliesPage: React.FC = () => {
     return (
         <div className="crud-page-container">
             <div className="page-header">
-                <h2>Gestión de Insumos</h2>
-                <Button variant="primary" onClick={handleCreate}>Nuevo Insumo</Button>
+                <h2>INSUMOS</h2>
             </div>
 
             <div className="filter-controls">
+                <Button variant="primary" onClick={handleCreate}>Nuevo Insumo</Button>
                 <InputField
                     name="search"
                     type="search"
-                    placeholder="Buscar por nombre o categoría..."
+                    placeholder="Buscar"
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                     className="search-input"

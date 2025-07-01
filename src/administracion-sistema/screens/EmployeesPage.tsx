@@ -135,15 +135,15 @@ export const EmployeesPage: React.FC = () => {
     return (
         <div className="crud-page-container">
             <div className="page-header">
-                <h2>Gestión de Empleados</h2>
-                <Button variant="primary" onClick={handleCreate}>Nuevo Empleado</Button>
+                <h2>EMPLEADOS</h2>
             </div>
 
             <div className="filter-controls">
+                <Button variant="primary" onClick={handleCreate}>Nuevo Empleado</Button>
                 <InputField
                     name="search"
                     type="search"
-                    placeholder="Buscar por nombre, apellido, correo o usuario..."
+                    placeholder="Buscar"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"

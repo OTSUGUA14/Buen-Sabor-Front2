@@ -103,14 +103,14 @@ export const OrderDashboard: React.FC = () => {
     return (
         <div className="crud-page-container">
             <div className="page-header">
-                <h2>Gestión de Órdenes</h2>
+                <h2>ÓRDENES</h2>
             </div>
 
             <div className="filter-controls">
                 <InputField
                     name="searchOrders"
                     type="search"
-                    placeholder="Buscar por cliente..."
+                    placeholder="Buscar"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"

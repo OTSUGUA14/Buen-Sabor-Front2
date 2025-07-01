@@ -337,7 +337,7 @@ export const SalesPage: React.FC = () => {
     return (
         <div className="crud-page-container">
             <div className="page-header">
-                <h2>Gestión de Ofertas</h2>
+                <h2>OFERTAS</h2>
                 {isAdmin && (
                     <Button variant="primary" onClick={handleCreate}>
                         Nueva Oferta

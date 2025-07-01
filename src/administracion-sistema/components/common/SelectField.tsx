@@ -1,4 +1,3 @@
-
 import './styles/SelectField.css'; 
 
 interface SelectOption {

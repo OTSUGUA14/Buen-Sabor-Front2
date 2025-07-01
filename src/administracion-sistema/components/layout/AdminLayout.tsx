@@ -23,22 +23,28 @@ export const AdminLayout: React.FC = () => {
 
     return (
         <div className="admin-layout">
-
-            <Sidebar />
             <main className="main-content">
                 {role && (
                     <header className="admin-header">
+                        <div className="logo">
+                            Buen<span className="logoAccent">SABOR</span>
+                        </div>
                         <div className="header-right">
-                            <span className="user-info">{roleEs}</span>
+                            <button className="user-info">{roleEs}</button>
                             <button className="logout-btn" onClick={handleLogout}>
                                 Cerrar sesión
                             </button>
                         </div>
                     </header>
+
                 )}
-                <div className="page-content">
-                    <Outlet />
+                <div className='container-page-content'>
+                    <Sidebar />
+                    <div className="page-content">
+                        <Outlet />
+                    </div>
                 </div>
+
             </main>
         </div>
     );

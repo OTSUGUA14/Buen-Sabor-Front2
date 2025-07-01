@@ -89,7 +89,7 @@ export const Orders: React.FC = () => {
                 <InputField
                     name="searchOrders"
                     type="search"
-                    placeholder="Buscar por nombre..."
+                    placeholder="Buscar"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="client-orders-search"

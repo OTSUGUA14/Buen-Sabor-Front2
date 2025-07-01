@@ -349,20 +349,20 @@ export const ProductsPage: React.FC = () => {
 
     return (
         <div className="crud-page-container">
-            <div className="page-header">
-                <h2>Gestión de Productos</h2>
+            {/* <div className="page-header">
+                <h2>PRODUCTOS</h2>
+            </div> */}
+
+            <div className="filter-controls">
                 {isAdmin && (
                     <Button variant="primary" onClick={handleCreate}>
                         Nuevo Producto
                     </Button>
                 )}
-            </div>
-
-            <div className="filter-controls">
                 <InputField
                     name="search"
                     type="search"
-                    placeholder="Buscar por nombre o ingredientes..."
+                    placeholder="Buscar"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"

@@ -20,19 +20,12 @@
     /* Añadimos search para el buscador */
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: none;
+    border-bottom: 1px solid #333;
+    outline: none;
     font-size: 16px;
     box-sizing: border-box;
-    /* Para que padding no aumente el ancho total */
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.input-field-container input:focus {
-    outline: none;
-    border-color: var(--color-primary, #007bff);
-    /* Usa variable de color si está definida */
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 .input-field-container input.input-error {

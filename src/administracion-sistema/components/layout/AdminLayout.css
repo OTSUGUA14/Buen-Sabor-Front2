@@ -1,9 +1,9 @@
-/* src/administracion-sistema/components/layout/AdminLayout/AdminLayout.css */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 .admin-layout {
     display: flex;
     min-height: 100vh;
-    background-color: #f8f8f8;
+    background-color: #ffffff;
 }
 
 .main-content {
@@ -13,18 +13,40 @@
 }
 
 .admin-header {
-    background-color: #ffffff;
+    background-color: #ffd284;
+    z-index: 100;
     padding: 20px 30px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
 }
 
-.admin-header .user-info {
+.logo{
+    font-family: "Montserrat Alternates";
+    color: #333;
     font-weight: bold;
-    color: #555;
+    font-size: 1.5rem;
+}
+
+.logoAccent{
+    color: #ffa101;
+}
+
+.admin-header .user-info {
+    background-color: #ffa101;
+    padding: 12px 10px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    color: #333;
     font-size: 16px;
+}
+
+
+.container-page-content{
+    display: flex;
+    flex-direction: row;
 }
 
 .page-content {

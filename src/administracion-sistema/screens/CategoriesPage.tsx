@@ -20,7 +20,6 @@ export const CategoriesPage: React.FC = () => {
         loading,
         error,
         fetchData,
-        deleteItem,
         createItem,
         updateItem,
     } = useCrud<ICategory>(categoryApi);
@@ -114,15 +113,15 @@ export const CategoriesPage: React.FC = () => {
     return (
         <div className="crud-page-container">
             <div className="page-header">
-                <h2>Gestión de Categorías</h2>
-                <Button variant="primary" onClick={handleCreate}>Nueva Categoría</Button>
+                <h2>CATEGORIAS</h2>
             </div>
 
             <div className="filter-controls">
+                <Button variant="primary" onClick={handleCreate}>Nueva Categoría</Button>
                 <InputField
                     name="search"
                     type="search"
-                    placeholder="Buscar por nombre..."
+                    placeholder="Buscar"
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                     className="search-input"

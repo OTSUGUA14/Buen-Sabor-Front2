@@ -22,21 +22,19 @@
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     width: 90%;
-    max-width: 600px;
-    /* Ancho máximo para el formulario */
+    max-width: 500px;
     position: relative;
     max-height: 90vh;
-    /* Altura máxima para el modal, permite scroll */
     overflow-y: auto;
 }
 
 .form-modal-header {
+    margin-left: auto;
     display: flex;
     justify-content: space-between;
+    width: 70%;
     align-items: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .form-modal-title {
@@ -50,19 +48,15 @@
     border: none;
     font-size: 30px;
     cursor: pointer;
-    color: #888;
+    color: #333;
     padding: 0;
     line-height: 1;
-    /* Para que la "x" se vea bien */
 }
 
 .form-modal-close-button:hover {
     color: #333;
 }
 
-.form-modal-body {
-    /* Puedes añadir padding o estilos específicos para el contenido del formulario aquí */
-}
 
 /* Responsividad básica */
 @media (max-width: 600px) {
