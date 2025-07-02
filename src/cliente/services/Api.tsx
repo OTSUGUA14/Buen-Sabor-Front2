@@ -32,6 +32,13 @@ export const registerUser = async (userToSend: UserRegister): Promise<void> => {
     }
 };
 
+// obtener localidades de la base
+export async function getLocations() {
+    const response = await fetch("http://localhost:8080/location/getAll");
+    if (!response.ok) throw new Error("Error al obtener localidades");
+    return response.json();
+}
+
 export const loginUser = async (userToLogin: UserLogin): Promise<any> => {
     try {
         const response = await fetch('http://localhost:8080/client/login', {

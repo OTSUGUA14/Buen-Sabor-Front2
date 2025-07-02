@@ -1,6 +1,6 @@
 export interface Domicile {
     street: string;
-    zipCode: string;
+    zipcode: string;
     number: number;
     location: {
         name: string;
@@ -29,12 +29,12 @@ export interface UserRegister {
     password: string;
     auth0Id?: string | null;
     userImage?: string | null;
-    domiciles?: SimpleDomicile[];
+    domiciles?: DomicileToSend[];
 }
-export interface SimpleDomicile {
+
+export type DomicileToSend = {
     street: string;
     zipcode: string;
     number: number;
-    location: number; // solo el id de la location
-}
-
+    location: number; // solo el id
+};

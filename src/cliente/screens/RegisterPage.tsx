@@ -1,11 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "../styles/Login.module.css";
-
 import "../../index.css";
 import { regexPatterns } from "../validation/Validatios";
-import type { Domicile, SimpleDomicile, UserRegister } from "../types/UserData";
-import { registerUser } from "../services/Api";
+import type { Domicile, UserRegister } from "../types/UserData";
+import { registerUser, getLocations } from "../services/Api";
 import { Link } from "react-router-dom";
+
+interface Location {
+    idlocation: number;
+    name: string;
+    province: {
+        name: string;
+        idprovince: number;
+        country: {
+            name: string;
+            idcountry: number;
+        };
+    };
+}
 
 export default function RegisterPage() {
     const [userData, setUserData] = useState({
@@ -19,15 +31,32 @@ export default function RegisterPage() {
         repeat_password: "",
         auth0Id: null,
         userImage: null,
-        domiciles: [] as SimpleDomicile[],
+        domiciles: [] as Domicile[],
     });
 
-    const [domicile, setDomicile] = useState<SimpleDomicile>({
+    const [locations, setLocations] = useState<Location[]>([]);
+    const [domicile, setDomicile] = useState<Domicile>({
         street: "",
         zipcode: "",
         number: 0,
-        location: 1
+        location: {
+            name: "",
+            province: {
+                name: "",
+                idprovince: 1,
+                country: {
+                    name: "",
+                    idcountry: 1,
+                },
+            },
+            idlocation: 1,
+        },
+        iddomicile: 0,
     });
+
+    useEffect(() => {
+        getLocations().then((data) => setLocations(data));
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -36,7 +65,6 @@ export default function RegisterPage() {
         const warnings = document.querySelectorAll<HTMLParagraphElement>("p.warning");
         const pattern = regexPatterns[name as keyof typeof regexPatterns];
 
-        // Solo valida si el valor es string y el patrón existe
         if (typeof value === "string" && pattern) {
             if (name === "repeat_password" && value === userData.repeat_password) {
                 warnings[7].classList.add("hide");
@@ -50,7 +78,84 @@ export default function RegisterPage() {
                 });
             }
         }
+    };
 
+    const handleDomicileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        if (name === "location") {
+            const selectedId = Number(value);
+            const selectedLoc = locations.find((l) => l.idlocation === selectedId);
+            setDomicile((prev) => ({
+                ...prev,
+                location: selectedLoc
+                    ? {
+                          name: selectedLoc.name,
+                          idlocation: selectedLoc.idlocation,
+                          province: {
+                              name: selectedLoc.province.name,
+                              idprovince: selectedLoc.province.idprovince,
+                              country: {
+                                  name: selectedLoc.province.country.name,
+                                  idcountry: selectedLoc.province.country.idcountry,
+                              },
+                          },
+                      }
+                    : prev.location,
+            }));
+        } else {
+            setDomicile((prev) => ({
+                ...prev,
+                [name]: name === "number" ? Number(value) : value,
+            }));
+        }
+    };
+
+    const handleSaveDomicile = () => {
+        if (
+            !domicile.street ||
+            !domicile.zipcode ||
+            !domicile.number ||
+            !domicile.location.idlocation
+        ) {
+            alert("Completa todos los campos del domicilio.");
+            return;
+        }
+        setUserData((prev) => ({
+            ...prev,
+            domiciles: [domicile], // O [...prev.domiciles, domicile] si permitís varios
+        }));
+        alert("Domicilio guardado");
+        setDomicile({
+            street: "",
+            zipcode: "",
+            number: 0,
+            location: locations[0]
+                ? {
+                      name: locations[0].name,
+                      idlocation: locations[0].idlocation,
+                      province: {
+                          name: locations[0].province.name,
+                          idprovince: locations[0].province.idprovince,
+                          country: {
+                              name: locations[0].province.country.name,
+                              idcountry: locations[0].province.country.idcountry,
+                          },
+                      },
+                  }
+                : {
+                      name: "",
+                      idlocation: 1,
+                      province: {
+                          name: "",
+                          idprovince: 1,
+                          country: {
+                              name: "",
+                              idcountry: 1,
+                          },
+                      },
+                  },
+            iddomicile: 0,
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -67,13 +172,8 @@ export default function RegisterPage() {
             "repeat_password",
         ];
         const allValid = keysToValidate.every((key) => {
-            console.log(key);
-
             const value = userData[key as keyof typeof userData];
             const pattern = regexPatterns[key as keyof typeof regexPatterns];
-            // Solo valida si value es string y pattern existe
-            console.log(value, pattern);
-
             return pattern && typeof value === "string" ? pattern.test(value) : false;
         });
 
@@ -89,6 +189,19 @@ export default function RegisterPage() {
             return;
         }
 
+        if (userData.domiciles.length === 0) {
+            alert("Debes agregar al menos un domicilio.");
+            return;
+        }
+
+        // Transforma domicilios para que location sea solo el id
+        const domicilesToSend = userData.domiciles.map((d) => ({
+            street: d.street,
+            zipcode: d.zipcode,
+            number: d.number,
+            location: d.location.idlocation,
+        }));
+
         const userToSend: UserRegister = {
             firstName: userData.firstName,
             lastName: userData.lastName,
@@ -99,7 +212,7 @@ export default function RegisterPage() {
             password: userData.password,
             auth0Id: userData.auth0Id,
             userImage: userData.userImage,
-            domiciles: userData.domiciles,
+            domiciles: domicilesToSend,
         };
 
         await registerUser(userToSend);
@@ -174,9 +287,6 @@ export default function RegisterPage() {
                         <p className="warning hide" data-name="email"># Ingrese un correo válido</p>
                     </div>
 
-
-
-                    {/* esto es al pedo pedirlo */}
                     {/* birthDate */}
                     <div className={styles.inputGroup}>
                         <label htmlFor="birthDate" className={styles.inputLabel}>Fecha de Nacimiento*</label>
@@ -235,49 +345,52 @@ export default function RegisterPage() {
                         />
                         <p className="warning hide" data-name="repeat_password"># Las contraseñas deben coincidir</p>
                     </div>
+
+                    {/* Domicilio */}
                     <div className={styles.inputGroup}>
                         <label className={styles.inputLabel}>Agregar domicilio</label>
                         <input
                             type="text"
+                            name="street"
                             placeholder="Calle"
                             className={styles.loginInput}
                             value={domicile.street}
-                            onChange={e => setDomicile({ ...domicile, street: e.target.value })}
+                            onChange={handleDomicileChange}
                         />
                         <input
                             type="number"
+                            name="number"
                             className={styles.loginInput}
                             placeholder="Número"
                             value={domicile.number}
-                            onChange={e => setDomicile({ ...domicile, number: Number(e.target.value) })}
+                            onChange={handleDomicileChange}
                         />
                         <input
                             type="text"
+                            name="zipcode"
                             className={styles.loginInput}
                             placeholder="Código Postal"
                             value={domicile.zipcode}
-                            onChange={e => setDomicile({ ...domicile, zipcode: e.target.value })}
+                            onChange={handleDomicileChange}
                         />
-
-
-
+                        <select
+                            name="location"
+                            className={styles.loginInput}
+                            value={domicile.location.idlocation}
+                            onChange={handleDomicileChange}
+                        >
+                            <option value="">Selecciona una localidad</option>
+                            {locations.map((loc) => (
+                                <option key={loc.idlocation} value={loc.idlocation}>
+                                    {loc.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <button
                         type="button"
                         className={styles["btn-guardar-domicilio"]}
-                        onClick={() => {
-                            setUserData(prev => ({
-                                ...prev,
-                                domiciles: [domicile] // o [...prev.domiciles, domicile] si permitís varios
-                            }));
-                            alert("Domicilio guardado");
-                            setDomicile({
-                                street: "",
-                                zipcode: "",
-                                number: 0,
-                                location: 1
-                            });
-                        }}
+                        onClick={handleSaveDomicile}
                     >
                         Guardar Domicilio
                     </button>
