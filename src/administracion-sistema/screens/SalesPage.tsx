@@ -12,8 +12,9 @@ import { getProductsAll, getIngredientesAll } from '../utils/Api'; // Ajusta la 
 import type { IProduct } from '../api/types/IProduct';
 import type { IArticle } from '../api/types/IArticle';
 
-const isAdmin = !localStorage.getItem("employeeRole");
 
+const role = localStorage.getItem("employeeRole");
+const isAdmin = role === 'ADMIN';
 
 export const SalesPage: React.FC = () => {
     const {
@@ -314,7 +315,7 @@ export const SalesPage: React.FC = () => {
                 saleDetails,
             };
             console.log(newSale);
-            
+
             if (saleToEdit) {
                 newSale.idsale = saleToEdit.idsale;
                 await updateItem(newSale);

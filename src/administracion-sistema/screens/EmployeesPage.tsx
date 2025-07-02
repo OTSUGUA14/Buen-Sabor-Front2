@@ -63,6 +63,9 @@ export const EmployeesPage: React.FC = () => {
         });
     }, [employees, searchTerm]);
 
+    const role = localStorage.getItem("employeeRole");
+    const isAdmin = role === 'ADMIN';
+
     const employeeColumns: ITableColumn<IEmployee>[] = [
         { id: 'id', label: '#', numeric: true },
         { id: 'name', label: 'Nombre' },
@@ -71,15 +74,19 @@ export const EmployeesPage: React.FC = () => {
         { id: 'phoneNumber', label: 'Teléfono' },
         { id: 'employeeRole', label: 'Rol' },
         { id: 'shift', label: 'Turno' },
-        {
-            id: 'acciones',
-            label: 'Acciones',
-            render: (item) => (
-                <div className="table-actions">
-                    <Button variant="secondary" onClick={() => handleEdit(item)}>Editar</Button>
-                </div>
-            ),
-        },
+        ...(isAdmin
+            ? [{
+                id: 'acciones' as const,
+                label: 'Acciones',
+                render: (item: IEmployee) => (
+                    <div className="table-actions">
+                        <Button variant="secondary" onClick={() => handleEdit(item)}>
+                            Editar
+                        </Button>
+                    </div>
+                ),
+            }]
+            : [])
     ];
 
     const employeeFormFields: IFormFieldConfig[] = [
@@ -139,7 +146,9 @@ export const EmployeesPage: React.FC = () => {
             </div>
 
             <div className="filter-controls">
-                <Button variant="primary" onClick={handleCreate}>Nuevo Empleado</Button>
+                {isAdmin && (
+                    <Button variant="primary" onClick={handleCreate}>Nuevo Empleado</Button>
+                )}
                 <InputField
                     name="search"
                     type="search"

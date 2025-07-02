@@ -25,10 +25,12 @@ export const CategoriesPage: React.FC = () => {
     } = useCrud<ICategory>(categoryApi);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-    const [categoryToDeleteId, setCategoryToDeleteId] = useState<number | null>(null);
+
     const [categoryToEdit, setCategoryToEdit] = useState<ICategory | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+
+    const role = localStorage.getItem("employeeRole");
+    const isAdmin = role === 'ADMIN';
 
     const filteredCategories = useMemo(() => {
         return categories
@@ -55,17 +57,19 @@ export const CategoriesPage: React.FC = () => {
             label: '¿En venta?',
             render: item => item.forSale ? 'Sí' : 'No',
         },
-        {
-            id: 'acciones',
-            label: 'Acciones',
-            render: item => (
-                <div className="table-actions">
-                    <Button variant="secondary" onClick={() => handleEdit(item)}>
-                        Editar
-                    </Button>
-                </div>
-            ),
-        },
+        ...(isAdmin
+            ? [{
+                id: 'acciones' as const, // <-- así TypeScript lo acepta
+                label: 'Acciones',
+                render: (item: ICategory) => (
+                    <div className="table-actions">
+                        <Button variant="secondary" onClick={() => handleEdit(item)}>
+                            Editar
+                        </Button>
+                    </div>
+                ),
+            }]
+            : [])
     ];
 
     const categoryFormFields: IFormFieldConfig[] = [
@@ -117,7 +121,9 @@ export const CategoriesPage: React.FC = () => {
             </div>
 
             <div className="filter-controls">
-                <Button variant="primary" onClick={handleCreate}>Nueva Categoría</Button>
+                {isAdmin && (
+                    <Button variant="primary" onClick={handleCreate}>Nueva Categoría</Button>
+                )}
                 <InputField
                     name="search"
                     type="search"

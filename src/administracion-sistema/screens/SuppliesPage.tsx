@@ -6,8 +6,8 @@ import { useCrud } from '../hooks/useCrud';
 import { supplyApi} from '../api/supply';
 import type { IArticle } from '../api/types/IArticle';
 import { FormModal } from '../components/common/FormModal';
-import { GenericForm } from '../components/crud/GenericForm';
-import type { IFormFieldConfig, ISelectOption } from '../components/crud/GenericForm.types';
+
+import type {  ISelectOption } from '../components/crud/GenericForm.types';
 import { InputField } from '../components/common/InputField';
 import { SelectField } from '../components/common/SelectField';
 import { getCategopryAll, getMeasuringUnitsAll } from '../utils/Api';
@@ -39,7 +39,8 @@ export const SuppliesPage: React.FC = () => {
     const [measuringUnits, setMeasuringUnits] = useState<{ unit: string; idmeasuringUnit: number }[]>([]);
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
     const [imagePreview, setImagePreview] = useState<string | null>(null);
-
+  const role = localStorage.getItem("employeeRole");
+const isAdmin = role === 'ADMIN';
     useEffect(() => {
         getCategopryAll().then(data => {
             setCategories(data.filter(cat => cat.forSale === false));
@@ -119,17 +120,19 @@ export const SuppliesPage: React.FC = () => {
             label: 'Para venta',
             render: i => i.forSale ? 'Sí' : 'No'
         },
-        {
-            id: 'acciones',
-            label: 'Acciones',
-            render: item => (
-                <div className="table-actions">
-                    <Button variant="secondary" onClick={() => handleEdit(item)}>
-                        Editar
-                    </Button>
-                </div>
-            ),
-        },
+        ...(isAdmin
+    ? [{
+        id: 'acciones' as const, // <-- así TypeScript lo acepta
+        label: 'Acciones',
+        render: (item: IArticle) => (
+            <div className="table-actions">
+                <Button variant="secondary" onClick={() => handleEdit(item)}>
+                    Editar
+                </Button>
+            </div>
+        ),
+    }]
+    : [])
     ];
 
     const supplyFormFields = useMemo(() => [
@@ -308,7 +311,9 @@ export const SuppliesPage: React.FC = () => {
             </div>
 
             <div className="filter-controls">
-                <Button variant="primary" onClick={handleCreate}>Nuevo Insumo</Button>
+                {isAdmin && (
+    <Button variant="primary" onClick={handleCreate}>Nuevo Insumo</Button>
+)}
                 <InputField
                     name="search"
                     type="search"

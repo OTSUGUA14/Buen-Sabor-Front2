@@ -1,18 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { GenericTable } from '../components/crud/GenericTable';
 import type { ITableColumn } from '../components/crud/GenericTable.types';
-import { Button } from '../components/common/Button';
 import { InputField } from '../components/common/InputField';
 import { SelectField } from '../components/common/SelectField';
 import type { ISelectOption } from '../components/crud/GenericForm.types';
-
+import { OrderState } from '../api/types/IOrder';
 import { orderApi } from '../api/order';
 import { useCrud } from '../hooks/useCrud';
 import { type IOrder } from '../api/types/IOrder';
 
 import './styles/crud-pages.css';
 import './styles/CashOrdersPage.css';
-import { OrderState } from '../../cliente/types/IOrderData';
+
 
 export const OrderDashboard: React.FC = () => {
     const {
@@ -30,36 +29,81 @@ export const OrderDashboard: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editState, setEditState] = useState<string>('');
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+    const role = localStorage.getItem("employeeRole");
+    const isCashier = role === "CASHIER";
+    const isChef = role === "CHEF";
+    const isDriver = role === "DRIVER";
 
-    const statusOptions: ISelectOption[] = useMemo(() => [
-        { value: 'TODOS', label: 'ESTADO' },
-        { value: 'PENDING', label: 'PENDIENTE' },
-        { value: 'PREPARING', label: 'EN COCINA' },
-        { value: 'ARRIVED', label: 'LISTO PARA ENTREGAR' },
-        { value: 'BILLED', label: 'FACTURADO' },
-        { value: 'READY_FOR_DELIVERY', label: 'LISTO PARA DELIVERY' },
-        { value: 'ON_THE_WAY', label: 'EN CAMINO' },
-        { value: 'CANCELED', label: 'CANCELADO' },
-        { value: 'REJECTED', label: 'RECHAZADO' },
-    ], []);
+    // Opciones de estado según el rol
+    const statusOptions: ISelectOption[] = useMemo(() => {
+        if (isCashier) {
+            return [
+                { value: 'TODOS', label: 'ESTADO' },
+                { value: 'PENDING', label: 'PENDIENTE' },
+                { value: 'CANCELED', label: 'CANCELADO' },
+                { value: 'REJECTED', label: 'RECHAZADO' },
+                { value: 'BILLED', label: 'FACTURADO' },
+                { value: 'ARRIVED', label: 'LISTO PARA ENTREGAR' }
+            ];
+        }
+        if (isChef) {
+            return [
+                { value: 'TODOS', label: 'ESTADO' },
+                { value: 'BILLED', label: 'FACTURADO' },
+                { value: 'PREPARING', label: 'EN COCINA' }
+            ];
+        }
+        if (isDriver) {
+            return [
+                { value: 'READY_FOR_DELIVERY', label: 'LISTO PARA DELIVERY' }
+            ];
+        }
+        // Admin y otros
+        return [
+            { value: 'TODOS', label: 'ESTADO' },
+            { value: 'PENDING', label: 'PENDIENTE' },
+            { value: 'PREPARING', label: 'EN COCINA' },
+            { value: 'ARRIVED', label: 'LISTO PARA ENTREGAR' },
+            { value: 'BILLED', label: 'FACTURADO' },
+            { value: 'READY_FOR_DELIVERY', label: 'LISTO PARA DELIVERY' },
+            { value: 'ON_THE_WAY', label: 'EN CAMINO' },
+            { value: 'CANCELED', label: 'CANCELADO' },
+            { value: 'REJECTED', label: 'RECHAZADO' },
+        ];
+    }, [isCashier, isChef, isDriver]);
 
+    // Opciones de tipo de entrega (solo para no-cajero)
     const deliveryTypeOptions: ISelectOption[] = useMemo(() => [
         { value: 'TODOS', label: 'ENTREGA' },
         { value: 'DELIVERY', label: 'DELIVERY' },
         { value: 'LOCAL', label: 'LOCAL' },
     ], []);
 
+    // Filtrado de órdenes
     const filteredOrders = useMemo(() => {
-        return orders.filter(order => {
+        let filtered = orders;
+        if (isCashier) {
+            filtered = filtered.filter(order =>
+                ["REJECTED", "CANCELED", "PENDING", "BILLED", "ARRIVED"].includes(order.orderState)
+            );
+        } else if (isChef) {
+            filtered = filtered.filter(order =>
+                ["BILLED", "PREPARING"].includes(order.orderState)
+            );
+        } else if (isDriver) {
+            filtered = filtered.filter(order =>
+                order.orderState === "READY_FOR_DELIVERY"
+            );
+        }
+        return filtered.filter(order => {
             const matchesSearch = order.clientName.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesStatus = statusFilter === 'TODOS' || order.orderState === statusFilter;
-            const matchesDelivery = deliveryTypeFilter === 'TODOS' || order.tipoEntrega === deliveryTypeFilter;
+            const matchesDelivery = isCashier || isChef || isDriver
+                ? true
+                : (deliveryTypeFilter === 'TODOS' || order.tipoEntrega === deliveryTypeFilter);
             return matchesSearch && matchesStatus && matchesDelivery;
         });
-    }, [orders, searchTerm, statusFilter, deliveryTypeFilter]);
+    }, [orders, searchTerm, statusFilter, deliveryTypeFilter, isCashier, isChef, isDriver]);
 
     const orderColumns: ITableColumn<IOrder>[] = useMemo(() => [
         { id: 'id', label: 'ID Orden', numeric: true },
@@ -83,22 +127,49 @@ export const OrderDashboard: React.FC = () => {
             id: "acciones" as const,
             label: "Acciones",
             render: (item) => (
-                <button
-                    className="client-orders-detail-btn"
-                    onClick={() => {
-                        setSelectedOrder(item);
-                        setEditState(item.orderState);
-                        setIsModalOpen(true);
-                    }}
-                >
-                    Ver Detalles
-                </button>
+                isDriver ? (
+                    <button
+                        className="client-orders-detail-btn"
+                        onClick={async () => {
+                            // Aquí puedes cambiar el estado a ON_THE_WAY o lo que corresponda
+                            await orderApi.update({ ...item, orderState: OrderState.ON_THE_WAY });
+                            fetchData();
+                        }}
+                    >
+                        Tomar pedido
+                    </button>
+                ) : (
+                    <button
+                        className="client-orders-detail-btn"
+                        onClick={() => {
+                            setSelectedOrder(item);
+                            setEditState(item.orderState);
+                            setIsModalOpen(true);
+                        }}
+                    >
+                        Ver Detalles
+                    </button>
+                )
             )
         }
-    ], []);
+    ], [isDriver, fetchData]);
+
 
     if (loading) return <p>Cargando órdenes...</p>;
     if (error) return <p>Error al cargar órdenes: {error}</p>;
+
+    const cashierStates = [
+        { value: "PENDING", label: "PENDIENTE" },
+        { value: "CANCELED", label: "CANCELADO" },
+        { value: "REJECTED", label: "RECHAZADO" },
+        { value: "BILLED", label: "FACTURADO" }
+    ];
+
+    const chefStates = [
+        { value: "READY_FOR_DELIVERY", label: "LISTO PARA DELIVERY" },
+        { value: "ARRIVED", label: "LISTO PARA ENTREGAR" },
+        { value: "CANCELED", label: "CANCELADO" }
+    ];
 
     return (
         <div className="crud-page-container">
@@ -122,14 +193,31 @@ export const OrderDashboard: React.FC = () => {
                     onChange={(e) => setStatusFilter(e.target.value)}
                     className="status-select"
                 />
-                <SelectField
-                    name="deliveryTypeFilter"
-                    options={deliveryTypeOptions}
-                    value={deliveryTypeFilter}
-                    onChange={(e) => setDeliveryTypeFilter(e.target.value)}
-                    className="status-select"
-                />
+                {/* Solo muestra el filtro de tipo de entrega si NO es cajero */}
+                {!isCashier && (
+                    <SelectField
+                        name="deliveryTypeFilter"
+                        options={deliveryTypeOptions}
+                        value={deliveryTypeFilter}
+                        onChange={(e) => setDeliveryTypeFilter(e.target.value)}
+                        className="status-select"
+                    />
+                )}
             </div>
+
+            {isCashier && (
+                <button
+                    className="btn btn-primary"
+                    style={{ marginBottom: 16 }}
+                    onClick={() => {
+                        // Aquí abre tu modal o navega a la página de creación de orden
+                        // Por ejemplo:
+                        // navigate("/admin/orders/create");
+                    }}
+                >
+                    Crear Orden
+                </button>
+            )}
 
             <GenericTable data={filteredOrders} columns={orderColumns} />
 
@@ -146,14 +234,27 @@ export const OrderDashboard: React.FC = () => {
                                 value={editState}
                                 onChange={e => setEditState(e.target.value)}
                             >
-                                <option value="PENDING">PENDIENTE</option>
-                                <option value="PREPARING">EN COCINA</option>
-                                <option value="ARRIVED">LISTO PARA ENTREGAR</option>
-                                <option value="BILLED">FACTURADO</option>
-                                <option value="READY_FOR_DELIVERY">LISTO PARA DELIVERY</option>
-                                <option value="ON_THE_WAY">EN CAMINO</option>
-                                <option value="CANCELED">CANCELADO</option>
-                                <option value="REJECTED">RECHAZADO</option>
+                                {isCashier
+                                    ? cashierStates.map(opt => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))
+                                    : isChef
+                                        ? chefStates.map(opt => (
+                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                        ))
+                                        : (
+                                            <>
+                                                <option value="PENDING">PENDIENTE</option>
+                                                <option value="PREPARING">EN COCINA</option>
+                                                <option value="ARRIVED">LISTO PARA ENTREGAR</option>
+                                                <option value="BILLED">FACTURADO</option>
+                                                <option value="READY_FOR_DELIVERY">LISTO PARA DELIVERY</option>
+                                                <option value="ON_THE_WAY">EN CAMINO</option>
+                                                <option value="CANCELED">CANCELADO</option>
+                                                <option value="REJECTED">RECHAZADO</option>
+                                            </>
+                                        )
+                                }
                             </select>
                         </p>
                         <p><b>Tipo de Entrega:</b> {selectedOrder.orderType}</p>
@@ -170,7 +271,7 @@ export const OrderDashboard: React.FC = () => {
                                 </li>
                             ))}
                         </ul>
-                        <div style={{marginTop: 16}}>
+                        <div style={{ marginTop: 16 }}>
                             <button
                                 onClick={async () => {
                                     await orderApi.update({ ...selectedOrder, orderState: editState });
@@ -180,7 +281,7 @@ export const OrderDashboard: React.FC = () => {
                             >
                                 Guardar Estado
                             </button>
-                            <button style={{marginLeft: 8}} onClick={() => setIsModalOpen(false)}>
+                            <button style={{ marginLeft: 8 }} onClick={() => setIsModalOpen(false)}>
                                 Cerrar
                             </button>
                         </div>
