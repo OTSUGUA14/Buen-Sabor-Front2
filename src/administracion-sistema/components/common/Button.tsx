@@ -3,7 +3,7 @@
 import './styles/Button.css'; 
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'primary' | 'secondary' | 'danger' | 'outline-primary' | 'outline-danger' | 'outline-info';
+    variant?: 'primary' | 'secondary' | 'danger' | 'outline-primary' | 'outline-danger' | 'outline-info' | 'actions';
     size?: 'small' | 'medium' | 'large';
     children: React.ReactNode;
     onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;

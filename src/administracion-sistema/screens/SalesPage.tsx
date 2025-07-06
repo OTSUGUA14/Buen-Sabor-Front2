@@ -337,13 +337,16 @@ export const SalesPage: React.FC = () => {
 
     return (
         <div className="crud-page-container">
-            <div className="page-header">
-                <h2>OFERTAS</h2>
+            {/* <div className="page-header">
+                <h2>PROMOCIONES</h2>
+            </div> */}
+            <div className="filter-controls">
                 {isAdmin && (
                     <Button variant="primary" onClick={handleCreate}>
-                        Nueva Oferta
+                        Nueva promocion
                     </Button>
                 )}
+
             </div>
 
             <GenericTable

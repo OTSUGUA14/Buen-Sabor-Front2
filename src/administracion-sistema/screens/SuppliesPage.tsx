@@ -306,9 +306,9 @@ const isAdmin = role === 'ADMIN';
 
     return (
         <div className="crud-page-container">
-            <div className="page-header">
+            {/* <div className="page-header">
                 <h2>INSUMOS</h2>
-            </div>
+            </div> */}
 
             <div className="filter-controls">
                 {isAdmin && (

@@ -45,6 +45,17 @@
     border-color: #c82333;
 }
 
+
+.btn-actions {
+    background-color: #fff;
+    width: 20px;
+    height: 20px;
+}
+
+.btn-actions:hover {
+    border: 1px solid #ffa101;
+}
+
 /* Variantes de contorno (outline) */
 .btn-outline-primary {
     background-color: transparent;

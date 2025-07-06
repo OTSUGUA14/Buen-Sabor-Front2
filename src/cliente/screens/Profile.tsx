@@ -18,6 +18,7 @@ const Profile = () => {
         street: profile?.domiciles?.[0]?.street || '',
         number: profile?.domiciles?.[0]?.number?.toString() || '',
         zipcode: profile?.domiciles?.[0]?.zipcode || '',
+        // locationName: profile?.domiciles?.[0]?.location?.name || '',  
     });
 
     useEffect(() => {
@@ -32,6 +33,7 @@ const Profile = () => {
                 street: profile.domiciles?.[0]?.street || '',
                 number: profile.domiciles?.[0]?.number?.toString() || '',
                 zipcode: profile.domiciles?.[0]?.zipcode || '',
+                // locationName: profile?.domiciles?.[0]?.location?.name || '', 
             });
         }
     }, [profile]);
@@ -60,6 +62,7 @@ const Profile = () => {
             street: profile.domiciles?.[0]?.street || '',
             number: profile.domiciles?.[0]?.number?.toString() || '',
             zipcode: profile.domiciles?.[0]?.zipcode || '',
+            // locationName: profile?.domiciles?.[0]?.location?.name || '', 
         });
     };
 
@@ -212,6 +215,19 @@ const Profile = () => {
                             <p className="profile-value">{profile.domiciles?.[0]?.number || ""}</p>
                         )}
                     </div>
+{/* <div className="profile-detail-item">
+    <label className="profile-label">Localidad</label>
+    {isEditing ? (
+        <input
+            name="locationName"
+            value={form.locationName}
+            onChange={handleChange}
+            className="profile-input"
+        />
+    ) : (
+        <p className="profile-value">{profile.domiciles?.[0]?.location?.name || "No registrado"}</p>
+    )}
+</div> */}
 
                     <div className="profile-detail-item">
                         <label className="profile-label">Codigo postal</label>

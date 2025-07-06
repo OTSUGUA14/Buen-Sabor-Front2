@@ -21,13 +21,15 @@ export const ProductsPage: React.FC = () => {
         loading,
         error,
         fetchData,
-        
+
         createItem,
         updateItem,
     } = useCrud<IProduct>(productApi);
 
     const [productsCount, setProductsCount] = useState(0);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+    
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState<IProduct | null>(null);
@@ -39,11 +41,15 @@ export const ProductsPage: React.FC = () => {
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
     const [categories, setCategories] = useState<Category[]>([]);
 
+    // NUEVO ESTADO PARA MODAL DE VISTA (SOLO LECTURA)
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [productToView, setProductToView] = useState<IProduct | null>(null);
+
     const role = localStorage.getItem("employeeRole");
     const isAdmin = role === 'ADMIN';
 
-    
-    
+
+
     const statusOptions: ISelectOption[] = [
         { value: 'TODOS', label: 'TODOS' },
         { value: 'Activo', label: 'Activo' },
@@ -112,12 +118,19 @@ export const ProductsPage: React.FC = () => {
                 label: 'Acciones',
                 render: (item: IProduct) => (
                     <div className="table-actions">
-                        <Button variant="secondary" onClick={() => handleEdit(item)}>Editar</Button>
+                        <Button variant="actions" onClick={() => handleEdit(item)}>
+                            <img src="../../../public/icons/pencil.png" alt="Editar" className="pencil icon"
+                                style={{ width:'18px', height:'18px',filter: 'invert(25%) sepia(83%) saturate(7466%) hue-rotate(196deg) brightness(95%) contrast(104%)' }} />
+                        </Button>
+                        {/* CAMBIO: este botón ahora abre modal de vista */}
+                        <Button variant="actions" onClick={() => handleView(item)}>
+                            <img src="../../../public/icons/eye-on.svg" alt="Ver" className="pencil icon"
+                                style={{width:'18px', height:'18px',  filter: 'invert(52%) sepia(94%) saturate(636%) hue-rotate(1deg) brightness(103%) contrast(102%)' }} />
+                        </Button>
                     </div>
                 ),
             }]
-            : [])
-    ];
+            : [])];
 
     // Campos del formulario
     const productFormFields: IFormFieldConfig[] = useMemo(() => [
@@ -227,6 +240,12 @@ export const ProductsPage: React.FC = () => {
         setIsModalOpen(true);
     };
 
+    // NUEVO HANDLER PARA EL MODAL DE VISTA
+    const handleView = (product: IProduct) => {
+        setProductToView(product);
+        setIsViewModalOpen(true);
+    };
+
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
@@ -255,7 +274,7 @@ export const ProductsPage: React.FC = () => {
         }));
     };
 
-  
+
     // Función auxiliar para convertir File a Base64
     const convertFileToBase64 = (file: File): Promise<string> => {
         return new Promise((resolve, reject) => {
@@ -424,7 +443,82 @@ export const ProductsPage: React.FC = () => {
                     {productToEdit ? 'Actualizar' : 'Crear'}
                 </Button>
             </FormModal>
-            
+
+            {/* NUEVO MODAL SOLO LECTURA */}
+            <FormModal
+                isOpen={isViewModalOpen}
+                onClose={() => setIsViewModalOpen(false)}
+                title="Detalle del Producto"
+                onSubmit={undefined}
+            >
+                {productToView && (
+                    <>
+                        <InputField
+                            label="Nombre"
+                            name="name"
+                            type="text"
+                            value={productToView.name ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Descripción"
+                            name="description"
+                            type="textarea"
+                            value={productToView.description ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Precio Venta"
+                            name="price"
+                            type="number"
+                            value={productToView.price?.toString() ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Tiempo Estimado (minutos)"
+                            name="estimatedTimeMinutes"
+                            type="number"
+                            value={productToView.estimatedTimeMinutes?.toString() ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Estado"
+                            name="isAvailable"
+                            type="text"
+                            value={productToView.isAvailable ? 'Activo' : 'Inactivo'}
+                            disabled
+                        />
+                        <InputField
+                            label="Categoría"
+                            name="category"
+                            type="text"
+                            value={productToView.category?.name ?? 'Sin categoría'}
+                            disabled
+                        />
+                        {productToView.manufacInventoryImage?.imageData && (
+                            <div style={{ marginBottom: 16 }}>
+                                <label>Imagen del Inventario:</label>
+                                <img
+                                    src={`data:image/jpeg;base64,${productToView.manufacInventoryImage.imageData}`}
+                                    alt="Imagen del producto"
+                                    style={{ maxWidth: 200, maxHeight: 200, display: 'block', marginTop: 8 }}
+                                />
+                            </div>
+                        )}
+                        <div style={{ marginBottom: 16 }}>
+                            <label>Ingredientes:</label>
+                            <ul>
+                                {productToView.manufacturedArticleDetail.map((ing, index) => (
+                                    <li key={index}>
+                                        {ing.article?.denomination ?? ''} - Cantidad: {ing.quantity}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </>
+                )}
+            </FormModal>
+
         </div>
     );
 };

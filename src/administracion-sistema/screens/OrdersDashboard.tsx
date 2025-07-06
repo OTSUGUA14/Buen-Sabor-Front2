@@ -173,9 +173,9 @@ export const OrderDashboard: React.FC = () => {
 
     return (
         <div className="crud-page-container">
-            <div className="page-header">
+            {/* <div className="page-header">
                 <h2>ÓRDENES</h2>
-            </div>
+            </div> */}
 
             <div className="filter-controls">
                 <InputField
