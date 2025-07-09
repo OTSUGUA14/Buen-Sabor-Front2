@@ -21,6 +21,11 @@ export const EmployeesPage: React.FC = () => {
 
     const [searchTerm, setSearchTerm] = useState('');
 
+
+    // ESTADO PARA MODAL DE VISTA (SOLO LECTURA)
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [employeeToView, setEmployeeToView] = useState<IEmployee | null>(null);
+
     const roleOptions: ISelectOption[] = [
         { value: 'ADMIN', label: 'Admin' },
         { value: 'CASHIER', label: 'Cajero' },
@@ -80,8 +85,13 @@ export const EmployeesPage: React.FC = () => {
                 label: 'Acciones',
                 render: (item: IEmployee) => (
                     <div className="table-actions">
-                        <Button variant="secondary" onClick={() => handleEdit(item)}>
-                            Editar
+                        <Button variant="actions" onClick={() => handleEdit(item)}>
+                            <img src="../../../public/icons/pencil.png" alt="Editar" className="pencil icon"
+                                style={{ width: '18px', height: '18px', filter: 'invert(25%) sepia(83%) saturate(7466%) hue-rotate(196deg) brightness(95%) contrast(104%)' }} />
+                        </Button>
+                        <Button variant="actions" onClick={() => handleView(item)}>
+                            <img src="../../../public/icons/eye-on.svg" alt="Ver" className="pencil icon"
+                                style={{ width: '18px', height: '18px', filter: 'invert(52%) sepia(94%) saturate(636%) hue-rotate(1deg) brightness(103%) contrast(102%)' }} />
                         </Button>
                     </div>
                 ),
@@ -101,6 +111,13 @@ export const EmployeesPage: React.FC = () => {
         { name: 'username', label: 'Usuario', type: 'text', validation: { required: true, minLength: 3 } },
         { name: 'password', label: 'Contraseña', type: 'password', validation: { required: !employeeToEdit, minLength: 6 } },
     ];
+
+
+    //  HANDLER PARA EL MODAL DE VISTA
+    const handleView = (employee: IEmployee) => {
+        setEmployeeToView(employee);
+        setIsViewModalOpen(true);
+    };
 
     const handleCreate = () => {
         setEmployeeToEdit(null);
@@ -175,6 +192,29 @@ export const EmployeesPage: React.FC = () => {
                     onSubmit={handleFormSubmit}
                     submitButtonText={employeeToEdit ? 'Actualizar Empleado' : 'Crear Empleado'}
                 />
+            </FormModal>
+
+
+            <FormModal
+                isOpen={isViewModalOpen}
+                onClose={() => setIsViewModalOpen(false)}
+                title="Detalle del Empleado"
+                onSubmit={undefined}
+            >
+                {employeeToView && (
+                    <>
+                        <InputField label="ID" name="id" type="text" value={employeeToView.id ?? ''} disabled />
+                        <InputField label="Nombre" name="name" type="text" value={employeeToView.name ?? ''} disabled />
+                        <InputField label="Apellido" name="lastName" type="text" value={employeeToView.lastName ?? ''} disabled />
+                        <InputField label="Correo" name="email" type="text" value={employeeToView.email ?? ''} disabled />
+                        <InputField label="Teléfono" name="phoneNumber" type="text" value={employeeToView.phoneNumber ?? ''} disabled />
+                        <InputField label="Rol" name="employeeRole" type="text" value={employeeToView.employeeRole ?? ''} disabled />
+                        <InputField label="Turno" name="shift" type="text" value={employeeToView.shift ?? ''} disabled />
+                        <InputField label="Salario" name="salary" type="number" value={employeeToView.salary?.toString() ?? ''} disabled />
+                        <InputField label="Usuario" name="username" type="text" value={employeeToView.username ?? ''} disabled />
+                        <InputField label="Fecha de nacimiento" name="birthDate" type="date" value={employeeToView.birthDate ?? ''} disabled />
+                    </>
+                )}
             </FormModal>
         </div>
     );

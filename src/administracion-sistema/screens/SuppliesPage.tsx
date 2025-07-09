@@ -3,11 +3,11 @@ import { GenericTable } from '../components/crud/GenericTable';
 import type { ITableColumn } from '../components/crud/GenericTable.types';
 import { Button } from '../components/common/Button';
 import { useCrud } from '../hooks/useCrud';
-import { supplyApi} from '../api/supply';
+import { supplyApi } from '../api/supply';
 import type { IArticle } from '../api/types/IArticle';
 import { FormModal } from '../components/common/FormModal';
 
-import type {  ISelectOption } from '../components/crud/GenericForm.types';
+import type { ISelectOption } from '../components/crud/GenericForm.types';
 import { InputField } from '../components/common/InputField';
 import { SelectField } from '../components/common/SelectField';
 import { getCategopryAll, getMeasuringUnitsAll } from '../utils/Api';
@@ -32,6 +32,10 @@ export const SuppliesPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [supplyToEdit, setSupplyToEdit] = useState<IArticle | null>(null);
 
+    // ESTADO PARA MODAL DE VISTA (SOLO LECTURA)
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [supplyToView, setSupplyToView] = useState<IArticle | null>(null);
+
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'TODOS' | 'Activo' | 'Inactivo'>('TODOS');
     const [categoryFilter, setCategoryFilter] = useState<'TODOS' | string>('TODOS');
@@ -39,8 +43,8 @@ export const SuppliesPage: React.FC = () => {
     const [measuringUnits, setMeasuringUnits] = useState<{ unit: string; idmeasuringUnit: number }[]>([]);
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
     const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const role = localStorage.getItem("employeeRole");
-const isAdmin = role === 'ADMIN';
+    const role = localStorage.getItem("employeeRole");
+    const isAdmin = role === 'ADMIN';
     useEffect(() => {
         getCategopryAll().then(data => {
             setCategories(data.filter(cat => cat.forSale === false));
@@ -73,7 +77,7 @@ const isAdmin = role === 'ADMIN';
             label: mu.unit
         })),
         [measuringUnits]);
-        
+
     const filteredSupplies = useMemo(() => {
         return ingredientesAll.filter(item => {
             const nombre = item.denomination?.toLowerCase() ?? '';
@@ -121,18 +125,23 @@ const isAdmin = role === 'ADMIN';
             render: i => i.forSale ? 'Sí' : 'No'
         },
         ...(isAdmin
-    ? [{
-        id: 'acciones' as const, // <-- así TypeScript lo acepta
-        label: 'Acciones',
-        render: (item: IArticle) => (
-            <div className="table-actions">
-                <Button variant="secondary" onClick={() => handleEdit(item)}>
-                    Editar
-                </Button>
-            </div>
-        ),
-    }]
-    : [])
+            ? [{
+                id: 'acciones' as const, // <-- así TypeScript lo acepta
+                label: 'Acciones',
+                render: (item: IArticle) => (
+                    <div className="table-actions">
+                        <Button variant="actions" onClick={() => handleEdit(item)}>
+                            <img src="../../../public/icons/pencil.png" alt="Editar" className="pencil icon"
+                                style={{ width: '18px', height: '18px', filter: 'invert(25%) sepia(83%) saturate(7466%) hue-rotate(196deg) brightness(95%) contrast(104%)' }} />
+                        </Button>
+                        <Button variant="actions" onClick={() => handleView(item)}>
+                            <img src="../../../public/icons/eye-on.svg" alt="Ver" className="pencil icon"
+                                style={{ width: '18px', height: '18px', filter: 'invert(52%) sepia(94%) saturate(636%) hue-rotate(1deg) brightness(103%) contrast(102%)' }} />
+                        </Button>
+                    </div>
+                ),
+            }]
+            : [])
     ];
 
     const supplyFormFields = useMemo(() => [
@@ -178,6 +187,12 @@ const isAdmin = role === 'ADMIN';
 
         setSupplyToEdit(null);
         setIsModalOpen(true);
+    };
+
+    // HANDLER PARA VER INSUMO
+    const handleView = (item: IArticle) => {
+        setSupplyToView(item);
+        setIsViewModalOpen(true);
     };
 
     const handleEdit = (item: IArticle) => {
@@ -312,8 +327,8 @@ const isAdmin = role === 'ADMIN';
 
             <div className="filter-controls">
                 {isAdmin && (
-    <Button variant="primary" onClick={handleCreate}>Nuevo Insumo</Button>
-)}
+                    <Button variant="primary" onClick={handleCreate}>Nuevo Insumo</Button>
+                )}
                 <InputField
                     name="search"
                     type="search"
@@ -382,6 +397,83 @@ const isAdmin = role === 'ADMIN';
                 <Button variant="primary" type="submit">
                     {supplyToEdit ? 'Actualizar Insumo' : 'Crear Insumo'}
                 </Button>
+            </FormModal>
+
+
+            {/* NUEVO MODAL SOLO LECTURA */}
+            <FormModal
+                isOpen={isViewModalOpen}
+                onClose={() => setIsViewModalOpen(false)}
+                title="Detalle del Insumo"
+                onSubmit={undefined}
+            >
+                {supplyToView && (
+                    <>
+                        <InputField
+                            label="Nombre"
+                            name="denomination"
+                            type="text"
+                            value={supplyToView.denomination ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Unidad de Medida"
+                            name="measuringUnit"
+                            type="text"
+                            value={supplyToView.measuringUnit?.unit ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Stock Actual"
+                            name="currentStock"
+                            type="number"
+                            value={supplyToView.currentStock?.toString() ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Stock Máximo"
+                            name="maxStock"
+                            type="number"
+                            value={supplyToView.maxStock?.toString() ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Precio Compra"
+                            name="buyingPrice"
+                            type="number"
+                            value={supplyToView.buyingPrice?.toString() ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Categoría"
+                            name="category"
+                            type="text"
+                            value={supplyToView.category?.name ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="¿Para venta?"
+                            name="forSale"
+                            type="text"
+                            value={supplyToView.forSale ? 'Sí' : 'No'}
+                            disabled
+                        />
+                        {supplyToView.forSale && supplyToView.inventoryImage?.imageData && (
+                            <div style={{ marginBottom: 16 }}>
+                                <label>Imagen:</label>
+                                <img
+                                    src={
+                                        supplyToView.inventoryImage.imageData.startsWith('data:image')
+                                            ? supplyToView.inventoryImage.imageData
+                                            : `data:image/jpeg;base64,${supplyToView.inventoryImage.imageData}`
+                                    }
+                                    alt="Imagen del insumo"
+                                    style={{ maxWidth: 200, maxHeight: 200, display: 'block', marginTop: 8 }}
+                                />
+                            </div>
+                        )}
+                    </>
+                )}
             </FormModal>
 
         </div>

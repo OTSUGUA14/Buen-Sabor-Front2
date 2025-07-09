@@ -29,6 +29,11 @@ export const CategoriesPage: React.FC = () => {
     const [categoryToEdit, setCategoryToEdit] = useState<ICategory | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+
+    // ESTADO PARA MODAL DE VISTA (SOLO LECTURA)
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [categoryToView, setCategoryToView] = useState<ICategory | null>(null);
+
     const role = localStorage.getItem("employeeRole");
     const isAdmin = role === 'ADMIN';
 
@@ -63,8 +68,13 @@ export const CategoriesPage: React.FC = () => {
                 label: 'Acciones',
                 render: (item: ICategory) => (
                     <div className="table-actions">
-                        <Button variant="secondary" onClick={() => handleEdit(item)}>
-                            Editar
+                        <Button variant="actions" onClick={() => handleEdit(item)}>
+                            <img src="../../../public/icons/pencil.png" alt="Editar" className="pencil icon"
+                                style={{ width: '18px', height: '18px', filter: 'invert(25%) sepia(83%) saturate(7466%) hue-rotate(196deg) brightness(95%) contrast(104%)' }} />
+                        </Button>
+                        <Button variant="actions" onClick={() => handleView(item)}>
+                            <img src="../../../public/icons/eye-on.svg" alt="Ver" className="pencil icon"
+                                style={{ width: '18px', height: '18px', filter: 'invert(52%) sepia(94%) saturate(636%) hue-rotate(1deg) brightness(103%) contrast(102%)' }} />
                         </Button>
                     </div>
                 ),
@@ -80,6 +90,12 @@ export const CategoriesPage: React.FC = () => {
     const handleCreate = () => {
         setCategoryToEdit(null);
         setIsModalOpen(true);
+    };
+
+    //  HANDLER PARA EL MODAL DE VISTA
+    const handleView = (category: ICategory) => {
+        setCategoryToView(category);
+        setIsViewModalOpen(true);
     };
 
     const handleEdit = (item: ICategory) => {
@@ -99,7 +115,7 @@ export const CategoriesPage: React.FC = () => {
             await updateItem(submitData);
         } else {
             const createData = {
-                IDCategory: 0, 
+                IDCategory: 0,
                 name: formData.name ?? '',
                 forSale: formData.forSale ?? false,
             };
@@ -151,6 +167,42 @@ export const CategoriesPage: React.FC = () => {
                     submitButtonText={categoryToEdit ? 'Actualizar Categora' : 'Crear Categoría'}
                 />
             </FormModal>
+
+
+            {/* NUEVO MODAL SOLO LECTURA */}
+            <FormModal
+                isOpen={isViewModalOpen}
+                onClose={() => setIsViewModalOpen(false)}
+                title="Detalle de la Categoría"
+                onSubmit={undefined}
+            >
+                {categoryToView && (
+                    <>
+                        <InputField
+                            label="ID"
+                            name="IDCategory"
+                            type="text"
+                            value={categoryToView.IDCategory ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Nombre de la Categoría"
+                            name="name"
+                            type="text"
+                            value={categoryToView.name ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="¿En venta?"
+                            name="forSale"
+                            type="text"
+                            value={categoryToView.forSale ? 'Sí' : 'No'}
+                            disabled
+                        />
+                    </>
+                )}
+            </FormModal>
+
 
         </div>
     );

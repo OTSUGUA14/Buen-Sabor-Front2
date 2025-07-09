@@ -35,7 +35,11 @@ export const SalesPage: React.FC = () => {
     const [selectedProducts, setSelectedProducts] = useState<IProduct[]>([]);
     const [articles, setArticles] = useState<IArticle[]>([]);
     const [selectedArticles, setSelectedArticles] = useState<IArticle[]>([]);
-    // Mapa de traducción para SaleType
+
+    // ESTADO PARA MODAL DE VISTA (SOLO LECTURA)
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [saleToView, setSaleToView] = useState<ISale | null>(null);
+
 
     const saleTypeLabels: Record<string, string> = {
         HAPPYHOUR: "Hora Feliz",
@@ -104,7 +108,14 @@ export const SalesPage: React.FC = () => {
                 label: 'Acciones',
                 render: (item: ISale) => (
                     <div className="table-actions">
-                        <Button variant="secondary" onClick={() => handleEdit(item)}>Editar</Button>
+                        <Button variant="actions" onClick={() => handleEdit(item)}>
+                            <img src="../../../public/icons/pencil.png" alt="Editar" className="pencil icon"
+                                style={{ width: '18px', height: '18px', filter: 'invert(25%) sepia(83%) saturate(7466%) hue-rotate(196deg) brightness(95%) contrast(104%)' }} />
+                        </Button>
+                        <Button variant="actions" onClick={() => handleView(item)}>
+                            <img src="../../../public/icons/eye-on.svg" alt="Ver" className="pencil icon"
+                                style={{ width: '18px', height: '18px', filter: 'invert(52%) sepia(94%) saturate(636%) hue-rotate(1deg) brightness(103%) contrast(102%)' }} />
+                        </Button>
                     </div>
                 ),
             }]
@@ -179,6 +190,13 @@ export const SalesPage: React.FC = () => {
         setSelectedProducts([]);
         setIsModalOpen(true);
     };
+
+    //  HANDLER PARA EL MODAL DE VISTA
+    const handleView = (sale: ISale) => {
+        setSaleToView(sale);
+        setIsViewModalOpen(true);
+    };
+
 
     const handleEdit = (sale: ISale) => {
         // Para productos
@@ -465,6 +483,99 @@ export const SalesPage: React.FC = () => {
                     {saleToEdit ? 'Actualizar' : 'Crear'}
                 </Button>
             </FormModal>
+
+
+            {/* NUEVO MODAL SOLO LECTURA */}
+            <FormModal
+                isOpen={isViewModalOpen}
+                onClose={() => setIsViewModalOpen(false)}
+                title="Detalle de la Promoción"
+                onSubmit={undefined}
+            >
+                {saleToView && (
+                    <>
+                        <InputField
+                            label="Nombre"
+                            name="denomination"
+                            type="text"
+                            value={saleToView.denomination ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Descripción"
+                            name="saleDescription"
+                            type="textarea"
+                            value={saleToView.saleDescription ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Precio Oferta"
+                            name="salePrice"
+                            type="number"
+                            value={saleToView.salePrice?.toString() ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Tipo de Oferta"
+                            name="saleType"
+                            type="text"
+                            value={saleTypeLabels[saleToView.saleType] ?? saleToView.saleType}
+                            disabled
+                        />
+                        <InputField
+                            label="Fecha Inicio"
+                            name="startDate"
+                            type="date"
+                            value={saleToView.startDate ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Fecha Fin"
+                            name="endDate"
+                            type="date"
+                            value={saleToView.endDate ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Hora Inicio"
+                            name="startTime"
+                            type="time"
+                            value={saleToView.startTime ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Hora Fin"
+                            name="endTime"
+                            type="time"
+                            value={saleToView.endTime ?? ''}
+                            disabled
+                        />
+                        {saleToView.inventoryImage?.imageData && (
+                            <div style={{ marginBottom: 16 }}>
+                                <label>Imagen de la promoción:</label>
+                                <img
+                                    src={`data:image/jpeg;base64,${saleToView.inventoryImage.imageData}`}
+                                    alt="Imagen de la promoción"
+                                    style={{ maxWidth: 200, maxHeight: 200, display: 'block', marginTop: 8 }}
+                                />
+                            </div>
+                        )}
+                        <div style={{ marginBottom: 16 }}>
+                            <label>Productos en la promo:</label>
+                            <ul>
+                                {saleToView.saleDetails?.map((detail, idx) => (
+                                    <li key={idx}>
+                                        {detail.manufacturedArticle?.name ||
+                                            detail.article?.denomination ||
+                                            'Sin nombre'}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </>
+                )}
+            </FormModal>
+
         </div>
     );
 };
