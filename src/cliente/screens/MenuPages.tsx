@@ -6,8 +6,8 @@ import CartModal from '../components/CartModal';
 import { getProductsAll } from '../../administracion-sistema/utils/Api';
 import Menu from '../components/Menu';
 import type { IProductClient } from '../types/IProductClient';
-import { PayMethod, type OrderRequestDTO } from '../types/IOrderData';
-import { createOrder } from '../services/Api';
+import { PayMethod, type OrderRequestDTO, type UserPreferenceRequest } from '../types/IOrderData';
+import { createOrder, createPreferenceMP } from '../services/Api';
 
 export default function MenuPages() {
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
@@ -98,16 +98,32 @@ export default function MenuPages() {
     };
 
     const handlePayment = async (orderData: OrderRequestDTO | any, payMethod: PayMethod) => {
-
-        // orderData es un OrderRequestDTO
         console.log(orderData);
-
+    
         const response = await createOrder(orderData as OrderRequestDTO);
-        if (payMethod === PayMethod.MERCADOPAGO) { }
-        handleCloseModal()
-        setIsCartModalOpen(false)
-        setCart([]); // Vacía el carrito
-        localStorage.removeItem('cart'); // Opcional: limpia el carrito en localStorage también
+    
+
+        if (payMethod === PayMethod.MERCADOPAGO) {
+            const preferenceItems: UserPreferenceRequest[] = orderData.orderDetails.map((item: any) => ({
+                title: item.name,
+                quantity: item.quantity,
+                price: item.subTotal.toFixed(2),
+            }));
+    
+            const preference = await createPreferenceMP(preferenceItems);
+
+            if (preference?.init_point) {
+                window.location.href = preference.init_point;
+            } else {
+                console.error("Missing init_point from preference:", preference);
+            }
+              
+        }
+    
+        handleCloseModal();
+        setIsCartModalOpen(false);
+        setCart([]);
+        localStorage.removeItem('cart');
     };
     const handleDecrement = (productId: number) => {
         setCart(prevCart => {

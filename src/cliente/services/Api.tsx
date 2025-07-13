@@ -124,18 +124,19 @@ export const getCategopryAll = async (): Promise<[Category]> => {
     return await response.json();
 }
 
-export async function createPreferenceMP(pedido?: UserPreferenceRequest) {
-    let urlServer = 'http://localhost:8080/instrumentos/api/create_preference_mp';
-    let method: string = "POST";
+export async function createPreferenceMP(pedido: UserPreferenceRequest[]) {
+    const urlServer = 'http://localhost:8080/api/orders/createPreference';
     const response = await fetch(urlServer, {
-        "method": method,
-        "body": JSON.stringify(pedido),
-        "headers": {
-            "Content-Type": 'application/json'
+        method: "POST",
+        body: JSON.stringify(pedido),
+        headers: {
+            "Content-Type": "application/json"
         }
     });
-    return await response.json()
+
+    return await response.json(); // Should now be { init_point: "..." }
 }
+
 
 export async function createOrder(pedido?: OrderRequestDTO) {
     let urlServer = 'http://localhost:8080/api/orders';
