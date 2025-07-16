@@ -9,6 +9,7 @@ import { orderApi } from '../api/order';
 import { useCrud } from '../hooks/useCrud';
 import { type IOrder } from '../api/types/IOrder';
 import { FormModal } from '../components/common/FormModal';
+import { Button } from '../components/common/Button';
 
 import './styles/crud-pages.css';
 import './styles/CashOrdersPage.css';
@@ -129,27 +130,37 @@ export const OrderDashboard: React.FC = () => {
             label: "Acciones",
             render: (item) => (
                 isDriver ? (
-                    <button
-                        className="client-orders-detail-btn"
+                    <Button
+                        variant="primary"
+                        size="small"
                         onClick={async () => {
-                            // Aquí puedes cambiar el estado a ON_THE_WAY o lo que corresponda
                             await orderApi.update({ ...item, orderState: OrderState.ON_THE_WAY });
                             fetchData();
                         }}
                     >
                         Tomar pedido
-                    </button>
+                    </Button>
                 ) : (
-                    <button
-                        className="client-orders-detail-btn"
+                    <Button
+                        variant="actions"
+                        size="small"
                         onClick={() => {
                             setSelectedOrder(item);
                             setEditState(item.orderState);
                             setIsModalOpen(true);
                         }}
+                        title="Ver detalles"
                     >
-                        Ver Detalles
-                    </button>
+                        <img
+                            src="../../../public/icons/eye-on.svg"
+                            alt="Ver"
+                            style={{
+                                width: '18px',
+                                height: '18px',
+                                filter: 'invert(52%) sepia(94%) saturate(636%) hue-rotate(1deg) brightness(103%) contrast(102%)'
+                            }}
+                        />
+                    </Button>
                 )
             )
         }
@@ -236,63 +247,95 @@ export const OrderDashboard: React.FC = () => {
                 }}
             >
                 {selectedOrder && (
-                    <>
-                        <p><b>Cliente:</b> {selectedOrder.client?.firstName} {selectedOrder.client?.lastName}</p>
-                        <p><b>Teléfono:</b> {selectedOrder.client?.phoneNumber}</p>
-                        <p><b>Email:</b> {selectedOrder.client?.email}</p>
-                        <p><b>Fecha:</b> {selectedOrder.orderDate}</p>
-                        <p><b>Estado:</b>
-                            <select
-                                value={editState}
-                                onChange={e => setEditState(e.target.value)}
-                                style={{ marginLeft: 8 }}
-                            >
-                                {isCashier
-                                    ? cashierStates.map(opt => (
-                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                    ))
-                                    : isChef
-                                        ? chefStates.map(opt => (
+                    <div className="order-modal-custom">
+                        <div className="order-modal-section">
+                            <div className="section-title">
+                                <span role="img" aria-label="Cliente">👤</span> Cliente
+                            </div>
+                            <div className="order-modal-table">
+                                <div className="order-modal-row order-modal-header">
+                                    <div>Nombre</div>
+                                    <div>Dirección</div>
+                                    <div>Teléfono</div>
+                                </div>
+                                <div className="order-modal-row">
+                                    <div>{selectedOrder.client?.firstName} {selectedOrder.client?.lastName}</div>
+                                    <div>{selectedOrder.directionToSend ?? '-'}</div>
+                                    <div>{selectedOrder.client?.phoneNumber}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="order-modal-section">
+                            <div className="section-title">
+                                <span role="img" aria-label="Envío">🚚</span> Envío
+                            </div>
+                            <div className="order-modal-table">
+                                <div className="order-modal-row order-modal-header">
+                                    <div>Enviar a:</div>
+                                    <div>{selectedOrder.orderDate}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="order-modal-section">
+                            <div className="section-title">
+                                <span role="img" aria-label="Detalle">📋</span> Detalle
+                            </div>
+                            <div className="order-modal-table">
+                                <div className="order-modal-row order-modal-header">
+                                    <div>Producto</div>
+                                    <div>Cantidad</div>
+                                </div>
+                                {selectedOrder.orderDetails?.map((detail: any, idx: number) => (
+                                    <div className="order-modal-row" key={idx}>
+                                        <div>{detail.articleName ?? detail.manufacturedArticleName ?? `ID: ${detail.manufacturedArticleId}`}</div>
+                                        <div>{detail.quantity}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="order-modal-section">
+                            <div className="section-title">
+                                <span role="img" aria-label="Estado">🗂️</span> Estado
+                            </div>
+                            <div style={{ marginTop: 8 }}>
+                                <select
+                                    value={editState}
+                                    onChange={e => setEditState(e.target.value)}
+                                    style={{ minWidth: 160, padding: '6px', borderRadius: 6, border: '1px solid #ccc' }}
+                                >
+                                    {isCashier
+                                        ? cashierStates.map(opt => (
                                             <option key={opt.value} value={opt.value}>{opt.label}</option>
                                         ))
-                                        : (
-                                            <>
-                                                <option value="PENDING">PENDIENTE</option>
-                                                <option value="PREPARING">EN COCINA</option>
-                                                <option value="ARRIVED">LISTO PARA ENTREGAR</option>
-                                                <option value="BILLED">FACTURADO</option>
-                                                <option value="READY_FOR_DELIVERY">LISTO PARA DELIVERY</option>
-                                                <option value="ON_THE_WAY">EN CAMINO</option>
-                                                <option value="CANCELED">CANCELADO</option>
-                                                <option value="REJECTED">RECHAZADO</option>
-                                            </>
-                                        )
-                                }
-                            </select>
-                        </p>
-                        <p><b>Tipo de Entrega:</b> {selectedOrder.orderType}</p>
-                        <p><b>Método de Pago:</b> {selectedOrder.payMethod}</p>
-                        <p><b>Total:</b> ${selectedOrder.total}</p>
-                        <p><b>Dirección:</b> {selectedOrder.directionToSend ?? '-'}</p>
-                        <p><b>Hora estimada de entrega:</b> {selectedOrder.estimatedFinishTime}</p>
-                        <hr />
-                        <h4>Detalles:</h4>
-                        <ul>
-                            {selectedOrder.orderDetails?.map((detail: any, idx: number) => (
-                                <li key={idx}>
-                                    Artículo ID: {detail.manufacturedArticleId} | Cantidad: {detail.quantity} | Subtotal: ${detail.subTotal}
-                                </li>
-                            ))}
-                        </ul>
-                        <div style={{ marginTop: 16 }}>
-                            <button type="submit">
-                                Guardar Estado
-                            </button>
-                            <button type="button" style={{ marginLeft: 8 }} onClick={() => setIsModalOpen(false)}>
-                                Cerrar
-                            </button>
+                                        : isChef
+                                            ? chefStates.map(opt => (
+                                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                            ))
+                                            : (
+                                                <>
+                                                    <option value="PENDING">PENDIENTE</option>
+                                                    <option value="PREPARING">EN COCINA</option>
+                                                    <option value="ARRIVED">LISTO PARA ENTREGAR</option>
+                                                    <option value="BILLED">FACTURADO</option>
+                                                    <option value="READY_FOR_DELIVERY">LISTO PARA DELIVERY</option>
+                                                    <option value="ON_THE_WAY">EN CAMINO</option>
+                                                    <option value="CANCELED">CANCELADO</option>
+                                                    <option value="REJECTED">RECHAZADO</option>
+                                                </>
+                                            )
+                                    }
+                                </select>
+                            </div>
                         </div>
-                    </>
+                        <div className="order-actions" style={{ marginTop: 24 }}>
+                            <Button variant="primary" type="submit">
+                                Guardar
+                            </Button>
+                            <Button variant="secondary" type="button" onClick={() => setIsModalOpen(false)}>
+                                Cerrar
+                            </Button>
+                        </div>
+                    </div>
                 )}
             </FormModal>
         </div>
