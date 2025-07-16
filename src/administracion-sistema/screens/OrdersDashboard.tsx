@@ -8,6 +8,7 @@ import { OrderState } from '../api/types/IOrder';
 import { orderApi } from '../api/order';
 import { useCrud } from '../hooks/useCrud';
 import { type IOrder } from '../api/types/IOrder';
+import { FormModal } from '../components/common/FormModal';
 
 import './styles/crud-pages.css';
 import './styles/CashOrdersPage.css';
@@ -221,10 +222,21 @@ export const OrderDashboard: React.FC = () => {
 
             <GenericTable data={filteredOrders} columns={orderColumns} />
 
-            {isModalOpen && selectedOrder && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <h3>Detalle de Orden #{selectedOrder.id}</h3>
+            <FormModal
+                isOpen={isModalOpen && !!selectedOrder}
+                onClose={() => setIsModalOpen(false)}
+                title={selectedOrder ? `Detalle de Orden #${selectedOrder.id}` : ''}
+                onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (selectedOrder) {
+                        await orderApi.update({ ...selectedOrder, orderState: editState });
+                        setIsModalOpen(false);
+                        fetchData();
+                    }
+                }}
+            >
+                {selectedOrder && (
+                    <>
                         <p><b>Cliente:</b> {selectedOrder.client?.firstName} {selectedOrder.client?.lastName}</p>
                         <p><b>Teléfono:</b> {selectedOrder.client?.phoneNumber}</p>
                         <p><b>Email:</b> {selectedOrder.client?.email}</p>
@@ -233,6 +245,7 @@ export const OrderDashboard: React.FC = () => {
                             <select
                                 value={editState}
                                 onChange={e => setEditState(e.target.value)}
+                                style={{ marginLeft: 8 }}
                             >
                                 {isCashier
                                     ? cashierStates.map(opt => (
@@ -272,22 +285,16 @@ export const OrderDashboard: React.FC = () => {
                             ))}
                         </ul>
                         <div style={{ marginTop: 16 }}>
-                            <button
-                                onClick={async () => {
-                                    await orderApi.update({ ...selectedOrder, orderState: editState });
-                                    setIsModalOpen(false);
-                                    fetchData();
-                                }}
-                            >
+                            <button type="submit">
                                 Guardar Estado
                             </button>
-                            <button style={{ marginLeft: 8 }} onClick={() => setIsModalOpen(false)}>
+                            <button type="button" style={{ marginLeft: 8 }} onClick={() => setIsModalOpen(false)}>
                                 Cerrar
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
+                    </>
+                )}
+            </FormModal>
         </div>
     );
 };
