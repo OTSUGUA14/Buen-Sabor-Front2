@@ -8,6 +8,7 @@ import Menu from '../components/Menu';
 import type { IProductClient } from '../types/IProductClient';
 import { PayMethod, type OrderRequestDTO, type UserPreferenceRequest } from '../types/IOrderData';
 import { createOrder, createPreferenceMP } from '../services/Api';
+import { supplyApi } from '../../administracion-sistema/api/supply';
 
 export default function MenuPages() {
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
@@ -48,7 +49,26 @@ export default function MenuPages() {
     localStorage.removeItem('cart');
     const fetchProductos = async () => {
         const platos = await getProductsAll();
-        setProductosAll(platos);
+
+        // Trae insumos para venta
+        const allSupplies = await supplyApi.getAll();
+        const suppliesForSale = allSupplies
+            .filter(s => s.forSale)
+            .map(s => ({
+                id: `supply-${s.idarticle}`,
+                idmanufacturedArticle: `supply-${s.idarticle}`,
+                name: s.denomination,
+                price: s.buyingPrice,
+                category: s.category,
+                isAvailable: true,
+                manufacInventoryImage: s.inventoryImage
+                    ? { imageData: s.inventoryImage.imageData }
+                    : { imageData: "" },
+                isSupply: true, // para distinguir en el modal si hace falta
+            }));
+
+        // Unifica manufacturados + insumos
+        setProductosAll([...platos, ...suppliesForSale]);
     };
     fetchProductos();
 
