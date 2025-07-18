@@ -15,7 +15,13 @@ const Menu: React.FC<MenuProps> = ({ products, onProductClick }) => {
         const fetchCategories = async () => {
             try {
                 const allCategories = await getCategopryAll();
-                setCategories(allCategories);
+                // Agrega la categoría "Promociones" si no existe
+                const promoCategory = { idcategory: 999, name: "Promociones", forSale: true };
+                const categoriesWithPromo = [
+                    promoCategory,
+                    ...allCategories.filter(cat => cat.forSale)
+                ];
+                setCategories(categoriesWithPromo);
             } catch (error) {
                 console.error('Error al cargar las categorías:', error);
             }

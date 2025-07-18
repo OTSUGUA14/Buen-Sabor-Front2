@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import styles from '../styles/Menu.module.css';
 import type { IProductClient } from '../types/IProductClient';
@@ -52,6 +51,20 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product, o
                 </div>
 
                 <p className={styles.modalDescription}>{product.description}</p>
+                {product.isPromo && (
+                    <div>
+                        <p><strong>Incluye:</strong></p>
+                        <ul>
+                            {product.manufacturedArticleDetail?.map((detail, idx) => (
+                                <li key={idx}>
+                                    {detail.article?.denomination || detail.manufacturedArticle?.name}
+                                    {detail.quantity ? ` x${detail.quantity}` : ""}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
                 <p className={styles.modalIngredients}>
                     <span className={styles.ingredientsTitle}>Ingredientes:</span>{' '}
                     {product.manufacturedArticleDetail

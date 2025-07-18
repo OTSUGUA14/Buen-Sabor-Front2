@@ -9,6 +9,7 @@ import type { IProductClient } from '../types/IProductClient';
 import { PayMethod, type OrderRequestDTO, type UserPreferenceRequest } from '../types/IOrderData';
 import { createOrder, createPreferenceMP } from '../services/Api';
 import { supplyApi } from '../../administracion-sistema/api/supply';
+import { saleApi } from '../../administracion-sistema/api/sale'; // Importa la API de promociones
 
 export default function MenuPages() {
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
@@ -50,7 +51,7 @@ export default function MenuPages() {
     const fetchProductos = async () => {
         const platos = await getProductsAll();
 
-        // Trae insumos para venta
+        // Insumos para venta
         const allSupplies = await supplyApi.getAll();
         const suppliesForSale = allSupplies
             .filter(s => s.forSale)
@@ -64,11 +65,31 @@ export default function MenuPages() {
                 manufacInventoryImage: s.inventoryImage
                     ? { imageData: s.inventoryImage.imageData }
                     : { imageData: "" },
-                isSupply: true, // para distinguir en el modal si hace falta
+                isSupply: true,
+                description: "",
+                estimatedTimeMinutes: 0,
+                manufacturedArticleDetail: [],
             }));
 
-        // Unifica manufacturados + insumos
-        setProductosAll([...platos, ...suppliesForSale]);
+        // Promociones
+        const allPromos = await saleApi.getAll();
+        const promosForMenu = allPromos.map(promo => ({
+            id: `promo-${promo.idsale}`,
+            idmanufacturedArticle: `promo-${promo.idsale}`,
+            name: promo.denomination,
+            price: promo.salePrice,
+            category: { name: "Promociones", idcategory: 999, forSale: true }, // Categoría especial
+            isAvailable: true,
+            manufacInventoryImage: promo.inventoryImage
+                ? { imageData: promo.inventoryImage.imageData }
+                : { imageData: "" },
+            isPromo: true,
+            description: promo.saleDescription,
+            estimatedTimeMinutes: 0,
+            manufacturedArticleDetail: promo.saleDetails, // Puedes adaptar esto si necesitas
+        }));
+
+        setProductosAll([...platos, ...suppliesForSale, ...promosForMenu]);
     };
     fetchProductos();
 
