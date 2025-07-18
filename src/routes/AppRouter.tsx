@@ -24,6 +24,7 @@ import { DeliveryOrdersPage } from "../administracion-sistema/screens/DeliveryOr
 import { OrderDashboard } from "../administracion-sistema/screens/OrdersDashboard";
 import MenuPages from "../cliente/screens/MenuPages";
 import { AdminRouteGuard } from "../administracion-sistema/components/common/AdminRouteGuard";
+import { StattisticsPage } from "../administracion-sistema/screens/StattisticsPage";
 
 
 export function AppRouter() {
@@ -52,7 +53,7 @@ export function AppRouter() {
                         <Route path="category" element={<CategoriesPage />} />
                         <Route path="employees" element={<EmployeesPage />} />
                         <Route path="orders" element={<OrderDashboard />} />
-                        {/* <Route path="statistics" element={<StatisticsPage />} /> */}
+                        {<Route path="statistics" element={<StattisticsPage />} />}
                         <Route path="cash-orders" element={<OrderDashboard />} />
                         <Route path="kitchen-orders" element={<KitchenOrdersPage />} />
                         <Route path="delivery-orders" element={<DeliveryOrdersPage />} />
