@@ -9,7 +9,10 @@ interface MenuProps {
 }
 
 const Menu: React.FC<MenuProps> = ({ products, onProductClick }) => {
-    const [categories, setCategories] = useState<Category[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]); 
+    //Estado para la barra de búsqueda
+    const [searchTerm, setSearchTerm] = useState('');
+
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -36,14 +39,14 @@ const Menu: React.FC<MenuProps> = ({ products, onProductClick }) => {
             <aside className={styles.sidebar}>
                 <ul className={styles.categoryList}>
                     <h2>CATEGORÍAS</h2>
-                        {categories
-                            .filter((category) => category.forSale)
-                            .map((category) => (
-                                <li key={category.idcategory} className={styles.categoryListItem}>
-                                    <a href={`#cat-${category.idcategory}`} className={styles.categoryButton}>
-                                        {category.name}
-                                    </a>
-                                </li>
+                    {categories
+                        .filter((category) => category.forSale)
+                        .map((category) => (
+                            <li key={category.idcategory} className={styles.categoryListItem}>
+                                <a href={`#cat-${category.idcategory}`} className={styles.categoryButton}>
+                                    {category.name}
+                                </a>
+                            </li>
                         ))}
                 </ul>
             </aside>
@@ -55,6 +58,8 @@ const Menu: React.FC<MenuProps> = ({ products, onProductClick }) => {
                         type="text"
                         placeholder="Buscar Plato"
                         className={styles.searchInput}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                     />
                     <img
                         src="/icons/search.svg"
@@ -67,7 +72,8 @@ const Menu: React.FC<MenuProps> = ({ products, onProductClick }) => {
                     const categoryProducts = products.filter(
                         (product) =>
                             product.category?.idcategory === category.idcategory &&
-                            product.isAvailable
+                            product.isAvailable &&
+                            product.name.toLowerCase().includes(searchTerm.toLowerCase())
                     );
 
                     if (categoryProducts.length === 0) return null;
