@@ -50,22 +50,30 @@ export default function MenuPages() {
     localStorage.removeItem('cart');
     const fetchProductos = async () => {
         const platos = await getProductsAll();
+        const platosWithType = platos.map(plato => ({
+            ...plato,
+            productType: 'manufactured' as const
+        }));
 
         // Insumos para venta
         const allSupplies = await supplyApi.getAll();
         const suppliesForSale = allSupplies
-            .filter(s => s.forSale)
+            .filter(s => s.forSale && s.idarticle)
             .map(s => ({
-                id: `supply-${s.idarticle}`,
-                idmanufacturedArticle: `supply-${s.idarticle}`,
+                id: s.idarticle!,
+                idmanufacturedArticle: s.idarticle!,
                 name: s.denomination,
                 price: s.buyingPrice,
-                category: s.category,
+                category: { 
+                    name: s.category?.name || "Insumos",
+                    idcategory: s.category?.idcategory || 0,
+                    forSale: true 
+                },
                 isAvailable: true,
                 manufacInventoryImage: s.inventoryImage
                     ? { imageData: s.inventoryImage.imageData }
                     : { imageData: "" },
-                isSupply: true,
+                productType: 'supply' as const,
                 description: "",
                 estimatedTimeMinutes: 0,
                 manufacturedArticleDetail: [],
@@ -73,23 +81,25 @@ export default function MenuPages() {
 
         // Promociones
         const allPromos = await saleApi.getAll();
-        const promosForMenu = allPromos.map(promo => ({
-            id: `promo-${promo.idsale}`,
-            idmanufacturedArticle: `promo-${promo.idsale}`,
-            name: promo.denomination,
-            price: promo.salePrice,
-            category: { name: "Promociones", idcategory: 999, forSale: true }, // Categoría especial
-            isAvailable: true,
-            manufacInventoryImage: promo.inventoryImage
-                ? { imageData: promo.inventoryImage.imageData }
-                : { imageData: "" },
-            isPromo: true,
-            description: promo.saleDescription,
-            estimatedTimeMinutes: 0,
-            manufacturedArticleDetail: promo.saleDetails, // Puedes adaptar esto si necesitas
-        }));
+        const promosForMenu = allPromos
+            .filter(promo => promo.idsale)
+            .map(promo => ({
+                id: promo.idsale!,
+                idmanufacturedArticle: promo.idsale!,
+                name: promo.denomination,
+                price: promo.salePrice,
+                category: { name: "Promociones", idcategory: 999, forSale: true }, // Categoría especial
+                isAvailable: true,
+                manufacInventoryImage: promo.inventoryImage
+                    ? { imageData: promo.inventoryImage.imageData }
+                    : { imageData: "" },
+                productType: 'promo' as const,
+                description: promo.saleDescription,
+                estimatedTimeMinutes: 0,
+                manufacturedArticleDetail: [], // Simplificado por ahora
+            }));
 
-        setProductosAll([...platos, ...suppliesForSale, ...promosForMenu]);
+        setProductosAll([...platosWithType, ...suppliesForSale, ...promosForMenu]);
     };
     fetchProductos();
 
@@ -129,7 +139,6 @@ export default function MenuPages() {
     const handleIncrement = (productId: number) => {
         console.log(cart);
         setCart(prevCart =>
-
             prevCart.map(item =>
                 item.idmanufacturedArticle === productId
                     ? { ...item, quantity: item.quantity + 1 }
@@ -141,9 +150,8 @@ export default function MenuPages() {
     const handlePayment = async (orderData: OrderRequestDTO | any, payMethod: PayMethod) => {
         console.log(orderData);
     
-        const response = await createOrder(orderData as OrderRequestDTO);
+        await createOrder(orderData as OrderRequestDTO);
     
-
         if (payMethod === PayMethod.MERCADOPAGO) {
             const preferenceItems: UserPreferenceRequest[] = orderData.orderDetails.map((item: any) => ({
                 title: item.name,

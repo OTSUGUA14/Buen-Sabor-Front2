@@ -10,6 +10,7 @@ export interface IProductClient {
     category: Category;
     manufacInventoryImage: InventoryImage;
     isAvailable: boolean;
+    productType?: 'manufactured' | 'supply' | 'promo';
 }
 
 export interface ManufacturedArticleDetail {
