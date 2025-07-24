@@ -4,6 +4,12 @@ export interface OrderDetailDTO {
     subTotal: number;
 }
 
+export interface ArticleDetailDTO {
+    articleId: number;
+    quantity: number;
+    subTotal: number;
+}
+
 export enum OrderState {
     PREPARING = "PREPARING",
     PENDING = "PENDING",
@@ -34,6 +40,7 @@ export interface OrderRequestDTO {
     direction: string
     subsidiaryId: number;
     orderDetails: OrderDetailDTO[];
+    articleDetails: ArticleDetailDTO[];
 }
 
 export enum OrderType {

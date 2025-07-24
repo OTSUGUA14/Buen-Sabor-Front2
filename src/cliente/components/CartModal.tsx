@@ -1,7 +1,7 @@
 // components/CartModalCheckout.tsx
 import { useState } from 'react';
 import styles from '../styles/CartModal.module.css';
-import type { OrderRequestDTO, OrderDetailDTO, UserPreferenceRequest } from '../types/IOrderData';
+import type { OrderRequestDTO, OrderDetailDTO, ArticleDetailDTO, UserPreferenceRequest } from '../types/IOrderData';
 import { PayMethod, OrderState, OrderType } from '../types/IOrderData';
 
 interface CartModalProps {
@@ -39,12 +39,22 @@ export const CartModal: React.FC<CartModalProps> = ({
     const calculatedTotal = deliveryMethod === 'Delivery' ? subtotal + deliveryFee : subtotal;
 
 
-    // Construir detalles del pedido para OrderRequestDTO
-    const orderDetails: OrderDetailDTO[] = cart.map(item => ({
-        manufacturedArticleId: item.idmanufacturedArticle,
-        quantity: item.quantity,
-        subTotal: item.price * item.quantity
-    }));
+    // Separar productos manufacturados de insumos
+    const orderDetails: OrderDetailDTO[] = cart
+        .filter(item => item.productType === 'manufactured' || item.productType === 'promo')
+        .map(item => ({
+            manufacturedArticleId: item.idmanufacturedArticle,
+            quantity: item.quantity,
+            subTotal: item.price * item.quantity
+        }));
+
+    const articleDetails: ArticleDetailDTO[] = cart
+        .filter(item => item.productType === 'supply')
+        .map(item => ({
+            articleId: item.idmanufacturedArticle,
+            quantity: item.quantity,
+            subTotal: item.price * item.quantity
+        }));
 
     // Construir preferencia para MercadoPago
     const userPreference: UserPreferenceRequest[] = cart.map(item => ({
@@ -71,7 +81,8 @@ export const CartModal: React.FC<CartModalProps> = ({
             clientId,
             direction: selectedAddress,
             subsidiaryId,
-            orderDetails
+            orderDetails,
+            articleDetails
         };
 
         if (paymentMethod === PayMethod.MERCADOPAGO) {
