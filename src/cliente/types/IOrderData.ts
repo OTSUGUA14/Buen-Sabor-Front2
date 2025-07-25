@@ -4,6 +4,12 @@ export interface OrderDetailDTO {
     subTotal: number;
 }
 
+export interface SalesDTO {
+    SaleID: number;
+    quantity: number;
+    subTotal: number;
+}
+
 export interface ArticleDetailDTO {
     articleId: number;
     quantity: number;
@@ -40,6 +46,7 @@ export interface OrderRequestDTO {
     direction: string
     subsidiaryId: number;
     orderDetails: OrderDetailDTO[];
+    salesDetails: SalesDTO[];
     articleDetails: ArticleDetailDTO[];
 }
 

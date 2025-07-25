@@ -1,7 +1,7 @@
 // components/CartModalCheckout.tsx
 import { useState } from 'react';
 import styles from '../styles/CartModal.module.css';
-import type { OrderRequestDTO, OrderDetailDTO, ArticleDetailDTO, UserPreferenceRequest } from '../types/IOrderData';
+import type { OrderRequestDTO, OrderDetailDTO, SalesDTO, ArticleDetailDTO, UserPreferenceRequest } from '../types/IOrderData';
 import { PayMethod, OrderState, OrderType } from '../types/IOrderData';
 
 interface CartModalProps {
@@ -39,11 +39,19 @@ export const CartModal: React.FC<CartModalProps> = ({
     const calculatedTotal = deliveryMethod === 'Delivery' ? subtotal + deliveryFee : subtotal;
 
 
-    // Separar productos manufacturados de insumos
+    // Separar productos manufacturados, promos e insumos
     const orderDetails: OrderDetailDTO[] = cart
-        .filter(item => item.productType === 'manufactured' || item.productType === 'promo')
+        .filter(item => item.productType === 'manufactured')
         .map(item => ({
             manufacturedArticleId: item.idmanufacturedArticle,
+            quantity: item.quantity,
+            subTotal: item.price * item.quantity
+        }));
+
+    const salesDetails: SalesDTO[] = cart
+        .filter(item => item.productType === 'promo')
+        .map(item => ({
+            SaleID: item.idmanufacturedArticle,
             quantity: item.quantity,
             subTotal: item.price * item.quantity
         }));
@@ -82,6 +90,7 @@ export const CartModal: React.FC<CartModalProps> = ({
             direction: selectedAddress,
             subsidiaryId,
             orderDetails,
+            salesDetails,
             articleDetails
         };
 
