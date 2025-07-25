@@ -55,23 +55,41 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product, o
                     <div>
                         <p><strong>Incluye:</strong></p>
                         <ul>
-                            {product.manufacturedArticleDetail?.map((detail, idx) => (
+                            {/* Mostrar detalles de promoción desde saleDetails */}
+                            {product.saleDetails?.map((detail, idx) => (
                                 <li key={idx}>
                                     {detail.article?.denomination || detail.manufacturedArticle?.name}
                                     {detail.quantity ? ` x${detail.quantity}` : ""}
                                 </li>
                             ))}
+                            {/* Fallback: mostrar desde manufacturedArticleDetail si saleDetails está vacío */}
+                            {(!product.saleDetails || product.saleDetails.length === 0) &&
+                                product.manufacturedArticleDetail?.map((detail, idx) => (
+                                    <li key={idx}>
+                                        {detail.article?.denomination}
+                                        {detail.quantity ? ` x${detail.quantity}` : ""}
+                                    </li>
+                                ))
+                            }
                         </ul>
                     </div>
                 )}
 
                 <p className={styles.modalIngredients}>
                     <span className={styles.ingredientsTitle}>Ingredientes:</span>{' '}
-                    {product.manufacturedArticleDetail
-                        ?.map(ing => ing.article?.denomination ?? '')
-                        .filter(denomination => denomination)
-                        .join(', ')}
-
+                    {product.isPromo && product.saleDetails ? (
+                        // Para promociones, mostrar ingredientes de saleDetails
+                        product.saleDetails
+                            .map(detail => detail.article?.denomination ?? '')
+                            .filter(denomination => denomination)
+                            .join(', ')
+                    ) : (
+                        // Para productos normales, usar manufacturedArticleDetail
+                        product.manufacturedArticleDetail
+                            ?.map(ing => ing.article?.denomination ?? '')
+                            .filter(denomination => denomination)
+                            .join(', ')
+                    )}
                 </p>
 
                 <div className={styles.modalPriceSection}>

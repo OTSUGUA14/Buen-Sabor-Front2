@@ -94,9 +94,11 @@ export default function MenuPages() {
                     ? { imageData: promo.inventoryImage.imageData }
                     : { imageData: "" },
                 productType: 'promo' as const,
+                isPromo: true,
                 description: promo.saleDescription,
                 estimatedTimeMinutes: 0,
                 manufacturedArticleDetail: [], // Simplificado por ahora
+                saleDetails: promo.saleDetails || [],
             }));
 
         setProductosAll([...platosWithType, ...suppliesForSale, ...promosForMenu]);

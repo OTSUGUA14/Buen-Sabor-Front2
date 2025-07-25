@@ -1,4 +1,6 @@
 import type { IArticle } from "../../administracion-sistema/api/types/IArticle";
+import type { ISaleDetail } from "../../administracion-sistema/api/types/ISale";
+
 export interface IProductClient {
     id: number;
     idmanufacturedArticle?: number;
@@ -11,6 +13,8 @@ export interface IProductClient {
     manufacInventoryImage: InventoryImage;
     isAvailable: boolean;
     productType?: 'manufactured' | 'supply' | 'promo';
+    isPromo?: boolean;
+    saleDetails?: ISaleDetail[];
 }
 
 export interface ManufacturedArticleDetail {
