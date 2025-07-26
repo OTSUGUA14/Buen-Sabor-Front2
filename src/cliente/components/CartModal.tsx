@@ -95,7 +95,7 @@ export const CartModal: React.FC<CartModalProps> = ({
         };
 
         if (paymentMethod === PayMethod.MERCADOPAGO) {
-            onPayment(order, PayMethod.MERCADOPAGO, userPreference); // 👈 envío adicional
+            onPayment(order, PayMethod.MERCADOPAGO, userPreference); // ✅ Ya está correcto
         } else {
             onPayment(order, PayMethod.CASH);
         }

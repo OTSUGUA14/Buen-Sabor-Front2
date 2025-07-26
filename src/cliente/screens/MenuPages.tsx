@@ -6,7 +6,7 @@ import CartModal from '../components/CartModal';
 import { getProductsAll } from '../../administracion-sistema/utils/Api';
 import Menu from '../components/Menu';
 import type { IProductClient } from '../types/IProductClient';
-import { PayMethod, type OrderRequestDTO, type UserPreferenceRequest } from '../types/IOrderData';
+import { PayMethod, type OrderDetailDTO, type OrderRequestDTO, type UserPreferenceRequest } from '../types/IOrderData';
 import { createOrder, createPreferenceMP } from '../services/Api';
 import { supplyApi } from '../../administracion-sistema/api/supply';
 import { saleApi } from '../../administracion-sistema/api/sale'; // Importa la API de promociones
@@ -44,83 +44,88 @@ export default function MenuPages() {
     const deliveryFee = 800;
     const total = subtotal + deliveryFee;
 
+    useEffect(() => {
+        console.log("🛒 Estado del carrito cambió:", cart);
+    }, [cart]);
 
     // Guarda el carrito en localStorage cada vez que cambie
     useEffect(() => {
-    localStorage.removeItem('cart');
-    const fetchProductos = async () => {
-        const platos = await getProductsAll();
-        const platosWithType = platos.map(plato => ({
-            ...plato,
-            productType: 'manufactured' as const
+        const fetchProductos = async () => {
+            const platos = await getProductsAll();
+            const platosWithType = platos.map(plato => ({
+                ...plato,
+                productType: 'manufactured' as const
+            }));
+
+            // Insumos para venta
+            const allSupplies = await supplyApi.getAll();
+            const suppliesForSale = allSupplies
+                .filter(s => s.forSale && s.idarticle)
+                .map(s => ({
+                    id: s.idarticle!,
+                    idmanufacturedArticle: s.idarticle!,
+                    name: s.denomination,
+                    price: s.buyingPrice,
+                    category: { 
+                        name: s.category?.name || "Insumos",
+                        idcategory: s.category?.idcategory || 0,
+                        forSale: true 
+                    },
+                    isAvailable: true,
+                    manufacInventoryImage: s.inventoryImage
+                        ? { imageData: s.inventoryImage.imageData }
+                        : { imageData: "" },
+                    productType: 'supply' as const,
+                    description: "",
+                    estimatedTimeMinutes: 0,
+                    manufacturedArticleDetail: [],
+                }));
+
+            // Promociones
+            const allPromos = await saleApi.getAll();
+            const promosForMenu = allPromos
+                .filter(promo => promo.idsale)
+                .map(promo => ({
+                    id: promo.idsale!,
+                    idmanufacturedArticle: promo.idsale!,
+                    name: promo.denomination,
+                    price: promo.salePrice,
+                    category: { name: "Promociones", idcategory: 999, forSale: true }, // Categoría especial
+                    isAvailable: true,
+                    manufacInventoryImage: promo.inventoryImage
+                        ? { imageData: promo.inventoryImage.imageData }
+                        : { imageData: "" },
+                    productType: 'promo' as const,
+                    isPromo: true,
+                    description: promo.saleDescription,
+                    estimatedTimeMinutes: 0,
+                    manufacturedArticleDetail: [], // Simplificado por ahora
+                    saleDetails: promo.saleDetails || [],
+                }));
+
+            setProductosAll([...platosWithType, ...suppliesForSale, ...promosForMenu]);
+        };
+        fetchProductos();
+
+        // Solo guardar el carrito si tiene items
+        const minimalCart = cart.map(item => ({
+            idmanufacturedArticle: item.idmanufacturedArticle,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price
         }));
-
-        // Insumos para venta
-        const allSupplies = await supplyApi.getAll();
-        const suppliesForSale = allSupplies
-            .filter(s => s.forSale && s.idarticle)
-            .map(s => ({
-                id: s.idarticle!,
-                idmanufacturedArticle: s.idarticle!,
-                name: s.denomination,
-                price: s.buyingPrice,
-                category: { 
-                    name: s.category?.name || "Insumos",
-                    idcategory: s.category?.idcategory || 0,
-                    forSale: true 
-                },
-                isAvailable: true,
-                manufacInventoryImage: s.inventoryImage
-                    ? { imageData: s.inventoryImage.imageData }
-                    : { imageData: "" },
-                productType: 'supply' as const,
-                description: "",
-                estimatedTimeMinutes: 0,
-                manufacturedArticleDetail: [],
-            }));
-
-        // Promociones
-        const allPromos = await saleApi.getAll();
-        const promosForMenu = allPromos
-            .filter(promo => promo.idsale)
-            .map(promo => ({
-                id: promo.idsale!,
-                idmanufacturedArticle: promo.idsale!,
-                name: promo.denomination,
-                price: promo.salePrice,
-                category: { name: "Promociones", idcategory: 999, forSale: true }, // Categoría especial
-                isAvailable: true,
-                manufacInventoryImage: promo.inventoryImage
-                    ? { imageData: promo.inventoryImage.imageData }
-                    : { imageData: "" },
-                productType: 'promo' as const,
-                isPromo: true,
-                description: promo.saleDescription,
-                estimatedTimeMinutes: 0,
-                manufacturedArticleDetail: [], // Simplificado por ahora
-                saleDetails: promo.saleDetails || [],
-            }));
-
-        setProductosAll([...platosWithType, ...suppliesForSale, ...promosForMenu]);
-    };
-    fetchProductos();
-
-    const minimalCart = cart.map(item => ({
-        idmanufacturedArticle: item.idmanufacturedArticle, // <-- aquí el id del producto
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price
-    }));
-    const cartString = JSON.stringify(minimalCart);
-
-    if (minimalCart.length > 0) {
-        if (cartString.length < 5000000) {
-            localStorage.setItem('cart', cartString);
+        
+        if (minimalCart.length > 0) {
+            const cartString = JSON.stringify(minimalCart);
+            if (cartString.length < 5000000) {
+                localStorage.setItem('cart', cartString);
+            } else {
+                alert("El carrito es demasiado grande para guardar.");
+            }
         } else {
-            alert("El carrito es demasiado grande para guardar.");
+            localStorage.removeItem('cart'); // ✅ Solo remover si está vacío
         }
-    }
-}, [cart]);
+    }, [cart]);
     // Guarda el carrito solo si tiene productos, si no lo elimina
 
     const handleAddToCart = (product: IProductClient, quantity: number) => {
@@ -149,32 +154,47 @@ export default function MenuPages() {
         );
     };
 
-    const handlePayment = async (orderData: OrderRequestDTO | any, payMethod: PayMethod) => {
-        console.log(orderData);
-    
-        await createOrder(orderData as OrderRequestDTO);
-    
-        if (payMethod === PayMethod.MERCADOPAGO) {
-            const preferenceItems: UserPreferenceRequest[] = orderData.orderDetails.map((item: any) => ({
-                title: item.name,
-                quantity: item.quantity,
-                price: item.subTotal.toFixed(2),
-            }));
-    
-            const preference = await createPreferenceMP(preferenceItems);
+    const handlePayment = async (orderData: OrderRequestDTO | any, payMethod: PayMethod, userPreference?: UserPreferenceRequest[]) => {
+        console.log("=== INICIO PAYMENT ===");
+        console.log("orderData:", orderData);
+        console.log("payMethod:", payMethod);
+        console.log("userPreference:", userPreference);
+        console.log("cart:", cart);
 
-            if (preference?.init_point) {
-                window.location.href = preference.init_point;
-            } else {
-                console.error("Missing init_point from preference:", preference);
+        try {
+            console.log("Enviando orden...");
+            await createOrder(orderData as OrderRequestDTO);
+            console.log("Orden creada exitosamente");
+
+            // ✅ Limpiar carrito INMEDIATAMENTE después de crear la orden exitosamente
+            setCart([]);
+            localStorage.removeItem('cart');
+            setIsCartModalOpen(false);
+
+            if (payMethod === PayMethod.MERCADOPAGO) {
+                console.log("Procesando MercadoPago...");
+                if (userPreference && userPreference.length > 0) {
+                    console.log("Creando preferencia con:", userPreference);
+                    const preference = await createPreferenceMP(userPreference);
+                    console.log("Respuesta preferencia:", preference);
+
+                    if (preference?.init_point) {
+                        console.log("Redirigiendo a:", preference.init_point);
+                        window.location.href = preference.init_point;
+                    } else {
+                        console.error("Missing init_point from preference:", preference);
+                        alert("Error al crear la preferencia de MercadoPago");
+                    }
+                } else {
+                    console.error("No hay items para MercadoPago");
+                    alert("No hay items para procesar el pago");
+                }
             }
-              
+            
+        } catch (error) {
+            console.error("Error completo:", error);
+            alert("Error al procesar el pedido. Por favor intente nuevamente.");
         }
-    
-        handleCloseModal();
-        setIsCartModalOpen(false);
-        setCart([]);
-        localStorage.removeItem('cart');
     };
     const handleDecrement = (productId: number) => {
         setCart(prevCart => {
@@ -187,7 +207,13 @@ export default function MenuPages() {
             return updatedCart;
         });
     };
-
+    const orderDetails: OrderDetailDTO[] = cart
+    .filter(item => item.productType === 'manufactured')
+    .map(item => ({
+        manufacturedArticleId: item.idmanufacturedArticle,
+        quantity: item.quantity,
+        subTotal: item.price * item.quantity
+    }));
 
 
 
@@ -266,8 +292,7 @@ export default function MenuPages() {
                 total={total}
                 subsidiaryId={1}
                 clientId={clientId}
-                onPayment={handlePayment}
-
+                onPayment={handlePayment} // Ya acepta el tercer parámetro opcional
             />
 
         </main>
