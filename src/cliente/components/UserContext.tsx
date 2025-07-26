@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { updateUser } from '../services/Api';
-import type { SimpleDomicile } from "../types/UserData";
-import type { UserRegister } from "../types/UserData";
+import type { SimpleDomicile, UserRegister } from "../types/UserData";
 
 interface UserContextType {
     profile: UserRegister | null;
@@ -47,16 +46,21 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
         // Obtener el id de location correctamente
         let locationId: number = 1;
-        const loc = profile.domiciles[0].location;
-        if (typeof loc === "object" && loc !== null && "idlocation" in loc) {
-            locationId = (loc as any).idlocation;
-        } else if (typeof loc === "number") {
-            locationId = loc;
+        const domicile = profile.domiciles[0];
+        
+        // ✅ Mejorar el manejo de location
+        if (domicile && domicile.location) {
+            const loc = domicile.location;
+            if (typeof loc === "object" && loc !== null && "idlocation" in loc) {
+                locationId = (loc as any).idlocation;
+            } else if (typeof loc === "number") {
+                locationId = loc;
+            }
         }
 
         const domicilio: SimpleDomicile = {
             street: formData.street,
-            zipcode: formData.zipcode,
+            zipcode: formData.zipcode, // ✅ Enviar como zipcode (minúscula)
             number: Number(formData.number),
             location: locationId
         };
@@ -73,8 +77,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         });
         setProfile(updated);
     };
-
-
 
     // Cerrar sesión
     const logout = () => {

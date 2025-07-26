@@ -17,8 +17,8 @@ const Profile = () => {
         password: profile?.password || '',
         street: profile?.domiciles?.[0]?.street || '',
         number: profile?.domiciles?.[0]?.number?.toString() || '',
-        zipcode: profile?.domiciles?.[0]?.zipcode || '',
-        // locationName: profile?.domiciles?.[0]?.location?.name || '',  
+        zipcode: profile?.domiciles?.[0]?.zipCode || '', // ✅ zipCode del backend
+        locationName: profile?.domiciles?.[0]?.location?.name || '',  // ✅ Descomentado
     });
 
     useEffect(() => {
@@ -32,8 +32,8 @@ const Profile = () => {
                 password: profile.password || '',
                 street: profile.domiciles?.[0]?.street || '',
                 number: profile.domiciles?.[0]?.number?.toString() || '',
-                zipcode: profile.domiciles?.[0]?.zipcode || '',
-                // locationName: profile?.domiciles?.[0]?.location?.name || '', 
+                zipcode: profile.domiciles?.[0]?.zipCode || '', // ✅ zipCode del backend
+                locationName: profile?.domiciles?.[0]?.location?.name || '', // ✅ Descomentado
             });
         }
     }, [profile]);
@@ -61,8 +61,8 @@ const Profile = () => {
             password: profile.password || '',
             street: profile.domiciles?.[0]?.street || '',
             number: profile.domiciles?.[0]?.number?.toString() || '',
-            zipcode: profile.domiciles?.[0]?.zipcode || '',
-            // locationName: profile?.domiciles?.[0]?.location?.name || '', 
+            zipcode: profile.domiciles?.[0]?.zipCode || '', // ✅ zipCode del backend
+            locationName: profile?.domiciles?.[0]?.location?.name || '', // ✅ Descomentado
         });
     };
 
@@ -215,19 +215,23 @@ const Profile = () => {
                             <p className="profile-value">{profile.domiciles?.[0]?.number || ""}</p>
                         )}
                     </div>
-{/* <div className="profile-detail-item">
-    <label className="profile-label">Localidad</label>
-    {isEditing ? (
-        <input
-            name="locationName"
-            value={form.locationName}
-            onChange={handleChange}
-            className="profile-input"
-        />
-    ) : (
-        <p className="profile-value">{profile.domiciles?.[0]?.location?.name || "No registrado"}</p>
-    )}
-</div> */}
+
+                    {/* ✅ Descomentado y corregido */}
+                    <div className="profile-detail-item">
+                        <label className="profile-label">Localidad</label>
+                        {isEditing ? (
+                            <input
+                                name="locationName"
+                                value={form.locationName}
+                                onChange={handleChange}
+                                className="profile-input"
+                                disabled // ✅ Solo lectura por ahora, ya que location es complejo de editar
+                                style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+                            />
+                        ) : (
+                            <p className="profile-value">{profile.domiciles?.[0]?.location?.name || "No registrado"}</p>
+                        )}
+                    </div>
 
                     <div className="profile-detail-item">
                         <label className="profile-label">Codigo postal</label>
@@ -239,7 +243,7 @@ const Profile = () => {
                                 className="profile-input"
                             />
                         ) : (
-                            <p className="profile-value">{profile.domiciles?.[0]?.zipcode || ""}</p>
+                            <p className="profile-value">{profile.domiciles?.[0]?.zipCode || ""}</p>
                         )}
                     </div>
                 </div>

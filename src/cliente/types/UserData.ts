@@ -1,6 +1,6 @@
 export interface Domicile {
     street: string;
-    zipcode: string;
+    zipCode: string; // ✅ Como viene del backend (GET)
     number: number;
     location: {
         name: string;
@@ -34,7 +34,15 @@ export interface UserRegister {
 
 export type DomicileToSend = {
     street: string;
-    zipcode: string;
+    zipcode: string; // ✅ Como lo espera el backend (POST/PUT)
     number: number;
     location: number; // solo el id
 };
+
+// ✅ Añadir interfaz para manejo simple del domicilio
+export interface SimpleDomicile {
+    street: string;
+    zipcode: string; // Para envío al backend
+    number: number;
+    location: number;
+}
