@@ -39,22 +39,24 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Función para actualizar el perfil
     const updateProfile = async (formData: any) => {
-        if (!profile?.id || !profile.domiciles || profile.domiciles.length === 0) {
-            console.error("Faltan datos del usuario o del domicilio.");
+        if (!profile?.id) {
+            console.error("Falta el ID del usuario.");
             return;
         }
 
-        // Obtener el id de location correctamente
-        let locationId: number = 1;
-        const domicile = profile.domiciles[0];
+        // ✅ Usar locationId del form (si está disponible) o el ID actual del domicilio
+        let locationId: number = formData.locationId || 1;
         
-        // ✅ Mejorar el manejo de location
-        if (domicile && domicile.location) {
-            const loc = domicile.location;
-            if (typeof loc === "object" && loc !== null && "idlocation" in loc) {
-                locationId = (loc as any).idlocation;
-            } else if (typeof loc === "number") {
-                locationId = loc;
+        // Si no hay locationId en formData, obtenerlo del perfil actual
+        if (!formData.locationId && profile.domiciles && profile.domiciles.length > 0) {
+            const domicile = profile.domiciles[0];
+            if (domicile && domicile.location) {
+                const loc = domicile.location;
+                if (typeof loc === "object" && loc !== null && "idlocation" in loc) {
+                    locationId = (loc as any).idlocation;
+                } else if (typeof loc === "number") {
+                    locationId = loc;
+                }
             }
         }
 
@@ -62,7 +64,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             street: formData.street,
             zipcode: formData.zipcode, // ✅ Enviar como zipcode (minúscula)
             number: Number(formData.number),
-            location: locationId
+            location: locationId // ✅ Usar el locationId correcto
         };
 
         const updated = await updateUser(profile.id, {

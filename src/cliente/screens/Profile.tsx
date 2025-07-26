@@ -1,9 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '../../cliente/components/UserContext';
+import { getLocations } from '../services/Api'; // ✅ Importar getLocations
 import '../styles/Profile.css';
+
+interface Location {
+    idlocation: number;
+    name: string;
+    province: {
+        name: string;
+        idprovince: number;
+        country: {
+            name: string;
+            idcountry: number;
+        };
+    };
+}
 
 const Profile = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [locations, setLocations] = useState<Location[]>([]); // ✅ Estado para locations
 
     const { profile, updateProfile } = useUser();
     const [isEditing, setIsEditing] = useState(false);
@@ -17,9 +32,15 @@ const Profile = () => {
         password: profile?.password || '',
         street: profile?.domiciles?.[0]?.street || '',
         number: profile?.domiciles?.[0]?.number?.toString() || '',
-        zipcode: profile?.domiciles?.[0]?.zipCode || '', // ✅ zipCode del backend
-        locationName: profile?.domiciles?.[0]?.location?.name || '',  // ✅ Descomentado
+        zipcode: profile?.domiciles?.[0]?.zipCode || '',
+        locationId: profile?.domiciles?.[0]?.location?.idlocation || 1, // ✅ ID de location
+        locationName: profile?.domiciles?.[0]?.location?.name || '',
     });
+
+    // ✅ Cargar locations al montar el componente
+    useEffect(() => {
+        getLocations().then((data) => setLocations(data));
+    }, []);
 
     useEffect(() => {
         if (profile) {
@@ -32,8 +53,9 @@ const Profile = () => {
                 password: profile.password || '',
                 street: profile.domiciles?.[0]?.street || '',
                 number: profile.domiciles?.[0]?.number?.toString() || '',
-                zipcode: profile.domiciles?.[0]?.zipCode || '', // ✅ zipCode del backend
-                locationName: profile?.domiciles?.[0]?.location?.name || '', // ✅ Descomentado
+                zipcode: profile.domiciles?.[0]?.zipCode || '',
+                locationId: profile.domiciles?.[0]?.location?.idlocation || 1, // ✅ ID de location
+                locationName: profile?.domiciles?.[0]?.location?.name || '',
             });
         }
     }, [profile]);
@@ -44,8 +66,21 @@ const Profile = () => {
 
     const avatarUrl = profile.userImage || "https://images.steamusercontent.com/ugc/18200902477657540315/C8CBD823EF42E1F4E8368E5D56A9FC289B18DA32/?imw=512&&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false";
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        
+        // ✅ Manejar cambio de location
+        if (name === 'locationId') {
+            const selectedId = Number(value);
+            const selectedLocation = locations.find(loc => loc.idlocation === selectedId);
+            setForm({ 
+                ...form, 
+                locationId: selectedId,
+                locationName: selectedLocation?.name || ''
+            });
+        } else {
+            setForm({ ...form, [name]: value });
+        }
     };
 
     const handleEdit = () => setIsEditing(true);
@@ -61,8 +96,9 @@ const Profile = () => {
             password: profile.password || '',
             street: profile.domiciles?.[0]?.street || '',
             number: profile.domiciles?.[0]?.number?.toString() || '',
-            zipcode: profile.domiciles?.[0]?.zipCode || '', // ✅ zipCode del backend
-            locationName: profile?.domiciles?.[0]?.location?.name || '', // ✅ Descomentado
+            zipcode: profile.domiciles?.[0]?.zipCode || '',
+            locationId: profile.domiciles?.[0]?.location?.idlocation || 1,
+            locationName: profile?.domiciles?.[0]?.location?.name || '',
         });
     };
 
@@ -216,18 +252,23 @@ const Profile = () => {
                         )}
                     </div>
 
-                    {/* ✅ Descomentado y corregido */}
+                    {/* ✅ Localidad con selector */}
                     <div className="profile-detail-item">
                         <label className="profile-label">Localidad</label>
                         {isEditing ? (
-                            <input
-                                name="locationName"
-                                value={form.locationName}
+                            <select
+                                name="locationId"
+                                value={form.locationId}
                                 onChange={handleChange}
                                 className="profile-input"
-                                disabled // ✅ Solo lectura por ahora, ya que location es complejo de editar
-                                style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
-                            />
+                            >
+                                <option value="">Selecciona una localidad</option>
+                                {locations.map((location) => (
+                                    <option key={location.idlocation} value={location.idlocation}>
+                                        {location.name}
+                                    </option>
+                                ))}
+                            </select>
                         ) : (
                             <p className="profile-value">{profile.domiciles?.[0]?.location?.name || "No registrado"}</p>
                         )}
