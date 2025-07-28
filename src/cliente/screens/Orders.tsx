@@ -10,10 +10,12 @@ import type { ISelectOption } from '../../administracion-sistema/components/crud
 import { orderApi } from '../../administracion-sistema/api/order';
 import { useCrud } from '../../administracion-sistema/hooks/useCrud';
 import { type IOrder } from '../../administracion-sistema/api/types/IOrder';
+import { useUser } from '../components/UserContext'; // ✅ Importar el hook de usuario
 
 import '../styles/Orders.css';
 
 export const Orders: React.FC = () => {
+    const { profile } = useUser(); // ✅ Obtener el perfil del usuario logueado
     const {
         data: orders,
         loading,
@@ -47,14 +49,22 @@ export const Orders: React.FC = () => {
         { value: 'LOCAL', label: 'LOCAL' },
     ], []);
 
+    // ✅ Filtrar órdenes del usuario actual
     const filteredOrders = useMemo(() => {
+        if (!profile?.id) return []; // Si no hay usuario logueado, no mostrar órdenes
+        
         return orders.filter(order => {
-            const matchesSearch = order.clientName.toLowerCase().includes(searchTerm.toLowerCase());
+            // ✅ Solo mostrar órdenes del usuario actual - usar client.clientId en lugar de clientId
+            const isUserOrder = order.client?.clientId === profile.id;
+            // ✅ Usar client.firstName + client.lastName para la búsqueda
+            const clientFullName = `${order.client?.firstName || ''} ${order.client?.lastName || ''}`.toLowerCase();
+            const matchesSearch = clientFullName.includes(searchTerm.toLowerCase());
             const matchesStatus = statusFilter === 'TODOS' || order.orderState === statusFilter;
             const matchesDelivery = deliveryTypeFilter === 'TODOS' || order.tipoEntrega === deliveryTypeFilter;
-            return matchesSearch && matchesStatus && matchesDelivery;
+            
+            return isUserOrder && matchesSearch && matchesStatus && matchesDelivery;
         });
-    }, [orders, searchTerm, statusFilter, deliveryTypeFilter]);
+    }, [orders, searchTerm, statusFilter, deliveryTypeFilter, profile?.id]);
 
     const orderColumns: ITableColumn<IOrder>[] = useMemo(() => [
         { id: 'id', label: 'ID Orden', numeric: true },
@@ -75,6 +85,15 @@ export const Orders: React.FC = () => {
             label: 'Tipo Entrega',
         },
     ], []);
+
+    // ✅ Verificar si el usuario está logueado
+    if (!profile) {
+        return (
+            <div className="client-orders-container">
+                <p>Debes iniciar sesión para ver tus órdenes.</p>
+            </div>
+        );
+    }
 
     if (loading) return <p>Cargando órdenes...</p>;
     if (error) return <p>Error al cargar órdenes: {error}</p>;

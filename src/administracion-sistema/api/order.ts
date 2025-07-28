@@ -8,8 +8,10 @@ export const orderApi = {
         const data: IOrder[] = await response.json();
         return data.map(order => ({
             ...order,
-            tipoEntrega: order.takeAway ? 'LOCAL' : 'DELIVERY',
-            clientName: order.clientName ?? `Cliente #${order.clientId}`,
+            // ✅ Mapear campos para compatibilidad con el código existente
+            clientId: order.client?.clientId,
+            clientName: `${order.client?.firstName || ''} ${order.client?.lastName || ''}`.trim(),
+            tipoEntrega: order.orderType === 'TAKEAWAY' ? 'LOCAL' : 'DELIVERY',
         }));
     },
 

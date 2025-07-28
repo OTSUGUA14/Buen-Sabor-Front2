@@ -1,22 +1,32 @@
-
-
 export interface IOrder {
-    id: number;                       
-    clientId: number;
-    clientName: string;               
-    orderDate: string;
+    id: number;
     estimatedFinishTime: string;
     total: number;
     totalCost: number;
+    orderDate: string;
     orderState: OrderState;
-    orderTypeId: number;
+    orderType: string;
     payMethod: PayMethod;
-    takeAway: boolean;
+    client: {
+        clientId: number;
+        firstName: string;
+        lastName: string;
+        phoneNumber: string;
+        email: string;
+        birthDate: string;
+        domiciles: any;
+        username: string;
+        password: string;
+    };
+    directionToSend: string;
     subsidiaryId: number;
-    orderDetails: OrderDetailDTO[];
+    manufacturedArticles: any[];
+    orderedArticles: any[];
 
-    // Agregado útil para mostrarlo fácil en la tabla
-    tipoEntrega: 'DELIVERY' | 'LOCAL';
+    // Campos calculados para compatibilidad
+    clientId?: number;
+    clientName?: string;
+    tipoEntrega?: 'DELIVERY' | 'LOCAL';
 }
 
 export enum OrderState {
@@ -40,9 +50,4 @@ export enum OrderType {
     DELIVERY = "DELIVERY",
     TAKEAWAY = "TAKEAWAY",
     ON_SITE = "ON_SITE"
-}
-export interface OrderDetailDTO {
-    manufacturedArticleId: number;
-    quantity: number;
-    subTotal: number;
 }
