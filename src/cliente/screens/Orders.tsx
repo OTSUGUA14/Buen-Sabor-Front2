@@ -231,13 +231,11 @@ export const Orders: React.FC = () => {
                                     <div>Fecha</div>
                                     <div>Estado</div>
                                     <div>Tipo</div>
-                                    <div>Total</div>
                                 </div>
                                 <div className="order-modal-row">
                                     <div>{selectedOrder.orderDate}</div>
                                     <div>{selectedOrder.orderState}</div>
                                     <div>{selectedOrder.orderType}</div>
-                                    <div>${selectedOrder.total.toFixed(2)}</div>
                                 </div>
                             </div>
                         </div>

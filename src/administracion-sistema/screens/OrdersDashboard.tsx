@@ -98,7 +98,7 @@ export const OrderDashboard: React.FC = () => {
             );
         }
         return filtered.filter(order => {
-            const matchesSearch = order.clientName.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesSearch = (order.clientName ?? '').toLowerCase().includes(searchTerm.toLowerCase());
             const matchesStatus = statusFilter === 'TODOS' || order.orderState === statusFilter;
             const matchesDelivery = isCashier || isChef || isDriver
                 ? true
@@ -265,14 +265,21 @@ export const OrderDashboard: React.FC = () => {
                                 </div>
                             </div>
                         </div>
+                        
                         <div className="order-modal-section">
                             <div className="section-title">
-                                <span role="img" aria-label="Envío">🚚</span> Envío
+                                <span role="img" aria-label="Pedido">📋</span> Información del Pedido
                             </div>
                             <div className="order-modal-table">
                                 <div className="order-modal-row order-modal-header">
-                                    <div>Enviar a:</div>
+                                    <div>Fecha</div>
+                                    <div>Estado</div>
+                                    <div>Tipo</div>
+                                </div>
+                                <div className="order-modal-row">
                                     <div>{selectedOrder.orderDate}</div>
+                                    <div>{selectedOrder.orderState}</div>
+                                    <div>{selectedOrder.orderType || selectedOrder.tipoEntrega}</div>
                                 </div>
                             </div>
                         </div>
@@ -284,13 +291,37 @@ export const OrderDashboard: React.FC = () => {
                                 <div className="order-modal-row order-modal-header">
                                     <div>Producto</div>
                                     <div>Cantidad</div>
+                                    <div>Precio Unit.</div>
+                                    <div>Subtotal</div>
                                 </div>
-                                {selectedOrder.orderDetails?.map((detail: any, idx: number) => (
-                                    <div className="order-modal-row" key={idx}>
-                                        <div>{detail.articleName ?? detail.manufacturedArticleName ?? `ID: ${detail.manufacturedArticleId}`}</div>
-                                        <div>{detail.quantity}</div>
+                                {/* Mostrar manufacturedArticles */}
+                                {selectedOrder.manufacturedArticles?.map((article: any, idx: number) => (
+                                    <div className="order-modal-row" key={`manufactured-${idx}`}>
+                                        <div>{article.name || 'Producto manufacturado'}</div>
+                                        <div>{article.quantityOrdered || 1}</div>
+                                        <div>${(article.price || 0).toFixed(2)}</div>
+                                        <div>${((article.quantityOrdered || 1) * (article.price || 0)).toFixed(2)}</div>
                                     </div>
                                 ))}
+                                {/* Mostrar orderedArticles */}
+                                {selectedOrder.orderedArticles?.map((article: any, idx: number) => (
+                                    <div className="order-modal-row" key={`ordered-${idx}`}>
+                                        <div>{article.name || 'Artículo'}</div>
+                                        <div>{article.quantity || 1}</div>
+                                        <div>${(article.price || 0).toFixed(2)}</div>
+                                        <div>${((article.quantity || 1) * (article.price || 0)).toFixed(2)}</div>
+                                    </div>
+                                ))}
+                                {/* Mostrar orderDetails si existe (por compatibilidad) */}
+                                {selectedOrder.orderDetails?.map((detail: any, idx: number) => (
+                                    <div className="order-modal-row" key={`detail-${idx}`}>
+                                        <div>{detail.articleName ?? detail.manufacturedArticleName ?? `ID: ${detail.manufacturedArticleId}`}</div>
+                                        <div>{detail.quantity}</div>
+                                        <div>${(detail.unitPrice ?? detail.price ?? 0).toFixed(2)}</div>
+                                        <div>${(detail.subTotal ?? (detail.quantity * (detail.unitPrice ?? detail.price ?? 0))).toFixed(2)}</div>
+                                    </div>
+                                ))}
+                                
                             </div>
                         </div>
                         <div className="order-modal-section">
