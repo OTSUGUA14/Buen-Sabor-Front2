@@ -1,4 +1,5 @@
 import { Outlet, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { Sidebar } from '../common/Sidebar';
 import './AdminLayout.css';
 
@@ -11,13 +12,14 @@ const roleMap: Record<string, string> = {
 };
 
 export const AdminLayout: React.FC = () => {
+    const [open, setOpen] = useState(false);
     const role = localStorage.getItem("employeeRole");
     const roleEs = role ? (roleMap[role] || role) : "";
     const navigate = useNavigate();
 
-
     const handleLogout = () => {
         localStorage.removeItem("employeeRole");
+        setOpen(false);
         navigate("/admin/loginEmployee");
     };
 
@@ -30,13 +32,31 @@ export const AdminLayout: React.FC = () => {
                             Buen<span className="logoAccent">SABOR</span>
                         </div>
                         <div className="header-right">
-                            <button className="user-info">{roleEs}</button>
-                            <button className="logout-btn" onClick={handleLogout}>
-                                Cerrar sesión
-                            </button>
+                            <div className="profile-wrapper">
+                                <button 
+                                    className="user-info"
+                                    onClick={() => setOpen(!open)}
+                                >
+                                    {roleEs}
+                                </button>
+                                
+                                {open && (
+                                    <div className="dropdown">
+                                        <ul className="dropdown-list">
+                                            <li>
+                                                <button
+                                                    onClick={handleLogout}
+                                                    className="dropdown-item"
+                                                >
+                                                    Cerrar sesión
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </header>
-
                 )}
                 <div className='container-page-content'>
                     <Sidebar />
@@ -44,7 +64,6 @@ export const AdminLayout: React.FC = () => {
                         <Outlet />
                     </div>
                 </div>
-
             </main>
         </div>
     );
