@@ -31,6 +31,14 @@ export const OrderDashboard: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editState, setEditState] = useState<string>('');
 
+    // Opciones para tipo de entrega
+    const deliveryTypeOptions: ISelectOption[] = [
+        { value: 'TODOS', label: 'TIPO ENTREGA' },
+        { value: 'DELIVERY', label: 'Delivery' },
+        { value: 'TAKE_AWAY', label: 'Take Away' },
+        { value: 'IN_PLACE', label: 'En el local' }
+    ];
+
     const role = localStorage.getItem("employeeRole");
     const isCashier = role === "CASHIER";
     const isChef = role === "CHEF";
@@ -43,16 +51,14 @@ export const OrderDashboard: React.FC = () => {
                 { value: 'TODOS', label: 'ESTADO' },
                 { value: 'PENDING', label: 'PENDIENTE' },
                 { value: 'CANCELED', label: 'CANCELADO' },
-                { value: 'REJECTED', label: 'RECHAZADO' },
-                { value: 'BILLED', label: 'FACTURADO' },
-                { value: 'ARRIVED', label: 'LISTO PARA ENTREGAR' }
+                { value: 'PREPARING', label: 'EN COCINA' }
             ];
         }
         if (isChef) {
             return [
                 { value: 'TODOS', label: 'ESTADO' },
-                { value: 'BILLED', label: 'FACTURADO' },
-                { value: 'PREPARING', label: 'EN COCINA' }
+                { value: 'PREPARING', label: 'EN COCINA' },
+                { value: 'READY_FOR_DELIVERY', label: 'LISTO PARA DELIVERY' }
             ];
         }
         if (isDriver) {
@@ -65,36 +71,31 @@ export const OrderDashboard: React.FC = () => {
             { value: 'TODOS', label: 'ESTADO' },
             { value: 'PENDING', label: 'PENDIENTE' },
             { value: 'PREPARING', label: 'EN COCINA' },
-            { value: 'ARRIVED', label: 'LISTO PARA ENTREGAR' },
-            { value: 'BILLED', label: 'FACTURADO' },
             { value: 'READY_FOR_DELIVERY', label: 'LISTO PARA DELIVERY' },
             { value: 'ON_THE_WAY', label: 'EN CAMINO' },
+            { value: 'ARRIVED', label: 'ENTREGADO' },
             { value: 'CANCELED', label: 'CANCELADO' },
             { value: 'REJECTED', label: 'RECHAZADO' },
         ];
     }, [isCashier, isChef, isDriver]);
 
-    // Opciones de tipo de entrega (solo para no-cajero)
-    const deliveryTypeOptions: ISelectOption[] = useMemo(() => [
-        { value: 'TODOS', label: 'ENTREGA' },
-        { value: 'DELIVERY', label: 'DELIVERY' },
-        { value: 'LOCAL', label: 'LOCAL' },
-    ], []);
-
     // Filtrado de órdenes
     const filteredOrders = useMemo(() => {
         let filtered = orders;
         if (isCashier) {
+            // Cajero ve órdenes PENDING y puede gestionarlas
             filtered = filtered.filter(order =>
-                ["REJECTED", "CANCELED", "PENDING", "BILLED", "ARRIVED"].includes(order.orderState)
+                ["PENDING", "CANCELED", "PREPARING"].includes(order.orderState)
             );
         } else if (isChef) {
+            // Cocinero ve órdenes PREPARING y puede marcarlas como listas
             filtered = filtered.filter(order =>
-                ["BILLED", "PREPARING"].includes(order.orderState)
+                ["PREPARING", "READY_FOR_DELIVERY"].includes(order.orderState)
             );
         } else if (isDriver) {
+            // Repartidor ve órdenes listas para delivery
             filtered = filtered.filter(order =>
-                order.orderState === "READY_FOR_DELIVERY"
+                ["READY_FOR_DELIVERY", "ON_THE_WAY", "ARRIVED"].includes(order.orderState)
             );
         }
         return filtered.filter(order => {
@@ -106,6 +107,40 @@ export const OrderDashboard: React.FC = () => {
             return matchesSearch && matchesStatus && matchesDelivery;
         });
     }, [orders, searchTerm, statusFilter, deliveryTypeFilter, isCashier, isChef, isDriver]);
+
+    // Estados disponibles para cada rol en el modal
+    const getStateOptionsForRole = () => {
+        if (isCashier) {
+            return [
+                { value: "PENDING", label: "PENDIENTE" },
+                { value: "CANCELED", label: "CANCELADO" },
+                { value: "PREPARING", label: "ENVIAR A COCINA" }
+            ];
+        }
+        if (isChef) {
+            return [
+                { value: "PREPARING", label: "EN COCINA" },
+                { value: "READY_FOR_DELIVERY", label: "LISTO PARA DELIVERY" }
+            ];
+        }
+        if (isDriver) {
+            return [
+                { value: "READY_FOR_DELIVERY", label: "LISTO PARA DELIVERY" },
+                { value: "ON_THE_WAY", label: "EN CAMINO" },
+                { value: "ARRIVED", label: "ENTREGADO" }
+            ];
+        }
+        // Admin - todos los estados
+        return [
+            { value: "PENDING", label: "PENDIENTE" },
+            { value: "PREPARING", label: "EN COCINA" },
+            { value: "READY_FOR_DELIVERY", label: "LISTO PARA DELIVERY" },
+            { value: "ON_THE_WAY", label: "EN CAMINO" },
+            { value: "ARRIVED", label: "ENTREGADO" },
+            { value: "CANCELED", label: "CANCELADO" },
+            { value: "REJECTED", label: "RECHAZADO" }
+        ];
+    };
 
     const orderColumns: ITableColumn<IOrder>[] = useMemo(() => [
         { id: 'id', label: 'ID Orden', numeric: true },
@@ -130,16 +165,60 @@ export const OrderDashboard: React.FC = () => {
             label: "Acciones",
             render: (item) => (
                 isDriver ? (
-                    <Button
-                        variant="primary"
-                        size="small"
-                        onClick={async () => {
-                            await orderApi.update({ ...item, orderState: OrderState.ON_THE_WAY });
-                            fetchData();
-                        }}
-                    >
-                        Tomar pedido
-                    </Button>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        {item.orderState === "READY_FOR_DELIVERY" && (
+                            <Button
+                                variant="primary"
+                                size="small"
+                                onClick={async () => {
+                                    try {
+                                        await orderApi.updateOrderState(item.id, OrderState.ON_THE_WAY);
+                                        fetchData();
+                                    } catch (error) {
+                                        console.error('Error updating order:', error);
+                                    }
+                                }}
+                            >
+                                Tomar pedido
+                            </Button>
+                        )}
+                        {item.orderState === "ON_THE_WAY" && (
+                            <Button
+                                variant="primary"
+                                size="small"
+                                onClick={async () => {
+                                    try {
+                                        await orderApi.updateOrderState(item.id, OrderState.ARRIVED);
+                                        fetchData();
+                                    } catch (error) {
+                                        console.error('Error updating order:', error);
+                                    }
+                                }}
+                            >
+                                Marcar entregado
+                            </Button>
+                        )}
+                        <Button
+                            variant="actions"
+                            size="small"
+                            onClick={() => {
+                                setSelectedOrder(item);
+                                setEditState(item.orderState);
+                                setIsModalOpen(true);
+                            }}
+                            title="Ver detalles"
+                        >
+                            <img
+                                src="../../../public/icons/eye-on.svg"
+                                alt="Ver"
+                                style={{
+                                    width: '18px',
+                                    height: '18px',
+                                    filter: 'invert(52%) sepia(94%) saturate(636%) hue-rotate(1deg) brightness(103%) contrast(102%)'
+                                }}
+                            />
+                        </Button>
+                    </div>
                 ) : (
                     <Button
                         variant="actions"
@@ -166,29 +245,28 @@ export const OrderDashboard: React.FC = () => {
         }
     ], [isDriver, fetchData]);
 
+    // Función para actualizar el estado de la orden
+    const handleUpdateOrderState = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (selectedOrder && editState !== selectedOrder.orderState) {
+            try {
+                await orderApi.updateOrderState(selectedOrder.id, editState as OrderState);
+                setIsModalOpen(false);
+                fetchData();
+            } catch (error) {
+                console.error('Error updating order state:', error);
+                alert('Error al actualizar el estado de la orden');
+            }
+        } else {
+            setIsModalOpen(false);
+        }
+    };
 
     if (loading) return <p>Cargando órdenes...</p>;
     if (error) return <p>Error al cargar órdenes: {error}</p>;
 
-    const cashierStates = [
-        { value: "PENDING", label: "PENDIENTE" },
-        { value: "CANCELED", label: "CANCELADO" },
-        { value: "REJECTED", label: "RECHAZADO" },
-        { value: "BILLED", label: "FACTURADO" }
-    ];
-
-    const chefStates = [
-        { value: "READY_FOR_DELIVERY", label: "LISTO PARA DELIVERY" },
-        { value: "ARRIVED", label: "LISTO PARA ENTREGAR" },
-        { value: "CANCELED", label: "CANCELADO" }
-    ];
-
     return (
         <div className="crud-page-container">
-            {/* <div className="page-header">
-                <h2>ÓRDENES</h2>
-            </div> */}
-
             <div className="filter-controls">
                 <InputField
                     name="searchOrders"
@@ -205,8 +283,7 @@ export const OrderDashboard: React.FC = () => {
                     onChange={(e) => setStatusFilter(e.target.value)}
                     className="status-select"
                 />
-                {/* Solo muestra el filtro de tipo de entrega si NO es cajero */}
-                {!isCashier && (
+                {!isCashier && !isChef && !isDriver && (
                     <SelectField
                         name="deliveryTypeFilter"
                         options={deliveryTypeOptions}
@@ -217,34 +294,13 @@ export const OrderDashboard: React.FC = () => {
                 )}
             </div>
 
-            {isCashier && (
-                <button
-                    className="btn btn-primary"
-                    style={{ marginBottom: 16 }}
-                    onClick={() => {
-                        // Aquí abre tu modal o navega a la página de creación de orden
-                        // Por ejemplo:
-                        // navigate("/admin/orders/create");
-                    }}
-                >
-                    Crear Orden
-                </button>
-            )}
-
             <GenericTable data={filteredOrders} columns={orderColumns} />
 
             <FormModal
                 isOpen={isModalOpen && !!selectedOrder}
                 onClose={() => setIsModalOpen(false)}
                 title={selectedOrder ? `Detalle de Orden #${selectedOrder.id}` : ''}
-                onSubmit={async (e) => {
-                    e.preventDefault();
-                    if (selectedOrder) {
-                        await orderApi.update({ ...selectedOrder, orderState: editState });
-                        setIsModalOpen(false);
-                        fetchData();
-                    }
-                }}
+                onSubmit={handleUpdateOrderState}
             >
                 {selectedOrder && (
                     <div className="order-modal-custom">
@@ -283,6 +339,7 @@ export const OrderDashboard: React.FC = () => {
                                 </div>
                             </div>
                         </div>
+
                         <div className="order-modal-section">
                             <div className="section-title">
                                 <span role="img" aria-label="Detalle">📋</span> Detalle
@@ -294,7 +351,6 @@ export const OrderDashboard: React.FC = () => {
                                     <div>Precio Unit.</div>
                                     <div>Subtotal</div>
                                 </div>
-                                {/* Mostrar manufacturedArticles */}
                                 {selectedOrder.manufacturedArticles?.map((article: any, idx: number) => (
                                     <div className="order-modal-row" key={`manufactured-${idx}`}>
                                         <div>{article.name || 'Producto manufacturado'}</div>
@@ -303,7 +359,6 @@ export const OrderDashboard: React.FC = () => {
                                         <div>${((article.quantityOrdered || 1) * (article.price || 0)).toFixed(2)}</div>
                                     </div>
                                 ))}
-                                {/* Mostrar orderedArticles */}
                                 {selectedOrder.orderedArticles?.map((article: any, idx: number) => (
                                     <div className="order-modal-row" key={`ordered-${idx}`}>
                                         <div>{article.name || 'Artículo'}</div>
@@ -312,18 +367,10 @@ export const OrderDashboard: React.FC = () => {
                                         <div>${((article.quantity || 1) * (article.price || 0)).toFixed(2)}</div>
                                     </div>
                                 ))}
-                                {/* Mostrar orderDetails si existe (por compatibilidad) */}
-                                {selectedOrder.orderDetails?.map((detail: any, idx: number) => (
-                                    <div className="order-modal-row" key={`detail-${idx}`}>
-                                        <div>{detail.articleName ?? detail.manufacturedArticleName ?? `ID: ${detail.manufacturedArticleId}`}</div>
-                                        <div>{detail.quantity}</div>
-                                        <div>${(detail.unitPrice ?? detail.price ?? 0).toFixed(2)}</div>
-                                        <div>${(detail.subTotal ?? (detail.quantity * (detail.unitPrice ?? detail.price ?? 0))).toFixed(2)}</div>
-                                    </div>
-                                ))}
                                 
                             </div>
                         </div>
+
                         <div className="order-modal-section">
                             <div className="section-title">
                                 <span role="img" aria-label="Estado">🗂️</span> Estado
@@ -334,30 +381,13 @@ export const OrderDashboard: React.FC = () => {
                                     onChange={e => setEditState(e.target.value)}
                                     style={{ minWidth: 160, padding: '6px', borderRadius: 6, border: '1px solid #ccc' }}
                                 >
-                                    {isCashier
-                                        ? cashierStates.map(opt => (
-                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                        ))
-                                        : isChef
-                                            ? chefStates.map(opt => (
-                                                <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                            ))
-                                            : (
-                                                <>
-                                                    <option value="PENDING">PENDIENTE</option>
-                                                    <option value="PREPARING">EN COCINA</option>
-                                                    <option value="ARRIVED">LISTO PARA ENTREGAR</option>
-                                                    <option value="BILLED">FACTURADO</option>
-                                                    <option value="READY_FOR_DELIVERY">LISTO PARA DELIVERY</option>
-                                                    <option value="ON_THE_WAY">EN CAMINO</option>
-                                                    <option value="CANCELED">CANCELADO</option>
-                                                    <option value="REJECTED">RECHAZADO</option>
-                                                </>
-                                            )
-                                    }
+                                    {getStateOptionsForRole().map(opt => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
+
                         <div className="order-actions" style={{ marginTop: 24 }}>
                             <Button variant="primary" type="submit">
                                 Guardar
