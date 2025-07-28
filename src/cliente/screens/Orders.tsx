@@ -6,10 +6,12 @@ import type { ITableColumn } from '../../administracion-sistema/components/crud/
 import { InputField } from '../../administracion-sistema/components/common/InputField';
 import { SelectField } from '../../administracion-sistema/components/common/SelectField';
 import type { ISelectOption } from '../../administracion-sistema/components/crud/GenericForm.types';
+import { FormModal } from '../../administracion-sistema/components/common/FormModal'; // ✅ Importar FormModal
+import { Button } from '../../administracion-sistema/components/common/Button'; // ✅ Importar Button
 
 import { orderApi } from '../../administracion-sistema/api/order';
 import { useCrud } from '../../administracion-sistema/hooks/useCrud';
-import { type IOrder } from '../../administracion-sistema/api/types/IOrder';
+import { OrderState, type IOrder } from '../../administracion-sistema/api/types/IOrder';
 import { useUser } from '../components/UserContext'; // ✅ Importar el hook de usuario
 
 import '../styles/Orders.css';
@@ -26,6 +28,8 @@ export const Orders: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('TODOS');
     const [deliveryTypeFilter, setDeliveryTypeFilter] = useState('TODOS');
+    const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null); // ✅ Estado para la orden seleccionada
+    const [isModalOpen, setIsModalOpen] = useState(false); // ✅ Estado para el modal
 
     useEffect(() => {
         fetchData();
@@ -84,7 +88,64 @@ export const Orders: React.FC = () => {
             id: 'tipoEntrega',
             label: 'Tipo Entrega',
         },
+        // ✅ Columna de acciones actualizada
+        {
+            id: "acciones" as const,
+            label: "Acciones",
+            render: (item) => (
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <Button
+                        variant="actions"
+                        size="small"
+                        onClick={() => {
+                            setSelectedOrder(item);
+                            setIsModalOpen(true);
+                        }}
+                        title="Ver detalles"
+                    >
+                        <img
+                            src="/icons/eye-on.svg"
+                            alt="Ver"
+                            style={{
+                                width: '18px',
+                                height: '18px',
+                                filter: 'invert(52%) sepia(94%) saturate(636%) hue-rotate(1deg) brightness(103%) contrast(102%)'
+                            }}
+                        />
+                    </Button>
+                    
+                    {/* ✅ Botón de cancelar orden - solo mostrar si la orden se puede cancelar */}
+                    {(item.orderState === 'PENDING' || item.orderState === 'PREPARING') && (
+                        <Button
+                            variant="danger"
+                            size="small"
+                            onClick={async () => {
+                                if (window.confirm('¿Estás seguro de que deseas cancelar esta orden?')) {
+                                    await handleCancelOrder(item);
+                                }
+                            }}
+                            title="Cancelar orden"
+                        >
+                            Cancelar
+                        </Button>
+                    )}
+                </div>
+            )
+        }
     ], []);
+
+    // ✅ Función para cancelar una orden actualizada
+    const handleCancelOrder = async (order: IOrder) => {
+        try {
+            await orderApi.updateOrderState(order.id, OrderState.CANCELED);
+            await fetchData(); // Recargar los datos
+            
+            alert('Orden cancelada exitosamente');
+        } catch (error) {
+            console.error('Error al cancelar la orden:', error);
+            alert('Error al cancelar la orden. Por favor, intenta nuevamente.');
+        }
+    };
 
     // ✅ Verificar si el usuario está logueado
     if (!profile) {
@@ -130,6 +191,86 @@ export const Orders: React.FC = () => {
             </div>
 
             <GenericTable data={filteredOrders} columns={orderColumns} />
+
+            {/* ✅ Modal de detalles */}
+            <FormModal
+                isOpen={isModalOpen && !!selectedOrder}
+                onClose={() => setIsModalOpen(false)}
+                title={selectedOrder ? `Detalle de Orden #${selectedOrder.id}` : ''}
+                onSubmit={async (e) => {
+                    e.preventDefault();
+                    setIsModalOpen(false);
+                }}
+            >
+                {selectedOrder && (
+                    <div className="order-modal-custom">
+                        <div className="order-modal-section">
+                            <div className="section-title">
+                                <span role="img" aria-label="Cliente">👤</span> Cliente
+                            </div>
+                            <div className="order-modal-table">
+                                <div className="order-modal-row order-modal-header">
+                                    <div>Nombre</div>
+                                    <div>Dirección</div>
+                                    <div>Teléfono</div>
+                                </div>
+                                <div className="order-modal-row">
+                                    <div>{selectedOrder.client?.firstName} {selectedOrder.client?.lastName}</div>
+                                    <div>{selectedOrder.directionToSend ?? '-'}</div>
+                                    <div>{selectedOrder.client?.phoneNumber}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="order-modal-section">
+                            <div className="section-title">
+                                <span role="img" aria-label="Pedido">📋</span> Información del Pedido
+                            </div>
+                            <div className="order-modal-table">
+                                <div className="order-modal-row order-modal-header">
+                                    <div>Fecha</div>
+                                    <div>Estado</div>
+                                    <div>Tipo</div>
+                                    <div>Total</div>
+                                </div>
+                                <div className="order-modal-row">
+                                    <div>{selectedOrder.orderDate}</div>
+                                    <div>{selectedOrder.orderState}</div>
+                                    <div>{selectedOrder.orderType}</div>
+                                    <div>${selectedOrder.total.toFixed(2)}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="order-modal-section">
+                            <div className="section-title">
+                                <span role="img" aria-label="Productos">🍕</span> Productos
+                            </div>
+                            <div className="order-modal-table">
+                                <div className="order-modal-row order-modal-header">
+                                    <div>Producto</div>
+                                    <div>Cantidad</div>
+                                    <div>Precio</div>
+                                </div>
+                                {selectedOrder.manufacturedArticles?.map((article: any, idx: number) => (
+                                    <div className="order-modal-row" key={idx}>
+                                        <div>{article.name || 'Producto'}</div>
+                                        <div>{article.quantityOrdered || 1}</div>
+                                        <div>${article.price?.toFixed(2) || '0.00'}</div>
+                                    </div>
+                                ))}
+                                {selectedOrder.orderedArticles?.map((article: any, idx: number) => (
+                                    <div className="order-modal-row" key={`ordered-${idx}`}>
+                                        <div>{article.name || 'Artículo'}</div>
+                                        <div>{article.quantity || 1}</div>
+                                        <div>${article.price?.toFixed(2) || '0.00'}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </FormModal>
         </div>
     );
 };

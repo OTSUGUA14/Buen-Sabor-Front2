@@ -1,4 +1,4 @@
-import { type IOrder } from './types/IOrder.ts';
+import { OrderState, type IOrder } from './types/IOrder.ts';
 
 const BASE_URL = 'http://localhost:8080/api/orders';
 
@@ -51,5 +51,22 @@ export const orderApi = {
         await fetch(`${BASE_URL}/${id}`, {
             method: 'DELETE',
         });
+    },
+
+    // ✅ Método corregido para cambiar estado de la orden
+    updateOrderState: async (orderId: number, newState: OrderState): Promise<IOrder> => {
+        const response = await fetch(`${BASE_URL}/orderState/${orderId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newState), // ✅ Enviar solo el string del estado, no un objeto
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al actualizar el estado de la orden');
+        }
+        
+        return await response.json();
     },
 };
