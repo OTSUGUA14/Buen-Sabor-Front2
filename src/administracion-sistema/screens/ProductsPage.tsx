@@ -96,16 +96,15 @@ export const ProductsPage: React.FC = () => {
             render: (item) => item.category?.name ?? 'Sin categoría'
         },
 
-        {
-            id: 'price',
-            label: 'Precio Venta',
-            numeric: true,
-            render: (item) =>
-                typeof item.price === 'number'
-                    ? `$${item.price.toFixed(2)}`
-                    : 'Sin precio'
-        }
-        ,
+        // {
+        //     id: 'price',
+        //     label: 'Precio Venta',
+        //     numeric: true,
+        //     render: (item) =>
+        //         typeof item.price === 'number'
+        //             ? `$${item.price.toFixed(2)}`
+        //             : 'Sin precio'
+        // },
         {
             id: 'isAvailable',
             label: 'Estado',
@@ -143,16 +142,16 @@ export const ProductsPage: React.FC = () => {
         {
             name: 'description',
             label: 'Descripción',
-            type: 'textarea',
+            type: 'text',
             validation: { required: true, minLength: 5 },
             placeholder: 'Ej: Jugosa hamburguesa con lechuga, tomate y queso.',
         },
-        {
-            name: 'price',
-            label: 'Precio Venta',
-            type: 'number',
-            validation: { required: true, min: 0 }
-        },
+        // {
+        //     name: 'price',
+        //     label: 'Precio Venta',
+        //     type: 'number',
+        //     validation: { required: true, min: 0 }
+        // },
         {
             name: 'estimatedTimeMinutes',
             label: 'Tiempo Estimado (minutos)',
@@ -463,17 +462,17 @@ export const ProductsPage: React.FC = () => {
                         <InputField
                             label="Descripción"
                             name="description"
-                            type="textarea"
+                            type="text"
                             value={productToView.description ?? ''}
                             disabled
                         />
-                        <InputField
+                        {/* <InputField
                             label="Precio Venta"
                             name="price"
                             type="number"
                             value={productToView.price?.toString() ?? ''}
                             disabled
-                        />
+                        /> */}
                         <InputField
                             label="Tiempo Estimado (minutos)"
                             name="estimatedTimeMinutes"
