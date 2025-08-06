@@ -32,9 +32,9 @@ export const SalesPage: React.FC = () => {
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [products, setProducts] = useState<IProduct[]>([]);
-    const [selectedProducts, setSelectedProducts] = useState<IProduct[]>([]);
+    const [selectedProducts, setSelectedProducts] = useState<{product: IProduct, quantity: number}[]>([]);
     const [articles, setArticles] = useState<IArticle[]>([]);
-    const [selectedArticles, setSelectedArticles] = useState<IArticle[]>([]);
+    const [selectedArticles, setSelectedArticles] = useState<{article: IArticle, quantity: number}[]>([]);
 
     // ESTADO PARA MODAL DE VISTA (SOLO LECTURA)
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -199,19 +199,25 @@ export const SalesPage: React.FC = () => {
 
 
     const handleEdit = (sale: ISale) => {
-        // Para productos
+        // Para productos - mantener las cantidades
         const manufacturedProducts = sale.saleDetails
             ? sale.saleDetails
                 .filter((d: any) => d.manufacturedArticle && d.manufacturedArticle.idmanufacturedArticle)
-                .map((d: any) => products.find(p => p.idmanufacturedArticle === d.manufacturedArticle.idmanufacturedArticle))
+                .map((d: any) => {
+                    const product = products.find(p => p.idmanufacturedArticle === d.manufacturedArticle.idmanufacturedArticle);
+                    return product ? { product, quantity: d.quantity || 1 } : null;
+                })
                 .filter(Boolean)
             : [];
 
-        // Para artículos
+        // Para artículos - mantener las cantidades
         const promoArticles = sale.saleDetails
             ? sale.saleDetails
                 .filter((d: any) => d.article && d.article.idarticle)
-                .map((d: any) => articles.find(a => a.idarticle === d.article.idarticle))
+                .map((d: any) => {
+                    const article = articles.find(a => a.idarticle === d.article.idarticle);
+                    return article ? { article, quantity: d.quantity || 1 } : null;
+                })
                 .filter(Boolean)
             : [];
 
@@ -227,8 +233,8 @@ export const SalesPage: React.FC = () => {
             endTime: sale.endTime,
             inventoryImage: null,
         });
-        setSelectedProducts(manufacturedProducts as IProduct[]);
-        setSelectedArticles(promoArticles as IArticle[]);
+        setSelectedProducts(manufacturedProducts as {product: IProduct, quantity: number}[]);
+        setSelectedArticles(promoArticles as {article: IArticle, quantity: number}[]);
         if (sale.inventoryImage?.imageData) {
             setImagePreview(`data:image/jpeg;base64,${sale.inventoryImage.imageData}`);
         } else {
@@ -305,16 +311,16 @@ export const SalesPage: React.FC = () => {
                 inventoryImage = { imageData: saleToEdit.inventoryImage.imageData };
             }
 
-            // Construir saleDetails
+            // Construir saleDetails con cantidades
             const saleDetails = [
-                ...selectedProducts.map(p => ({
-                    id: p.idmanufacturedArticle,
-                    quantity: 1, // Puedes cambiar esto si quieres permitir editar la cantidad
+                ...selectedProducts.map(item => ({
+                    id: item.product.idmanufacturedArticle,
+                    quantity: item.quantity,
                     type: "MANUFACTURED"
                 })),
-                ...selectedArticles.map(a => ({
-                    id: a.idarticle,
-                    quantity: 1, // Puedes cambiar esto si quieres permitir editar la cantidad
+                ...selectedArticles.map(item => ({
+                    id: item.article.idarticle,
+                    quantity: item.quantity,
                     type: "ARTICLE"
                 }))
             ];
@@ -408,9 +414,21 @@ export const SalesPage: React.FC = () => {
                 {/* Productos de la promo */}
                 <div style={{ marginBottom: 16 }}>
                     <label>Productos en la promo:</label>
-                    {selectedProducts.map((prod, idx) => (
-                        <div key={prod.idmanufacturedArticle} style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
-                            <span style={{ marginRight: 8 }}>{prod.name}</span>
+                    {selectedProducts.map((item, idx) => (
+                        <div key={`${item.product.idmanufacturedArticle}-${idx}`} style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: '8px' }}>
+                            <span style={{ flex: 1 }}>{item.product.name}</span>
+                            <input
+                                type="number"
+                                min="1"
+                                value={item.quantity}
+                                onChange={(e) => {
+                                    const newQuantity = parseInt(e.target.value) || 1;
+                                    setSelectedProducts(selectedProducts.map((p, i) => 
+                                        i === idx ? { ...p, quantity: newQuantity } : p
+                                    ));
+                                }}
+                                style={{ width: '60px', padding: '4px' }}
+                            />
                             <Button
                                 variant="danger"
                                 type="button"
@@ -420,34 +438,46 @@ export const SalesPage: React.FC = () => {
                             </Button>
                         </div>
                     ))}
-                    <select
-                        style={{ marginRight: 8, marginTop: 8 }}
-                        defaultValue=""
-                        onChange={e => {
-                            const prod = products.find(p => p.idmanufacturedArticle === Number(e.target.value));
-                            if (prod && !selectedProducts.some(p => p.idmanufacturedArticle === prod.idmanufacturedArticle)) {
-                                setSelectedProducts([...selectedProducts, prod]);
-                            }
-                            e.target.value = "";
-                        }}
-                    >
-                        <option value="" disabled>Agregar producto...</option>
-                        {products
-                            .filter(p => !selectedProducts.some(sp => sp.idmanufacturedArticle === p.idmanufacturedArticle))
-                            .map(p => (
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: 8 }}>
+                        <select
+                            style={{ flex: 1 }}
+                            defaultValue=""
+                            onChange={e => {
+                                const product = products.find(p => p.idmanufacturedArticle === Number(e.target.value));
+                                if (product) {
+                                    setSelectedProducts([...selectedProducts, { product, quantity: 1 }]);
+                                }
+                                e.target.value = "";
+                            }}
+                        >
+                            <option value="" disabled>Agregar producto...</option>
+                            {products.map(p => (
                                 <option key={p.idmanufacturedArticle} value={p.idmanufacturedArticle}>
                                     {p.name}
                                 </option>
                             ))}
-                    </select>
+                        </select>
+                    </div>
                 </div>
 
                 {/* Artículos de la promo */}
                 <div style={{ marginBottom: 16 }}>
                     <label>Artículos en la promo:</label>
-                    {selectedArticles.map((art, idx) => (
-                        <div key={art.idarticle} style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
-                            <span style={{ marginRight: 8 }}>{art.denomination}</span>
+                    {selectedArticles.map((item, idx) => (
+                        <div key={`${item.article.idarticle}-${idx}`} style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: '8px' }}>
+                            <span style={{ flex: 1 }}>{item.article.denomination}</span>
+                            <input
+                                type="number"
+                                min="1"
+                                value={item.quantity}
+                                onChange={(e) => {
+                                    const newQuantity = parseInt(e.target.value) || 1;
+                                    setSelectedArticles(selectedArticles.map((a, i) => 
+                                        i === idx ? { ...a, quantity: newQuantity } : a
+                                    ));
+                                }}
+                                style={{ width: '60px', padding: '4px' }}
+                            />
                             <Button
                                 variant="danger"
                                 type="button"
@@ -457,26 +487,26 @@ export const SalesPage: React.FC = () => {
                             </Button>
                         </div>
                     ))}
-                    <select
-                        style={{ marginRight: 8, marginTop: 8 }}
-                        defaultValue=""
-                        onChange={e => {
-                            const art = articles.find(a => a.idarticle === Number(e.target.value));
-                            if (art && !selectedArticles.some(a => a.idarticle === art.idarticle)) {
-                                setSelectedArticles([...selectedArticles, art]);
-                            }
-                            e.target.value = "";
-                        }}
-                    >
-                        <option value="" disabled>Agregar artículo...</option>
-                        {articles
-                            .filter(a => !selectedArticles.some(sa => sa.idarticle === a.idarticle))
-                            .map(a => (
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: 8 }}>
+                        <select
+                            style={{ flex: 1 }}
+                            defaultValue=""
+                            onChange={e => {
+                                const article = articles.find(a => a.idarticle === Number(e.target.value));
+                                if (article) {
+                                    setSelectedArticles([...selectedArticles, { article, quantity: 1 }]);
+                                }
+                                e.target.value = "";
+                            }}
+                        >
+                            <option value="" disabled>Agregar artículo...</option>
+                            {articles.map(a => (
                                 <option key={a.idarticle} value={a.idarticle}>
                                     {a.denomination}
                                 </option>
                             ))}
-                    </select>
+                        </select>
+                    </div>
                 </div>
 
                 <Button variant="primary" type="submit">
