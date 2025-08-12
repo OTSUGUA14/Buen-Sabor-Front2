@@ -133,7 +133,7 @@ export const SalesPage: React.FC = () => {
         {
             name: 'saleDescription',
             label: 'Descripción',
-            type: 'textarea',
+            type: 'text',
             validation: { required: true, minLength: 5 }
         },
         {
@@ -534,7 +534,7 @@ export const SalesPage: React.FC = () => {
                         <InputField
                             label="Descripción"
                             name="saleDescription"
-                            type="textarea"
+                            type="text"
                             value={saleToView.saleDescription ?? ''}
                             disabled
                         />
