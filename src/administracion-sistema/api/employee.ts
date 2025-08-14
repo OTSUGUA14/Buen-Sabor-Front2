@@ -15,13 +15,20 @@ export const employeeApi = {
         return res.json();
     },
 
-    create: async (employee: Omit<IEmployee, 'id' | 'domiciles'>): Promise<IEmployee> => {
-        // Cambia 'name' por 'firstName' y 'employeeRole' por 'role'
-        const { name, employeeRole, ...rest } = employee as any;
+    create: async (employee: Omit<IEmployee, 'id'>): Promise<IEmployee> => {
+        // Mapear campos del frontend al DTO del backend
         const employeeToSend = {
-            ...rest,
-            firstName: name,
-            ...(employeeRole && { role: employeeRole }) // solo agrega 'role' si existe 'employeeRole'
+            firstName: employee.name,        // name -> firstName
+            lastName: employee.lastName,
+            phoneNumber: employee.phoneNumber,
+            email: employee.email,
+            birthDate: new Date(employee.birthDate).toISOString(), // Convertir a ISO string
+            domiciles: [],                   // Array vacío como requiere el DTO
+            username: employee.username,
+            password: employee.password,
+            role: employee.employeeRole,     // employeeRole -> role
+            salary: employee.salary,
+            shift: employee.shift,
         };
 
         const res = await fetch('http://localhost:8080/employee/register', {
@@ -29,20 +36,41 @@ export const employeeApi = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(employeeToSend),
         });
-        
 
-        if (!res.ok) throw new Error('Error al crear empleado');
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Error al crear empleado: ${errorText}`);
+        }
         return res.json();
     },
 
     update: async (employee: IEmployee): Promise<IEmployee> => {
         const { id, ...rest } = employee;
+        
+        // Mapear campos para la actualización si es necesario
+        const updateData = {
+            firstName: rest.name,
+            lastName: rest.lastName,
+            phoneNumber: rest.phoneNumber,
+            email: rest.email,
+            birthDate: new Date(rest.birthDate).toISOString(),
+            username: rest.username,
+            password: rest.password,
+            role: rest.employeeRole,
+            salary: rest.salary,
+            shift: rest.shift,
+        };
+
         const res = await fetch(`http://localhost:8080/employee/update/${id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(rest),
+            body: JSON.stringify(updateData),
         });
-        if (!res.ok) throw new Error('Error al actualizar empleado');
+        
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Error al actualizar empleado: ${errorText}`);
+        }
         return res.json();
     },
 

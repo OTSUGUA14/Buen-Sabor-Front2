@@ -1,7 +1,7 @@
 // src/administracion-sistema/api/types/IEmployee.ts
 
 export type Role = 'ADMIN' | 'CASHIER' | 'CHEF' | 'DRIVER';
-export type Shift = 'MORNING' | 'AFTERNOON' | 'NIGHT';
+export type Shift = 'MORNING' | 'EVENING' | 'NIGHT';
 
 export interface IEmployee {
     id: number;
@@ -17,7 +17,6 @@ export interface IEmployee {
     password: string;
     domiciles: any[]; 
 }
-
 
 // public enum Role {
 //     ADMIN, CASHIER, CHEF, DRIVER
