@@ -2,7 +2,6 @@
 
 import type { IArticle } from './types/IArticle';
 
-
 const BASE_URL = 'http://localhost:8080/article';
 
 async function handleResponse<T>(response: Response): Promise<T> {
@@ -12,7 +11,6 @@ async function handleResponse<T>(response: Response): Promise<T> {
     }
     return response.json();
 }
-
 
 export const supplyApi = {
     getAll: async (): Promise<IArticle[]> => {
@@ -33,36 +31,36 @@ export const supplyApi = {
         return handleResponse<IArticle>(res);
     },
 
-
     create: async (item: Omit<IArticle, "id">): Promise<IArticle> => {
-        // Construye el objeto con la estructura requerida por el backend
-        const payload: any = {
+        console.log('=== INICIO supplyApi.create ===');
+        console.log('Item recibido:', item);
+
+        // SIEMPRE incluir inventoryImageDTO, nunca como null
+        let inventoryImageDTO = { imageData: "" }; // Valor por defecto
+
+        // Solo si es para venta Y tiene imagen, sobrescribir
+        if (item.forSale && item.inventoryImage?.imageData) {
+            let imageData = item.inventoryImage.imageData;
+            if (typeof imageData === 'string' && imageData.startsWith('data:image')) {
+                const base64 = imageData.split(',')[1];
+                inventoryImageDTO = { imageData: base64 };
+            } else {
+                inventoryImageDTO = { imageData };
+            }
+        }
+
+        const payload = {
             denomination: item.denomination,
             currentStock: item.currentStock,
             maxStock: item.maxStock,
             buyingPrice: item.buyingPrice,
-            measuringUnit: Number(item.measuringUnit?.idmeasuringUnit), // solo el id
-            category: Number(item.category?.idcategory),                // solo el id
-            isForSale: item.forSale ?? false,         // usa isForSale
+            measuringUnit: Number(item.measuringUnit?.idmeasuringUnit),
+            category: Number(item.category?.idcategory),
+            isForSale: item.forSale ?? false,
+            inventoryImageDTO, // NUNCA null, siempre un objeto
         };
 
-        // Solo agrega inventoryImageDTO si corresponde y si es para venta
-        if (
-            ( item.forSale) &&
-            item.inventoryImage &&
-            typeof item.inventoryImage === 'object' &&
-            'imageData' in item.inventoryImage &&
-            item.inventoryImage.imageData
-        ) {
-            // Si la imagen viene como dataURL, extrae solo la parte base64
-            let imageData = item.inventoryImage.imageData;
-            if (typeof imageData === 'string' && imageData.startsWith('data:image')) {
-                const base64 = imageData.split(',')[1];
-                payload.inventoryImageDTO = { imageData: base64 };
-            } else {
-                payload.inventoryImageDTO = { imageData };
-            }
-        }
+        console.log('Payload enviado al backend:', payload);
 
         const res = await fetch(`${BASE_URL}/add`, {
             method: 'POST',
@@ -71,40 +69,47 @@ export const supplyApi = {
             body: JSON.stringify(payload),
         });
 
+        console.log('Response status:', res.status);
 
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('Error response:', errorText);
+            throw new Error(`Error al crear artículo: ${errorText}`);
+        }
+
+        const result = await handleResponse<IArticle>(res);
+        console.log('Resultado exitoso:', result);
+        console.log('=== FIN supplyApi.create ===');
+        
         window.alert('Artículo agregado correctamente');
-        return handleResponse<IArticle>(res);
+        return result;
     },
 
     update: async (updatedItem: IArticle): Promise<IArticle> => {
-        // Construye el objeto con la estructura requerida por el backend
-        const payload: any = {
+        // SIEMPRE incluir inventoryImageDTO, nunca como null
+        let inventoryImageDTO = { imageData: "" }; // Valor por defecto
+
+        // Solo si es para venta Y tiene imagen, sobrescribir
+        if (updatedItem.forSale && updatedItem.inventoryImage?.imageData) {
+            let imageData = updatedItem.inventoryImage.imageData;
+            if (typeof imageData === 'string' && imageData.startsWith('data:image')) {
+                const base64 = imageData.split(',')[1];
+                inventoryImageDTO = { imageData: base64 };
+            } else {
+                inventoryImageDTO = { imageData };
+            }
+        }
+
+        const payload = {
             denomination: updatedItem.denomination,
             currentStock: updatedItem.currentStock,
             maxStock: updatedItem.maxStock,
             buyingPrice: updatedItem.buyingPrice,
-            measuringUnit: Number(updatedItem.measuringUnit?.idmeasuringUnit), // solo el id
-            category: Number(updatedItem.category?.idcategory),                // solo el id
-            isForSale: updatedItem.forSale ?? false, // usa isForSale
+            measuringUnit: Number(updatedItem.measuringUnit?.idmeasuringUnit),
+            category: Number(updatedItem.category?.idcategory),
+            isForSale: updatedItem.forSale ?? false,
+            inventoryImageDTO, // NUNCA null, siempre un objeto
         };
-
-        // Solo agrega inventoryImageDTO si corresponde y si es para venta
-        if (
-            (updatedItem.forSale) &&
-            updatedItem.inventoryImage &&
-            typeof updatedItem.inventoryImage === 'object' &&
-            'imageData' in updatedItem.inventoryImage &&
-            updatedItem.inventoryImage.imageData
-        ) {
-            // Si la imagen viene como dataURL, extrae solo la parte base64
-            let imageData = updatedItem.inventoryImage.imageData;
-            if (typeof imageData === 'string' && imageData.startsWith('data:image')) {
-                const base64 = imageData.split(',')[1];
-                payload.inventoryImageDTO = { imageData: base64 };
-            } else {
-                payload.inventoryImageDTO = { imageData };
-            }
-        }
 
         const res = await fetch(`${BASE_URL}/update/${updatedItem.idarticle}`, {
             method: 'PATCH',
@@ -112,8 +117,12 @@ export const supplyApi = {
             mode: 'cors',
             body: JSON.stringify(payload),
         });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Error al actualizar artículo: ${errorText}`);
+        }
+
         return handleResponse<IArticle>(res);
     },
-
-  
 };

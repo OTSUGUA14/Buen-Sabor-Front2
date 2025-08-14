@@ -1,4 +1,3 @@
-
 import './styles/InputField.css';
 
 interface Option {
@@ -23,7 +22,8 @@ interface InputFieldProps {
     disabled?: boolean;
     readOnly?: boolean;
     className?: string;
-    options?: Option[]; // 🆕
+    options?: Option[]; 
+    step?: string; 
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -39,6 +39,7 @@ export const InputField: React.FC<InputFieldProps> = ({
     readOnly,
     className,
     options, // 🆕
+    step, // Add this parameter
 }) => {
     return (
         <div className={`input-field-container ${className || ''}`}>
@@ -76,9 +77,9 @@ export const InputField: React.FC<InputFieldProps> = ({
                     onBlur={onBlur}
                     placeholder={placeholder}
                     disabled={disabled}
-                    
                     readOnly={readOnly}
                     className={error ? 'input-error' : ''}
+                    step={step}
                 />
             )}
 

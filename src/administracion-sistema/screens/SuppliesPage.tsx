@@ -227,79 +227,96 @@ export const SuppliesPage: React.FC = () => {
         setIsModalOpen(true);
     };
 
-    const handleFormSubmit = async (formData: Partial<IArticle>) => {
-        const id = supplyToEdit?.id || Math.floor(Math.random() * 1e9);
+    const handleFormSubmit = async (e?: React.FormEvent) => {
+        if (e) {
+            e.preventDefault();
+        }
 
-
-        const unit = formData.measuringUnit as unknown as number; // Debe ser el id de la unidad
-        const categoriaId = formData.category as unknown as number; // Debe ser el id de la categoría
-        const forSale = String(formData.forSale) === "true"; // Puede venir como string
-        let inventoryImage = null;
-        if (formData.inventoryImage) {
-            const img = formData.inventoryImage;
-            if (img instanceof File) {
-                // Si es un archivo nuevo, conviértelo a base64 y arma el objeto esperado
-                const imageData = await new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result as string);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(img);
-                });
-                inventoryImage = { IDInventoryImage: 0, imageData };
-            } else if (
-                typeof img === 'object' &&
-                img !== null &&
-                'imageData' in img
-            ) {
-                // Si viene del backend, ya tiene imageData
-                inventoryImage = img;
+        // Validaciones básicas
+        const requiredFields = ['denomination', 'measuringUnit', 'currentStock', 'maxStock', 'buyingPrice', 'category', 'forSale'];
+        
+        for (const field of requiredFields) {
+            if (!formValues[field] || formValues[field].toString().trim() === '') {
+                alert(`El campo "${field}" es obligatorio`);
+                return;
             }
         }
 
-        if (supplyToEdit) {
-            // Si se edita, envía el objeto completo como antes
-            const submitData: IArticle = {
-                id,
-                idarticle: formData.idarticle,
-                denomination: formData.denomination!,
-                measuringUnit: {
-                    unit: typeof unit === "string" ? unit : "",
-                    idmeasuringUnit: typeof unit === "number" ? unit : 0,
-                },
-                currentStock: Number(formData.currentStock),
-                maxStock: Number(formData.maxStock),
-                buyingPrice: Number(formData.buyingPrice),
-                category: {
-                    name: "",
-                    idcategory: typeof categoriaId === "number" ? categoriaId : 0,
-                },
-                forSale,
-                inventoryImage,
-            };
-            await updateItem(submitData);
-        } else {
-            // Si es creación, solo envía los valores simples
-            const submitData: Omit<IArticle, "id"> = {
-                denomination: formData.denomination!,
-                currentStock: Number(formData.currentStock),
-                maxStock: Number(formData.maxStock),
-                buyingPrice: Number(formData.buyingPrice),
-                measuringUnit: {
-                    unit: "", // o el valor real si lo tienes
-                    idmeasuringUnit: unit,
-                },
-                category: {
-                    name: "", // o el valor real si lo tienes
-                    idcategory: categoriaId,
-                },
-                forSale,
-                inventoryImage,
-            };
-            await createItem(submitData);
+        try {
+            const id = supplyToEdit?.id || Math.floor(Math.random() * 1e9);
+            const unit = Number(formValues.measuringUnit);
+            const categoriaId = Number(formValues.category);
+            const forSale = String(formValues.forSale) === "true";
+            
+            let inventoryImage = null;
+            if (forSale && formValues.inventoryImage) {
+                const img = formValues.inventoryImage;
+                if (img instanceof File) {
+                    // Si es un archivo nuevo, conviértelo a base64
+                    const imageData = await new Promise<string>((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result as string);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(img);
+                    });
+                    inventoryImage = { IDInventoryImage: 0, imageData };
+                } else if (typeof img === 'object' && img !== null && 'imageData' in img) {
+                    inventoryImage = img;
+                }
+            }
+
+            if (supplyToEdit) {
+                // Modo edición
+                const submitData: IArticle = {
+                    id,
+                    idarticle: formValues.idarticle,
+                    denomination: formValues.denomination,
+                    measuringUnit: {
+                        unit: "",
+                        idmeasuringUnit: unit,
+                    },
+                    currentStock: Number(formValues.currentStock),
+                    maxStock: Number(formValues.maxStock),
+                    buyingPrice: Number(formValues.buyingPrice),
+                    category: {
+                        name: "",
+                        idcategory: categoriaId,
+                    },
+                    forSale,
+                    inventoryImage,
+                };
+                await updateItem(submitData);
+            } else {
+                // Modo creación
+                const submitData: Omit<IArticle, "id"> = {
+                    denomination: formValues.denomination,
+                    currentStock: Number(formValues.currentStock),
+                    maxStock: Number(formValues.maxStock),
+                    buyingPrice: Number(formValues.buyingPrice),
+                    measuringUnit: {
+                        unit: "",
+                        idmeasuringUnit: unit,
+                    },
+                    category: {
+                        name: "",
+                        idcategory: categoriaId,
+                    },
+                    forSale,
+                    inventoryImage,
+                };
+                await createItem(submitData);
+            }
+
+            // Cerrar modal y limpiar estados
+            setIsModalOpen(false);
+            setSupplyToEdit(null);
+            setFormValues({});
+            setImagePreview(null);
+            fetchData();
+        } catch (error) {
+            console.error('Error al guardar insumo:', error);
+            alert('Error al guardar insumo: ' + (error as Error).message);
         }
-        setIsModalOpen(false);
-        setSupplyToEdit(null);
-        fetchData();
     };
 
     const handleInputChange = (
@@ -355,48 +372,98 @@ export const SuppliesPage: React.FC = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title={supplyToEdit ? 'Editar Insumo' : 'Crear Insumo'}
-                onSubmit={async (e) => {
-                    e.preventDefault();
-                    await handleFormSubmit(formValues);
-                }}
+                onSubmit={undefined}
             >
-                {supplyFormFields.map(field => {
-                    // Oculta el campo de imagen si no es para venta
-                    if (
-                        field.name === 'inventoryImage' &&
-                        String(formValues.forSale) !== "true"
-                    ) {
-                        return null;
-                    }
-                    const isFileInput = field.type === 'file';
-                    return (
+                <form onSubmit={handleFormSubmit}>
+                    <SelectField
+                        label="Unidad de Medida"
+                        name="measuringUnit"
+                        options={[{ value: '', label: 'Seleccionar unidad' }, ...measuringUnitOptions]}
+                        value={formValues.measuringUnit ?? ''}
+                        onChange={handleInputChange}
+                    />
+                    <InputField
+                        label="Nombre"
+                        name="denomination"
+                        type="text"
+                        value={formValues.denomination ?? ''}
+                        onChange={handleInputChange}
+                    />
+                    <InputField
+                        label="Stock Actual"
+                        name="currentStock"
+                        type="number"
+                        value={formValues.currentStock ?? ''}
+                        onChange={handleInputChange}
+                    />
+                    <InputField
+                        label="Stock Máximo"
+                        name="maxStock"
+                        type="number"
+                        value={formValues.maxStock ?? ''}
+                        onChange={handleInputChange}
+                    />
+                    <InputField
+                        label="Precio Compra"
+                        name="buyingPrice"
+                        type="number"
+                        step="0.01"
+                        value={formValues.buyingPrice ?? ''}
+                        onChange={handleInputChange}
+                    />
+                    <SelectField
+                        label="Categoría"
+                        name="category"
+                        options={[{ value: '', label: 'Seleccionar categoría' }, ...categoryOptions.filter(opt => opt.value !== 'TODOS')]
+                        }
+                        value={formValues.category ?? ''}
+                        onChange={handleInputChange}
+                    />
+                    <SelectField
+                        label="¿Para venta?"
+                        name="forSale"
+                        options={[
+                            { value: '', label: 'Seleccionar opción' },
+                            { value: "true", label: 'Sí' },
+                            { value: "false", label: 'No' }
+                        ]}
+                        value={formValues.forSale ?? ''}
+                        onChange={handleInputChange}
+                    />
+                    
+                    {/* Campo de imagen solo si es para venta */}
+                    {String(formValues.forSale) === "true" && (
                         <InputField
-                            key={field.name}
-                            label={field.label}
-                            name={field.name}
-                            type={field.type as any}
+                            label="Imagen"
+                            name="inventoryImage"
+                            type="file"
                             onChange={handleInputChange}
-                            options={field.type === 'select' ? field.options || [] : undefined}
-                            {...(!isFileInput ? { value: formValues[field.name] ?? '' } : {})}
                         />
-                    );
-                })}
+                    )}
 
-                {/* Previsualización de la imagen solo si es para venta */}
-                {String(formValues.forSale) === "true" && imagePreview && (
-                    <div style={{ marginBottom: 16 }}>
-                        <label>Vista previa de la imagen:</label>
-                        <img
-                            src={imagePreview}
-                            alt="Vista previa"
-                            style={{ maxWidth: 200, maxHeight: 200, display: 'block', marginTop: 8 }}
-                        />
-                    </div>
-                )}
+                    {/* Previsualización de la imagen */}
+                    {String(formValues.forSale) === "true" && imagePreview && (
+                        <div style={{ marginBottom: 16 }}>
+                            <label>Vista previa de la imagen:</label>
+                            <img
+                                src={imagePreview}
+                                alt="Vista previa"
+                                style={{ maxWidth: 200, maxHeight: 200, display: 'block', marginTop: 8 }}
+                            />
+                        </div>
+                    )}
 
-                <Button variant="primary" type="submit">
-                    {supplyToEdit ? 'Actualizar Insumo' : 'Crear Insumo'}
-                </Button>
+                    <Button 
+                        type="submit" 
+                        variant="primary"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            handleFormSubmit();
+                        }}
+                    >
+                        {supplyToEdit ? 'Actualizar Insumo' : 'Crear Insumo'}
+                    </Button>
+                </form>
             </FormModal>
 
 
