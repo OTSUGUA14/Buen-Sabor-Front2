@@ -5,18 +5,3 @@ export interface ICategory {
     forSale: boolean;
 }
 
-
-// @Entity
-// @Setter
-// @Getter
-// @AllArgsConstructor
-// @NoArgsConstructor
-// @Builder
-// public class Category {
-//     @Id
-//     @GeneratedValue(strategy = GenerationType.IDENTITY)
-//     private Long IDCategory;
-
-//     private String name;
-//     private boolean isForSale;
-// }

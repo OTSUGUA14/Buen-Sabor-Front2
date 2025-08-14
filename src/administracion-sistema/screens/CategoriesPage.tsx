@@ -8,14 +8,14 @@ import { useCrud } from '../hooks/useCrud';
 import { categoryApi } from '../api/category';
 import type { ICategory } from '../api/types/ICategory';
 import { FormModal } from '../components/common/FormModal';
-import { GenericForm } from '../components/crud/GenericForm';
-import type { IFormFieldConfig, ISelectOption } from '../components/crud//GenericForm.types';
+import type { ISelectOption } from '../components/crud//GenericForm.types';
 import { InputField } from '../components/common/InputField';
 import { SelectField } from '../components/common/SelectField';
 
 import './styles/crud-pages.css';
 
 export const CategoriesPage: React.FC = () => {
+    // Hook personalizado que maneja las operaciones CRUD básicas
     const {
         data: categories,
         loading,
@@ -25,24 +25,30 @@ export const CategoriesPage: React.FC = () => {
         updateItem,
     } = useCrud<ICategory>(categoryApi);
 
+    // Estados para los modales de crear/editar
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [categoryToEdit, setCategoryToEdit] = useState<ICategory | null>(null);
+    
+    // Estados para filtros de búsqueda
     const [searchTerm, setSearchTerm] = useState('');
     const [forSaleFilter, setForSaleFilter] = useState('TODOS');
 
-    // ESTADO PARA MODAL DE VISTA (SOLO LECTURA)
+    // Estados para modal de vista (solo lectura)
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [categoryToView, setCategoryToView] = useState<ICategory | null>(null);
 
+    // Verificar permisos de usuario desde localStorage
     const role = localStorage.getItem("employeeRole");
     const isAdmin = role === 'ADMIN';
 
+    // Opciones para el filtro de categorías en venta
     const forSaleOptions: ISelectOption[] = [
         { value: 'TODOS', label: 'TODOS' },
         { value: 'SI', label: 'Para venta' },
         { value: 'NO', label: 'Para insumos' },
     ];
 
+    // Aplicar filtros de búsqueda y estado usando useMemo para optimizar rendimiento
     const filteredCategories = useMemo(() => {
         return categories
             .map((c: any) => ({
@@ -65,6 +71,7 @@ export const CategoriesPage: React.FC = () => {
             });
     }, [categories, searchTerm, forSaleFilter]);
 
+    // Configuración de columnas para la tabla
     const categoryColumns: ITableColumn<ICategory>[] = [
         {
             id: 'IDCategory',
@@ -77,6 +84,7 @@ export const CategoriesPage: React.FC = () => {
             label: 'Para venta?',
             render: item => item.forSale ? 'Sí' : 'No',
         },
+        // Solo mostrar acciones si el usuario es administrador
         ...(isAdmin
             ? [{
                 id: 'acciones' as const,
@@ -97,13 +105,10 @@ export const CategoriesPage: React.FC = () => {
             : [])
     ];
 
-    const categoryFormFields: IFormFieldConfig[] = [
-        { name: 'name', label: 'Nombre de la Categoría', type: 'text', validation: { required: true, minLength: 2 } },
-        { name: 'forSale', label: '¿Para venta?', type: 'checkbox' },
-    ];
-
+    // Estado para manejar los valores del formulario
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
 
+    // Maneja cambios en los inputs del formulario
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
@@ -115,12 +120,14 @@ export const CategoriesPage: React.FC = () => {
         }));
     };
 
+    // Abre modal para crear nueva categoría
     const handleCreate = () => {
         setCategoryToEdit(null);
         setFormValues({});
         setIsModalOpen(true);
     };
 
+    // Abre modal para editar categoría existente
     const handleEdit = (item: ICategory) => {
         setCategoryToEdit(item);
         setFormValues({
@@ -130,23 +137,26 @@ export const CategoriesPage: React.FC = () => {
         setIsModalOpen(true);
     };
 
+    // Abre modal de vista solo lectura
     const handleView = (item: ICategory) => {
         setCategoryToView(item);
         setIsViewModalOpen(true);
     };
 
+    // Maneja el envío del formulario tanto para crear como para editar
     const handleFormSubmit = async (e?: React.FormEvent) => {
         if (e) {
             e.preventDefault();
         }
 
-        // Validaciones
+        // Validación básica del nombre
         if (!formValues.name || formValues.name.trim() === '') {
             alert('El nombre de la categoría es obligatorio');
             return;
         }
 
         if (categoryToEdit) {
+            // Modo edición - actualizar categoría existente
             const updateData: ICategory = {
                 id: categoryToEdit.id,
                 IDCategory: categoryToEdit.IDCategory,
@@ -155,6 +165,7 @@ export const CategoriesPage: React.FC = () => {
             };
             await updateItem(updateData);
         } else {
+            // Modo creación - crear nueva categoría
             const createData: Omit<ICategory, 'id'> = {
                 IDCategory: 0,
                 name: formValues.name,
@@ -169,17 +180,20 @@ export const CategoriesPage: React.FC = () => {
             }
         }
 
+        // Cerrar modal y limpiar estados después del envío exitoso
         setIsModalOpen(false);
         setCategoryToEdit(null);
         setFormValues({});
         fetchData();
     };
 
+    // Estados de carga y error
     if (loading && categories.length === 0) return <p>Cargando categorías...</p>;
     if (error) return <p className="error-message">Error al cargar categorías: {error}</p>;
 
     return (
         <div className="crud-page-container">
+            {/* Controles de filtro y botón de crear */}
             <div className="filter-controls">
                 {isAdmin && (
                     <Button variant="primary" onClick={handleCreate}>Nueva Categoría</Button>
@@ -201,11 +215,13 @@ export const CategoriesPage: React.FC = () => {
                 />
             </div>
 
+            {/* Tabla principal con datos filtrados */}
             <GenericTable
                 data={filteredCategories}
                 columns={categoryColumns}
             />
 
+            {/* Modal para crear/editar categorías */}
             <FormModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -240,7 +256,7 @@ export const CategoriesPage: React.FC = () => {
                 </form>
             </FormModal>
 
-            {/* MODAL SOLO LECTURA */}
+            {/* Modal de vista solo lectura */}
             <FormModal
                 isOpen={isViewModalOpen}
                 onClose={() => setIsViewModalOpen(false)}
