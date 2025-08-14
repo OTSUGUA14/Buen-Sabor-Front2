@@ -9,8 +9,9 @@ import { categoryApi } from '../api/category';
 import type { ICategory } from '../api/types/ICategory';
 import { FormModal } from '../components/common/FormModal';
 import { GenericForm } from '../components/crud/GenericForm';
-import type { IFormFieldConfig } from '../components/crud//GenericForm.types';
+import type { IFormFieldConfig, ISelectOption } from '../components/crud//GenericForm.types';
 import { InputField } from '../components/common/InputField';
+import { SelectField } from '../components/common/SelectField';
 
 import './styles/crud-pages.css';
 
@@ -25,10 +26,9 @@ export const CategoriesPage: React.FC = () => {
     } = useCrud<ICategory>(categoryApi);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-
     const [categoryToEdit, setCategoryToEdit] = useState<ICategory | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
-
+    const [forSaleFilter, setForSaleFilter] = useState('TODOS');
 
     // ESTADO PARA MODAL DE VISTA (SOLO LECTURA)
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -36,6 +36,12 @@ export const CategoriesPage: React.FC = () => {
 
     const role = localStorage.getItem("employeeRole");
     const isAdmin = role === 'ADMIN';
+
+    const forSaleOptions: ISelectOption[] = [
+        { value: 'TODOS', label: 'TODOS' },
+        { value: 'SI', label: 'Para venta' },
+        { value: 'NO', label: 'Para insumos' },
+    ];
 
     const filteredCategories = useMemo(() => {
         return categories
@@ -45,10 +51,19 @@ export const CategoriesPage: React.FC = () => {
                 IDCategory: c.idcategory,
                 isForSale: c.forSale,
             }))
-            .filter(c =>
-                c.name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-    }, [categories, searchTerm]);
+            .filter(c => {
+                const matchesSearch = c.name.toLowerCase().includes(searchTerm.toLowerCase());
+                
+                let matchesForSale = true;
+                if (forSaleFilter === 'SI') {
+                    matchesForSale = c.forSale === true;
+                } else if (forSaleFilter === 'NO') {
+                    matchesForSale = c.forSale === false;
+                }
+                
+                return matchesSearch && matchesForSale;
+            });
+    }, [categories, searchTerm, forSaleFilter]);
 
     const categoryColumns: ITableColumn<ICategory>[] = [
         {
@@ -59,12 +74,12 @@ export const CategoriesPage: React.FC = () => {
         { id: 'name', label: 'Nombre de Categoría' },
         {
             id: 'forSale',
-            label: '¿En venta?',
+            label: 'Para venta?',
             render: item => item.forSale ? 'Sí' : 'No',
         },
         ...(isAdmin
             ? [{
-                id: 'acciones' as const, // <-- así TypeScript lo acepta
+                id: 'acciones' as const,
                 label: 'Acciones',
                 render: (item: ICategory) => (
                     <div className="table-actions">
@@ -84,46 +99,79 @@ export const CategoriesPage: React.FC = () => {
 
     const categoryFormFields: IFormFieldConfig[] = [
         { name: 'name', label: 'Nombre de la Categoría', type: 'text', validation: { required: true, minLength: 2 } },
-        { name: 'isForSale', label: '¿En venta?', type: 'checkbox' },
+        { name: 'forSale', label: '¿Para venta?', type: 'checkbox' },
     ];
+
+    const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
+
+    const handleInputChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    ) => {
+        const { name, type, checked, value } = e.target as HTMLInputElement;
+        
+        setFormValues((prev) => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
 
     const handleCreate = () => {
         setCategoryToEdit(null);
+        setFormValues({});
         setIsModalOpen(true);
-    };
-
-    //  HANDLER PARA EL MODAL DE VISTA
-    const handleView = (category: ICategory) => {
-        setCategoryToView(category);
-        setIsViewModalOpen(true);
     };
 
     const handleEdit = (item: ICategory) => {
         setCategoryToEdit(item);
+        setFormValues({
+            name: item.name,
+            forSale: item.forSale
+        });
         setIsModalOpen(true);
     };
 
-    const handleFormSubmit = async (formData: Partial<ICategory>) => {
-        const submitData: ICategory = {
-            id: categoryToEdit?.id ?? 0,
-            IDCategory: categoryToEdit?.IDCategory ?? 0,
-            name: formData.name ?? '',
-            forSale: formData.forSale ?? false,
-        };
+    const handleView = (item: ICategory) => {
+        setCategoryToView(item);
+        setIsViewModalOpen(true);
+    };
+
+    const handleFormSubmit = async (e?: React.FormEvent) => {
+        if (e) {
+            e.preventDefault();
+        }
+
+        // Validaciones
+        if (!formValues.name || formValues.name.trim() === '') {
+            alert('El nombre de la categoría es obligatorio');
+            return;
+        }
 
         if (categoryToEdit) {
-            await updateItem(submitData);
-        } else {
-            const createData = {
-                IDCategory: 0,
-                name: formData.name ?? '',
-                forSale: formData.forSale ?? false,
+            const updateData: ICategory = {
+                id: categoryToEdit.id,
+                IDCategory: categoryToEdit.IDCategory,
+                name: formValues.name,
+                forSale: formValues.forSale ?? false,
             };
-            await createItem(createData);
+            await updateItem(updateData);
+        } else {
+            const createData: Omit<ICategory, 'id'> = {
+                IDCategory: 0,
+                name: formValues.name,
+                forSale: formValues.forSale ?? false,
+            };
+            
+            try {
+                await createItem(createData);
+            } catch (error) {
+                console.error('Error en createItem:', error);
+                return;
+            }
         }
 
         setIsModalOpen(false);
         setCategoryToEdit(null);
+        setFormValues({});
         fetchData();
     };
 
@@ -132,10 +180,6 @@ export const CategoriesPage: React.FC = () => {
 
     return (
         <div className="crud-page-container">
-            {/* <div className="page-header">
-                <h2>CATEGORIAS</h2>
-            </div> */}
-
             <div className="filter-controls">
                 {isAdmin && (
                     <Button variant="primary" onClick={handleCreate}>Nueva Categoría</Button>
@@ -148,6 +192,13 @@ export const CategoriesPage: React.FC = () => {
                     onChange={e => setSearchTerm(e.target.value)}
                     className="search-input"
                 />
+                <SelectField
+                    name="forSaleFilter"
+                    options={forSaleOptions}
+                    value={forSaleFilter}
+                    onChange={(e) => setForSaleFilter(e.target.value)}
+                    className="status-select"
+                />
             </div>
 
             <GenericTable
@@ -159,17 +210,37 @@ export const CategoriesPage: React.FC = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title={categoryToEdit ? 'Editar Categoría' : 'Crear Categoría'}
+                onSubmit={undefined}
             >
-                <GenericForm<ICategory>
-                    initialData={categoryToEdit ?? undefined}
-                    fieldsConfig={categoryFormFields}
-                    onSubmit={handleFormSubmit}
-                    submitButtonText={categoryToEdit ? 'Actualizar Categora' : 'Crear Categoría'}
-                />
+                <form onSubmit={handleFormSubmit}>
+                    <InputField
+                        label="Nombre de la Categoría"
+                        name="name"
+                        type="text"
+                        value={formValues.name ?? ''}
+                        onChange={handleInputChange}
+                    />
+                    <InputField
+                        label="¿Para venta?"
+                        name="forSale"
+                        type="checkbox"
+                        value={formValues.forSale ?? false}
+                        onChange={handleInputChange}
+                    />
+                    <Button 
+                        type="submit" 
+                        variant="primary"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            handleFormSubmit();
+                        }}
+                    >
+                        {categoryToEdit ? 'Actualizar Categoría' : 'Crear Categoría'}
+                    </Button>
+                </form>
             </FormModal>
 
-
-            {/* NUEVO MODAL SOLO LECTURA */}
+            {/* MODAL SOLO LECTURA */}
             <FormModal
                 isOpen={isViewModalOpen}
                 onClose={() => setIsViewModalOpen(false)}
@@ -193,7 +264,7 @@ export const CategoriesPage: React.FC = () => {
                             disabled
                         />
                         <InputField
-                            label="¿En venta?"
+                            label="Para venta?"
                             name="forSale"
                             type="text"
                             value={categoryToView.forSale ? 'Sí' : 'No'}
@@ -202,8 +273,6 @@ export const CategoriesPage: React.FC = () => {
                     </>
                 )}
             </FormModal>
-
-
         </div>
     );
 };

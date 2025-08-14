@@ -30,23 +30,48 @@ export const categoryApi = {
     },
 
     create: async (newItem: Omit<ICategory, 'id' | 'IDCategory'>): Promise<ICategory> => {
+        console.log('=== INICIO categoryApi.create ===');
+        console.log('newItem recibido:', newItem);
+        
         const body = {
             name: newItem.name,
-            isForSale: newItem.forSale,
+            isForsale: newItem.forSale,
         };
-        const res = await fetch(`${BASE_URL}/add`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            mode: 'cors',
-            body: JSON.stringify(body),
-        });
-        return handleResponse<ICategory>(res);
+        
+        console.log('Body a enviar al backend:', body);
+        console.log('URL:', `${BASE_URL}/add`);
+        
+        try {
+            const res = await fetch(`${BASE_URL}/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                mode: 'cors',
+                body: JSON.stringify(body),
+            });
+            
+            console.log('Response status:', res.status);
+            console.log('Response ok:', res.ok);
+            
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error('Error response text:', errorText);
+                throw new Error(`Error ${res.status}: ${errorText}`);
+            }
+            
+            const result = await res.json();
+            console.log('Resultado exitoso:', result);
+            console.log('=== FIN categoryApi.create ===');
+            return result;
+        } catch (error) {
+            console.error('Error en fetch:', error);
+            throw error;
+        }
     },
 
     update: async (updatedItem: ICategory): Promise<ICategory> => {
         const body = {
             name: updatedItem.name,
-            isForSale: updatedItem.forSale,
+            isForsale: updatedItem.forSale, // Cambio aquí también
         };
         const res = await fetch(`${BASE_URL}/update/${updatedItem.IDCategory}`, {
             method: 'PATCH',
