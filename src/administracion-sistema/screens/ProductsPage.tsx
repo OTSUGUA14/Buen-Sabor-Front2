@@ -57,11 +57,11 @@ export const ProductsPage: React.FC = () => {
     ];
 
     useEffect(() => {
-
         setProductsCount(products.length);
         const fetchIngredientes = async () => {
             const ingredientes = await getIngredientesAll();
-            setIngredientesAll(ingredientes);
+            // Filtrar solo ingredientes que NO son para venta (forSale = false)
+            setIngredientesAll(ingredientes.filter((ingrediente: IArticle) => ingrediente.forSale === false));
         };
         fetchIngredientes();
     }, [products]);
@@ -361,6 +361,15 @@ export const ProductsPage: React.FC = () => {
     };
 
 
+    // En el componente ProductsPage, agregar handler para el precio
+    const handlePriceChange = (price: number) => {
+        setFormValues(prev => ({
+            ...prev,
+            price: price
+        }));
+    };
+
+
     // Renderizado
     if (loading && products.length === 0) return <p>Cargando productos...</p>;
     if (error) return <p className="error-message">Error al cargar productos: {error}</p>;
@@ -437,6 +446,7 @@ export const ProductsPage: React.FC = () => {
                     ingredientesAll={ingredientesAll}
                     selectedIngredientes={selectedIngredientes}
                     onIngredientesChange={setSelectedIngredientes}
+                    onPriceChange={handlePriceChange}
                 />
                 <Button variant="primary" type="submit">
                     {productToEdit ? 'Actualizar' : 'Crear'}
@@ -466,13 +476,7 @@ export const ProductsPage: React.FC = () => {
                             value={productToView.description ?? ''}
                             disabled
                         />
-                        {/* <InputField
-                            label="Precio Venta"
-                            name="price"
-                            type="number"
-                            value={productToView.price?.toString() ?? ''}
-                            disabled
-                        /> */}
+                        
                         <InputField
                             label="Tiempo Estimado (minutos)"
                             name="estimatedTimeMinutes"
