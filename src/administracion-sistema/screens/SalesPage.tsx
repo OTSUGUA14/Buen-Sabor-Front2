@@ -8,10 +8,9 @@ import { saleApi } from '../api/sale';
 import { FormModal } from '../components/common/FormModal';
 import { InputField } from '../components/common/InputField';
 
-import { getProductsAll, getIngredientesAll } from '../utils/Api'; // Ajusta la ruta si es necesario
+import { getProductsAll, getIngredientesAll } from '../utils/Api';
 import type { IProduct } from '../api/types/IProduct';
 import type { IArticle } from '../api/types/IArticle';
-
 
 const role = localStorage.getItem("employeeRole");
 const isAdmin = role === 'ADMIN';
@@ -22,7 +21,6 @@ export const SalesPage: React.FC = () => {
         loading,
         error,
         fetchData,
-
         createItem,
         updateItem,
     } = useCrud<ISale>(saleApi);
@@ -36,10 +34,14 @@ export const SalesPage: React.FC = () => {
     const [articles, setArticles] = useState<IArticle[]>([]);
     const [selectedArticles, setSelectedArticles] = useState<{article: IArticle, quantity: number}[]>([]);
 
-    // ESTADO PARA MODAL DE VISTA (SOLO LECTURA)
+    // Estados para cálculo de precio y descuentos
+    const [totalOriginalPrice, setTotalOriginalPrice] = useState(0);
+    const [discount, setDiscount] = useState(0);
+    const [finalPrice, setFinalPrice] = useState(0);
+
+    // Modal de vista (solo lectura)
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [saleToView, setSaleToView] = useState<ISale | null>(null);
-
 
     const saleTypeLabels: Record<string, string> = {
         HAPPYHOUR: "Hora Feliz",
@@ -49,6 +51,8 @@ export const SalesPage: React.FC = () => {
         FALLSALE: "Oferta de Otoño",
         CHRISTMASSALE: "Oferta de Navidad"
     };
+
+    // Cargar productos y artículos al montar el componente
     useEffect(() => {
         getProductsAll().then(setProducts);
         getIngredientesAll().then(data => {
@@ -56,28 +60,45 @@ export const SalesPage: React.FC = () => {
         });
     }, []);
 
-    // Opciones para el select de tipo de oferta
+    // Calcular precios automáticamente cuando cambian productos o descuento
+    useEffect(() => {
+        let total = 0;
+        
+        selectedProducts.forEach(item => {
+            if (item.product.price) {
+                total += item.product.price * item.quantity;
+            }
+        });
+
+        selectedArticles.forEach(item => {
+            if (item.article.buyingPrice) {
+                total += item.article.buyingPrice * item.quantity;
+            }
+        });
+
+        setTotalOriginalPrice(total);
+        
+        const discountAmount = total * (discount / 100);
+        const newFinalPrice = total - discountAmount;
+        setFinalPrice(newFinalPrice);
+        
+        setFormValues(prev => ({
+            ...prev,
+            salePrice: newFinalPrice
+        }));
+    }, [selectedProducts, selectedArticles, discount]);
+
     const saleTypeOptions = Object.values(SaleType).map(type => ({
         value: type,
         label: saleTypeLabels[type] ?? type
     }));
 
-    // Opciones para el select de productos
-    const productOptions = useMemo(() =>
-        products
-            .filter(prod => typeof prod.idmanufacturedArticle === 'number')
-            .map(prod => ({
-                value: prod.idmanufacturedArticle as number,
-                label: prod.name
-            })),
-        [products]);
-
-    // Columnas de la tabla
+    // Configuración de columnas de la tabla
     const saleColumns: ITableColumn<ISale>[] = [
         { id: 'idsale', label: '#', numeric: true },
         { id: 'denomination', label: 'Nombre' },
         { id: 'saleDescription', label: 'Descripción' },
-        { id: 'salePrice', label: 'Precio Oferta', numeric: true, render: (item) => `$${item.salePrice}` },
+        { id: 'salePrice', label: 'Precio Final', numeric: true, render: (item) => `$${item.salePrice?.toFixed(2)}` },
         {
             id: 'saleType',
             label: 'Tipo',
@@ -137,12 +158,6 @@ export const SalesPage: React.FC = () => {
             validation: { required: true, minLength: 5 }
         },
         {
-            name: 'salePrice',
-            label: 'Precio Oferta',
-            type: 'number',
-            validation: { required: true, min: 0 }
-        },
-        {
             name: 'saleType',
             label: 'Tipo de Oferta',
             type: 'select',
@@ -179,27 +194,27 @@ export const SalesPage: React.FC = () => {
             type: 'file',
             accept: 'image/*',
         },
+    ], [saleTypeOptions]);
 
-    ], [saleTypeOptions, productOptions]);
-
-    // Handlers
     const handleCreate = () => {
         setSaleToEdit(null);
         setFormValues({});
         setImagePreview(null);
         setSelectedProducts([]);
+        setSelectedArticles([]);
+        setDiscount(0);
+        setTotalOriginalPrice(0);
+        setFinalPrice(0);
         setIsModalOpen(true);
     };
 
-    //  HANDLER PARA EL MODAL DE VISTA
     const handleView = (sale: ISale) => {
         setSaleToView(sale);
         setIsViewModalOpen(true);
     };
 
-
     const handleEdit = (sale: ISale) => {
-        // Para productos - mantener las cantidades
+        // Cargar productos y artículos existentes con sus cantidades
         const manufacturedProducts = sale.saleDetails
             ? sale.saleDetails
                 .filter((d: any) => d.manufacturedArticle && d.manufacturedArticle.idmanufacturedArticle)
@@ -210,7 +225,6 @@ export const SalesPage: React.FC = () => {
                 .filter(Boolean)
             : [];
 
-        // Para artículos - mantener las cantidades
         const promoArticles = sale.saleDetails
             ? sale.saleDetails
                 .filter((d: any) => d.article && d.article.idarticle)
@@ -235,6 +249,7 @@ export const SalesPage: React.FC = () => {
         });
         setSelectedProducts(manufacturedProducts as {product: IProduct, quantity: number}[]);
         setSelectedArticles(promoArticles as {article: IArticle, quantity: number}[]);
+        
         if (sale.inventoryImage?.imageData) {
             setImagePreview(`data:image/jpeg;base64,${sale.inventoryImage.imageData}`);
         } else {
@@ -260,10 +275,6 @@ export const SalesPage: React.FC = () => {
             } else {
                 setImagePreview(null);
             }
-        } else if (target instanceof HTMLSelectElement && target.multiple) {
-            value = Array.from(target.options)
-                .filter(option => option.selected)
-                .map(option => Number(option.value));
         } else {
             value = target.value;
         }
@@ -274,25 +285,33 @@ export const SalesPage: React.FC = () => {
         }));
     };
 
+    const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const discountValue = parseFloat(e.target.value) || 0;
+        const validDiscount = Math.max(0, Math.min(100, discountValue));
+        setDiscount(validDiscount);
+        
+        setFormValues(prev => ({
+            ...prev,
+            saleDiscount: validDiscount,
+        }));
+    };
 
-
-    // Convertir File a Base64
     const convertFileToBase64 = (file: File): Promise<string> => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => {
                 const result = reader.result as string;
-                resolve(result.split(',')[1]); // Solo la parte base64
+                resolve(result.split(',')[1]);
             };
             reader.onerror = (error) => reject(error);
         });
     };
 
     const handleFormSubmit = async () => {
-        // Validar campos requeridos
+        // Validaciones básicas
         const requiredFields = [
-            'denomination', 'saleDescription', 'salePrice', 'saleType',
+            'denomination', 'saleDescription', 'saleType',
             'startDate', 'endDate', 'startTime', 'endTime'
         ];
         for (const field of requiredFields) {
@@ -300,6 +319,11 @@ export const SalesPage: React.FC = () => {
                 alert(`El campo "${field}" es obligatorio.`);
                 return;
             }
+        }
+
+        if (selectedProducts.length === 0 && selectedArticles.length === 0) {
+            alert('Debe seleccionar al menos un producto o artículo para la promoción.');
+            return;
         }
 
         let inventoryImage = { imageData: '' };
@@ -311,7 +335,7 @@ export const SalesPage: React.FC = () => {
                 inventoryImage = { imageData: saleToEdit.inventoryImage.imageData };
             }
 
-            // Construir saleDetails con cantidades
+            // Construir saleDetails para el backend
             const saleDetails = [
                 ...selectedProducts.map(item => ({
                     id: item.product.idmanufacturedArticle,
@@ -328,17 +352,17 @@ export const SalesPage: React.FC = () => {
             const newSale: any = {
                 denomination: formValues.denomination,
                 saleDescription: formValues.saleDescription,
-                salePrice: parseFloat(formValues.salePrice),
                 saleType: formValues.saleType,
                 startDate: formValues.startDate,
                 endDate: formValues.endDate,
                 startTime: formValues.startTime,
                 endTime: formValues.endTime,
                 isActive: true,
+                saleDiscount: discount,
+                salePrice: finalPrice,
                 inventoryImage,
                 saleDetails,
             };
-            console.log(newSale);
 
             if (saleToEdit) {
                 newSale.idsale = saleToEdit.idsale;
@@ -361,16 +385,12 @@ export const SalesPage: React.FC = () => {
 
     return (
         <div className="crud-page-container">
-            {/* <div className="page-header">
-                <h2>PROMOCIONES</h2>
-            </div> */}
             <div className="filter-controls">
                 {isAdmin && (
                     <Button variant="primary" onClick={handleCreate}>
-                        Nueva promocion
+                        Nueva promoción
                     </Button>
                 )}
-
             </div>
 
             <GenericTable
@@ -399,7 +419,6 @@ export const SalesPage: React.FC = () => {
                     );
                 })}
 
-                {/* Previsualización de la imagen */}
                 {imagePreview && (
                     <div style={{ marginBottom: 16 }}>
                         <label>Vista previa de la imagen:</label>
@@ -411,12 +430,12 @@ export const SalesPage: React.FC = () => {
                     </div>
                 )}
 
-                {/* Productos de la promo */}
+                {/* Gestión de productos */}
                 <div style={{ marginBottom: 16 }}>
                     <label>Productos en la promo:</label>
                     {selectedProducts.map((item, idx) => (
                         <div key={`${item.product.idmanufacturedArticle}-${idx}`} style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: '8px' }}>
-                            <span style={{ flex: 1 }}>{item.product.name}</span>
+                            <span style={{ flex: 1 }}>{item.product.name} - ${item.product.price?.toFixed(2)}</span>
                             <input
                                 type="number"
                                 min="1"
@@ -429,6 +448,7 @@ export const SalesPage: React.FC = () => {
                                 }}
                                 style={{ width: '60px', padding: '4px' }}
                             />
+                            <span>${((item.product.price || 0) * item.quantity).toFixed(2)}</span>
                             <Button
                                 variant="danger"
                                 type="button"
@@ -453,19 +473,19 @@ export const SalesPage: React.FC = () => {
                             <option value="" disabled>Agregar producto...</option>
                             {products.map(p => (
                                 <option key={p.idmanufacturedArticle} value={p.idmanufacturedArticle}>
-                                    {p.name}
+                                    {p.name} - ${p.price?.toFixed(2)}
                                 </option>
                             ))}
                         </select>
                     </div>
                 </div>
 
-                {/* Artículos de la promo */}
+                {/* Gestión de artículos */}
                 <div style={{ marginBottom: 16 }}>
                     <label>Artículos en la promo:</label>
                     {selectedArticles.map((item, idx) => (
                         <div key={`${item.article.idarticle}-${idx}`} style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: '8px' }}>
-                            <span style={{ flex: 1 }}>{item.article.denomination}</span>
+                            <span style={{ flex: 1 }}>{item.article.denomination} - ${item.article.buyingPrice?.toFixed(2)}</span>
                             <input
                                 type="number"
                                 min="1"
@@ -478,6 +498,7 @@ export const SalesPage: React.FC = () => {
                                 }}
                                 style={{ width: '60px', padding: '4px' }}
                             />
+                            <span>${((item.article.buyingPrice || 0) * item.quantity).toFixed(2)}</span>
                             <Button
                                 variant="danger"
                                 type="button"
@@ -502,10 +523,41 @@ export const SalesPage: React.FC = () => {
                             <option value="" disabled>Agregar artículo...</option>
                             {articles.map(a => (
                                 <option key={a.idarticle} value={a.idarticle}>
-                                    {a.denomination}
+                                    {a.denomination} - ${a.buyingPrice?.toFixed(2)}
                                 </option>
                             ))}
                         </select>
+                    </div>
+                </div>
+
+                {/* Cálculo de precios y descuentos */}
+                <div style={{ marginBottom: 16, padding: '16px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f9f9f9' }}>
+                    <h4>Cálculo de Precio</h4>
+                    <div style={{ marginBottom: 8 }}>
+                        <strong>Precio Original Total: ${totalOriginalPrice.toFixed(2)}</strong>
+                    </div>
+                    
+                    <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <label>Descuento (%):</label>
+                        <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="1"
+                            value={discount}
+                            onChange={handleDiscountChange}
+                            style={{ width: '100px', padding: '4px' }}
+                            placeholder="10"
+                        />
+                        <span>({discount}% de descuento)</span>
+                    </div>
+                    
+                    <div style={{ marginBottom: 8, color: '#666' }}>
+                        <span>Descuento aplicado: ${(totalOriginalPrice * (discount / 100)).toFixed(2)}</span>
+                    </div>
+                    
+                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#2196F3' }}>
+                        <strong>Precio Final: ${finalPrice.toFixed(2)}</strong>
                     </div>
                 </div>
 
@@ -514,8 +566,7 @@ export const SalesPage: React.FC = () => {
                 </Button>
             </FormModal>
 
-
-            {/* NUEVO MODAL SOLO LECTURA */}
+            {/* Modal de vista (solo lectura) */}
             <FormModal
                 isOpen={isViewModalOpen}
                 onClose={() => setIsViewModalOpen(false)}
@@ -539,7 +590,7 @@ export const SalesPage: React.FC = () => {
                             disabled
                         />
                         <InputField
-                            label="Precio Oferta"
+                            label="Precio Final"
                             name="salePrice"
                             type="number"
                             value={saleToView.salePrice?.toString() ?? ''}
@@ -597,7 +648,7 @@ export const SalesPage: React.FC = () => {
                                     <li key={idx}>
                                         {detail.manufacturedArticle?.name ||
                                             detail.article?.denomination ||
-                                            'Sin nombre'}
+                                            'Sin nombre'} - Cantidad: {detail.quantity}
                                     </li>
                                 ))}
                             </ul>
