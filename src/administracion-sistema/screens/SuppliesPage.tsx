@@ -47,7 +47,7 @@ export const SuppliesPage: React.FC = () => {
     const isAdmin = role === 'ADMIN';
     useEffect(() => {
         getCategopryAll().then(data => {
-            setCategories(data.filter(cat => cat.forSale === false));
+            setCategories(data); // Cargar todas las categorías, no filtrar aquí
         });
         getMeasuringUnitsAll().then(data => {
             setMeasuringUnits(data);
@@ -62,14 +62,20 @@ export const SuppliesPage: React.FC = () => {
 
 
 
-    // Opciones de categoría para el select
-    const categoryOptions: ISelectOption[] = useMemo(() => [
-        { value: 'TODOS', label: 'TODOS' },
-        ...categories.map(cat => ({
-            value: cat.idcategory,
-            label: cat.name
-        })),
-    ], [categories]);
+    // Opciones de categoría para el select - FILTRADO DINÁMICAMENTE
+    const categoryOptions: ISelectOption[] = useMemo(() => {
+        const isForSale = String(formValues.forSale) === "true";
+        
+        return [
+            { value: '', label: 'Seleccionar categoría' },
+            ...categories
+                .filter(cat => cat.forSale === isForSale)
+                .map(cat => ({
+                    value: cat.idcategory,
+                    label: cat.name
+                }))
+        ];
+    }, [categories, formValues.forSale]);
     // Opciones para el select de unidades de medida
     const measuringUnitOptions: ISelectOption[] = useMemo(() =>
         measuringUnits.map(mu => ({
@@ -110,7 +116,7 @@ export const SuppliesPage: React.FC = () => {
         { id: 'maxStock', label: 'Stock Máximo', numeric: true },
         {
             id: 'buyingPrice',
-            label: 'Precio Compra',
+            label: 'Precio',
             numeric: true,
             render: i => i.buyingPrice != null ? `$${i.buyingPrice.toFixed(2)}` : ''
         },
@@ -155,22 +161,24 @@ export const SuppliesPage: React.FC = () => {
         },
         { name: 'currentStock', label: 'Stock Actual', type: 'number', validation: { required: true, min: 0 } },
         { name: 'maxStock', label: 'Stock Máximo', type: 'number', validation: { required: true, min: 0 } },
-        { name: 'buyingPrice', label: 'Precio Compra', type: 'number', validation: { required: true, min: 0 } },
-        {
-            name: 'category',
-            label: 'Categoría',
-            type: 'select',
-            options: categoryOptions.filter(opt => opt.value !== 'TODOS'),
-            validation: { required: true },
-        },
+        { name: 'buyingPrice', label: 'Precio', type: 'number', validation: { required: true, min: 0 } },
         {
             name: 'forSale',
             label: '¿Para venta?',
             type: 'select',
             options: [
+                { value: '', label: 'Seleccionar opción' },
                 { value: "true", label: 'Sí' },
                 { value: "false", label: 'No' }
             ],
+            validation: { required: true },
+        },
+        // MOVIDO: category después de forSale para que se actualice cuando cambie forSale
+        {
+            name: 'category',
+            label: 'Categoría',
+            type: 'select',
+            options: categoryOptions,
             validation: { required: true },
         },
         {
@@ -323,7 +331,15 @@ export const SuppliesPage: React.FC = () => {
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
         const { name, type, files, value } = e.target as HTMLInputElement;
-        if (type === 'file' && files && files.length > 0) {
+        
+        // Si cambia el valor de forSale, limpiar la categoría seleccionada
+        if (name === 'forSale') {
+            setFormValues(prev => ({ 
+                ...prev, 
+                [name]: value,
+                category: '' // Limpiar categoría cuando cambia forSale
+            }));
+        } else if (type === 'file' && files && files.length > 0) {
             setFormValues(prev => ({ ...prev, [name]: files[0] }));
             const reader = new FileReader();
             reader.onload = (ev) => setImagePreview(ev.target?.result as string);
@@ -375,18 +391,18 @@ export const SuppliesPage: React.FC = () => {
                 onSubmit={undefined}
             >
                 <form onSubmit={handleFormSubmit}>
-                    <SelectField
-                        label="Unidad de Medida"
-                        name="measuringUnit"
-                        options={[{ value: '', label: 'Seleccionar unidad' }, ...measuringUnitOptions]}
-                        value={formValues.measuringUnit ?? ''}
-                        onChange={handleInputChange}
-                    />
                     <InputField
                         label="Nombre"
                         name="denomination"
                         type="text"
                         value={formValues.denomination ?? ''}
+                        onChange={handleInputChange}
+                    />
+                    <SelectField
+                        label="Unidad de Medida"
+                        name="measuringUnit"
+                        options={[{ value: '', label: 'Seleccionar unidad' }, ...measuringUnitOptions]}
+                        value={formValues.measuringUnit ?? ''}
                         onChange={handleInputChange}
                     />
                     <InputField
@@ -404,19 +420,11 @@ export const SuppliesPage: React.FC = () => {
                         onChange={handleInputChange}
                     />
                     <InputField
-                        label="Precio Compra"
+                        label="Precio"
                         name="buyingPrice"
                         type="number"
                         step="0.01"
                         value={formValues.buyingPrice ?? ''}
-                        onChange={handleInputChange}
-                    />
-                    <SelectField
-                        label="Categoría"
-                        name="category"
-                        options={[{ value: '', label: 'Seleccionar categoría' }, ...categoryOptions.filter(opt => opt.value !== 'TODOS')]
-                        }
-                        value={formValues.category ?? ''}
                         onChange={handleInputChange}
                     />
                     <SelectField
@@ -428,6 +436,14 @@ export const SuppliesPage: React.FC = () => {
                             { value: "false", label: 'No' }
                         ]}
                         value={formValues.forSale ?? ''}
+                        onChange={handleInputChange}
+                    />
+                    <SelectField
+                        label="Categoría"
+                        name="category"
+                        options={[{ value: '', label: 'Seleccionar categoría' }, ...categoryOptions.filter(opt => opt.value !== 'TODOS')]
+                        }
+                        value={formValues.category ?? ''}
                         onChange={handleInputChange}
                     />
                     
@@ -505,7 +521,7 @@ export const SuppliesPage: React.FC = () => {
                             disabled
                         />
                         <InputField
-                            label="Precio Compra"
+                            label="Precio"
                             name="buyingPrice"
                             type="number"
                             value={supplyToView.buyingPrice?.toString() ?? ''}
