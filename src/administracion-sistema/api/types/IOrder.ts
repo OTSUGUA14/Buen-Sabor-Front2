@@ -1,3 +1,5 @@
+import type { ISale } from "./ISale";
+
 export interface IOrder {
     id: number;
     estimatedFinishTime: string;
@@ -21,12 +23,34 @@ export interface IOrder {
     directionToSend: string;
     subsidiaryId: number;
     manufacturedArticles: any[];
+    sales: Sale[];
     orderedArticles: any[];
-
     // Campos calculados para compatibilidad
     clientId?: number;
     clientName?: string;
     tipoEntrega?: 'DELIVERY' | 'LOCAL';
+}
+export interface SaleArticle {
+  denomination: string;
+  currentStock: number;
+  maxStock: number;
+  buyingPrice: number;
+  measuringUnit: number;
+  category: number;
+  inventoryImageDTO: string | null;
+  isForSale: boolean;
+  quantity: number;
+}
+
+export interface Sale {
+  id: number;
+  denomination: string;
+  startDate: string;
+  endDate: string;
+  saleDescription: string;
+  articles: SaleArticle[];
+  salePrice: number;
+  quantity: number;
 }
 
 export enum OrderState {

@@ -5,7 +5,7 @@ export interface OrderDetailDTO {
 }
 
 export interface SalesDTO {
-    SaleID: number;
+    saleID: number;
     quantity: number;
     subTotal: number;
 }

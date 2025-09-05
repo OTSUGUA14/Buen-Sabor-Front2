@@ -51,7 +51,7 @@ export const CartModal: React.FC<CartModalProps> = ({
     const salesDetails: SalesDTO[] = cart
         .filter(item => item.productType === 'promo')
         .map(item => ({
-            SaleID: item.idmanufacturedArticle,
+            saleID: item.idmanufacturedArticle,
             quantity: item.quantity,
             subTotal: item.price * item.quantity
         }));

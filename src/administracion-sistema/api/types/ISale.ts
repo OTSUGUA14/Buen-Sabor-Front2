@@ -30,6 +30,7 @@ export interface ISale {
     saleDiscount: number; 
     inventoryImage: InventoryImage;
     saleDetails: ISaleDetail[];
+    quantity?:number
 }
 
 export interface ISaleDetail {

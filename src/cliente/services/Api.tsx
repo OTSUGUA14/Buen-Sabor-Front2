@@ -47,7 +47,7 @@ export const loginUser = async (userToLogin: UserLogin): Promise<any> => {
             body: JSON.stringify(userToLogin),
         });
         console.log(userToLogin);
-
+        
         if (!response.ok) {
             throw new Error('Error al iniciar sesión');
         }
@@ -125,16 +125,16 @@ export const getCategopryAll = async (): Promise<[Category]> => {
 }
 
 export async function createPreferenceMP(pedido: UserPreferenceRequest[]) {
-    const urlServer = 'http://localhost:8080/api/orders/createPreference';
-    const response = await fetch(urlServer, {
-        method: "POST",
-        body: JSON.stringify(pedido),
-        headers: {
-            "Content-Type": "application/json"
-        }
-    });
+    // const urlServer = 'http://localhost:8080/api/orders/createPreference';
+    // const response = await fetch(urlServer, {
+    //     method: "POST",
+    //     body: JSON.stringify(pedido),
+    //     headers: {
+    //         "Content-Type": "application/json"
+    //     }
+    // });
 
-    return await response.json(); // Should now be { init_point: "..." }
+    // return await response.json(); // Should now be { init_point: "..." }
 }
 
 

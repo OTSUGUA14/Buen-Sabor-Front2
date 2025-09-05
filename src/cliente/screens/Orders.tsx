@@ -16,6 +16,7 @@ import { useUser } from '../components/UserContext'; // ✅ Importar el hook de 
 
 import '../styles/Orders.css';
 
+
 export const Orders: React.FC = () => {
     const { profile } = useUser(); // ✅ Obtener el perfil del usuario logueado
     const {
@@ -34,6 +35,7 @@ export const Orders: React.FC = () => {
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
 
     const statusOptions: ISelectOption[] = useMemo(() => [
         { value: 'TODOS', label: 'ESTADO' },
@@ -56,7 +58,7 @@ export const Orders: React.FC = () => {
     // ✅ Filtrar órdenes del usuario actual
     const filteredOrders = useMemo(() => {
         if (!profile?.id) return []; // Si no hay usuario logueado, no mostrar órdenes
-        
+
         return orders.filter(order => {
             // ✅ Solo mostrar órdenes del usuario actual - usar client.clientId en lugar de clientId
             const isUserOrder = order.client?.clientId === profile.id;
@@ -65,7 +67,7 @@ export const Orders: React.FC = () => {
             const matchesSearch = clientFullName.includes(searchTerm.toLowerCase());
             const matchesStatus = statusFilter === 'TODOS' || order.orderState === statusFilter;
             const matchesDelivery = deliveryTypeFilter === 'TODOS' || order.tipoEntrega === deliveryTypeFilter;
-            
+
             return isUserOrder && matchesSearch && matchesStatus && matchesDelivery;
         });
     }, [orders, searchTerm, statusFilter, deliveryTypeFilter, profile?.id]);
@@ -113,7 +115,7 @@ export const Orders: React.FC = () => {
                             }}
                         />
                     </Button>
-                    
+
                     {/* ✅ Botón de cancelar orden - solo mostrar si la orden se puede cancelar */}
                     {(item.orderState === 'PENDING' || item.orderState === 'PREPARING') && (
                         <Button
@@ -139,7 +141,7 @@ export const Orders: React.FC = () => {
         try {
             await orderApi.updateOrderState(order.id, OrderState.CANCELED);
             await fetchData(); // Recargar los datos
-            
+
             alert('Orden cancelada exitosamente');
         } catch (error) {
             console.error('Error al cancelar la orden:', error);
@@ -158,6 +160,7 @@ export const Orders: React.FC = () => {
 
     if (loading) return <p>Cargando órdenes...</p>;
     if (error) return <p>Error al cargar órdenes: {error}</p>;
+    console.log(selectedOrder);
 
     return (
         <div className="client-orders-container">
@@ -242,28 +245,43 @@ export const Orders: React.FC = () => {
 
                         <div className="order-modal-section">
                             <div className="section-title">
-                                <span role="img" aria-label="Productos">🍕</span> Productos
+                                <span role="img" aria-label="Productos">🍕</span> Productos / Promos / Artículos
                             </div>
                             <div className="order-modal-table">
                                 <div className="order-modal-row order-modal-header">
-                                    <div>Producto</div>
+                                    <div>Tipo</div>
+                                    <div>Nombre</div>
                                     <div>Cantidad</div>
                                     <div>Precio</div>
                                 </div>
+                                {/* Productos normales */}
                                 {selectedOrder.manufacturedArticles?.map((article: any, idx: number) => (
-                                    <div className="order-modal-row" key={idx}>
+                                    <div className="order-modal-row" key={`prod-${idx}`}>
+                                        <div>Producto</div>
                                         <div>{article.name || 'Producto'}</div>
                                         <div>{article.quantityOrdered || 1}</div>
                                         <div>${article.price?.toFixed(2) || '0.00'}</div>
                                     </div>
                                 ))}
+                                {/* Artículos */}
                                 {selectedOrder.orderedArticles?.map((article: any, idx: number) => (
-                                    <div className="order-modal-row" key={`ordered-${idx}`}>
-                                        <div>{article.name || 'Artículo'}</div>
+                                    <div className="order-modal-row" key={`art-${idx}`}>
+                                        <div>Artículo</div>
+                                        <div>{article.denomination || 'Artículo'}</div>
                                         <div>{article.quantity || 1}</div>
-                                        <div>${article.price?.toFixed(2) || '0.00'}</div>
+                                        <div>${article.buyingPrice?.toFixed(2) || '0.00'}</div>
                                     </div>
                                 ))}
+                                {/* Promociones */}
+                                {(selectedOrder.sales ?? []).map((promo: any, idx: number) => (
+                                    <div className="order-modal-row" key={`promo-${idx}`}>
+                                        <div>Promo</div>
+                                        <div>{promo.denomination || 'Promoción'}</div>
+                                        <div>{promo.quantity || 1}</div>z
+                                        <div>${promo.salePrice?.toFixed(2) || '0.00'}</div>
+                                    </div>
+                                ))}
+
                             </div>
                         </div>
                     </div>

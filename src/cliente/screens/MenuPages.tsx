@@ -31,7 +31,19 @@ export default function MenuPages() {
         setSelectedProduct(null);
     };
     // Inicializamos carrito desde localStorage (si existe)
-    const [cart, setCart] = useState<any[]>(() => {
+    // Puedes definir un tipo para los items del carrito
+    type CartItem = IProductClient & { quantity: number } | { 
+        idmanufacturedArticle: number;
+        name: string;
+        price: number;
+        quantity: number;
+        productType: 'promo';
+        saleDetails: any[];
+        isPromo: true;
+    };
+
+    // Cambia el tipo del carrito
+    const [cart, setCart] = useState<CartItem[]>(() => {
         try {
             const savedCart = localStorage.getItem('cart');
             const parsed = savedCart ? JSON.parse(savedCart) : [];
@@ -128,19 +140,36 @@ export default function MenuPages() {
     }, [cart]);
     // Guarda el carrito solo si tiene productos, si no lo elimina
 
-    const handleAddToCart = (product: IProductClient, quantity: number) => {
-        setCart(prevCart => {
-            const existingItem = prevCart.find(item => item.idmanufacturedArticle === product.idmanufacturedArticle);
-            if (existingItem) {
-                return prevCart.map(item =>
-                    item.idmanufacturedArticle === product.idmanufacturedArticle
-                        ? { ...item, quantity: item.quantity + quantity }
-                        : item
-                );
-            } else {
-                return [...prevCart, { ...product, quantity }];
-            }
-        });
+    const handleAddToCart = (product: IProductClient | CartItem, quantity: number) => {
+        if (product.productType === 'promo') {
+            // Si ya existe la promo en el carrito, suma la cantidad
+            setCart(prevCart => {
+                const existingPromo = prevCart.find(item => item.productType === 'promo' && item.idmanufacturedArticle === product.idmanufacturedArticle);
+                if (existingPromo && 'quantity' in existingPromo) {
+                    return prevCart.map(item =>
+                        item.productType === 'promo' && item.idmanufacturedArticle === product.idmanufacturedArticle
+                            ? { ...item, quantity: item.quantity + quantity }
+                            : item
+                    );
+                } else {
+                    return [...prevCart, { ...product, quantity }];
+                }
+            });
+        } else {
+            // Producto normal
+            setCart(prevCart => {
+                const existingItem = prevCart.find(item => item.idmanufacturedArticle === product.idmanufacturedArticle && item.productType !== 'promo');
+                if (existingItem && 'quantity' in existingItem) {
+                    return prevCart.map(item =>
+                        item.idmanufacturedArticle === product.idmanufacturedArticle && item.productType !== 'promo'
+                            ? { ...item, quantity: item.quantity + quantity }
+                            : item
+                    );
+                } else {
+                    return [...prevCart, { ...product, quantity }];
+                }
+            });
+        }
         handleCloseModal();
     };
     const handleIncrement = (productId: number) => {
