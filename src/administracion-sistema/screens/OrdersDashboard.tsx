@@ -346,28 +346,38 @@ export const OrderDashboard: React.FC = () => {
                             </div>
                             <div className="order-modal-table">
                                 <div className="order-modal-row order-modal-header">
-                                    <div>Producto</div>
+                                    <div>Tipo</div>
+                                    <div>Nombre</div>
                                     <div>Cantidad</div>
-                                    <div>Precio Unit.</div>
-                                    <div>Subtotal</div>
+                                    <div>Precio</div>
                                 </div>
+                                {/* Productos manufacturados */}
                                 {selectedOrder.manufacturedArticles?.map((article: any, idx: number) => (
                                     <div className="order-modal-row" key={`manufactured-${idx}`}>
+                                        <div>Producto</div>
                                         <div>{article.name || 'Producto manufacturado'}</div>
                                         <div>{article.quantityOrdered || 1}</div>
                                         <div>${(article.price || 0).toFixed(2)}</div>
-                                        <div>${((article.quantityOrdered || 1) * (article.price || 0)).toFixed(2)}</div>
                                     </div>
                                 ))}
+                                {/* Artículos */}
                                 {selectedOrder.orderedArticles?.map((article: any, idx: number) => (
                                     <div className="order-modal-row" key={`ordered-${idx}`}>
-                                        <div>{article.name || 'Artículo'}</div>
+                                        <div>Artículo</div>
+                                        <div>{article.denomination || article.name || 'Artículo'}</div>
                                         <div>{article.quantity || 1}</div>
-                                        <div>${(article.price || 0).toFixed(2)}</div>
-                                        <div>${((article.quantity || 1) * (article.price || 0)).toFixed(2)}</div>
+                                        <div>${(article.buyingPrice || article.price || 0).toFixed(2)}</div>
                                     </div>
                                 ))}
-                                
+                                {/* Promociones */}
+                                {(selectedOrder.sales ?? []).map((promo: any, idx: number) => (
+                                    <div className="order-modal-row" key={`promo-${idx}`}>
+                                        <div>Promo</div>
+                                        <div>{promo.denomination || 'Promoción'}</div>
+                                        <div>{promo.quantity || 1}</div>
+                                        <div>${promo.salePrice?.toFixed(2) || '0.00'}</div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
