@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styles from '../styles/Menu.module.css';
 import type { IProductClient } from '../types/IProductClient';
+import type { IArticle } from '../../administracion-sistema/api/types/IArticle';
 
 // Define las props que el modal esperará
 interface ProductModalProps {
@@ -32,6 +33,52 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product, o
         if (e.target === e.currentTarget) {
             onClose();
         }
+    };
+
+    const handleAddToCartWithStockCheck = () => {
+        if (product.productType === 'supply') {
+            // Safe type assertion via unknown
+            const supply = product as unknown as IArticle;
+            const stockActual = supply.currentStock ?? 0;
+            if (stockActual < quantity) {
+                alert('No hay suficiente stock del insumo seleccionado para la cantidad elegida.');
+                return;
+            }
+        } else if (!product.isPromo) {
+            // Validación de platos (ya implementada)
+            const faltantes = product.manufacturedArticleDetail?.filter(detail => {
+                const cantidadNecesaria = detail.quantity * quantity;
+                const stockActual = detail.article?.currentStock ?? 0;
+                return stockActual < cantidadNecesaria;
+            });
+            if (faltantes && faltantes.length > 0) {
+                alert(`Este plato no se encuentra disponible por falta de stock de ingredientes. Disculpe las molestias.`);
+                return;
+            }
+        } else {
+            // Validación de promos (ya implementada)
+            const faltantes = product.saleDetails?.filter(detail => {
+                if (detail.article) {
+                    const cantidadNecesaria = detail.quantity * quantity;
+                    const stockActual = detail.article.currentStock ?? 0;
+                    return stockActual < cantidadNecesaria;
+                }
+                if (detail.manufacturedArticle && Array.isArray(detail.manufacturedArticle.manufacturedArticleDetail)) {
+                    return detail.manufacturedArticle.manufacturedArticleDetail.some(ing => {
+                        const cantidadNecesaria = ing.quantity * detail.quantity * quantity;
+                        const stockActual = ing.article?.currentStock ?? 0;
+                        return stockActual < cantidadNecesaria;
+                    });
+                }
+                return false;
+            });
+            if (faltantes && faltantes.length > 0) {
+                alert(`No hay suficiente stock para la promo seleccionada.`);
+                return;
+            }
+        }
+        // Si todo OK, agrega al carrito
+        onAddToCart(product, quantity);
     };
 
     return (
@@ -106,7 +153,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product, o
                     </div>
                 </div>
 
-                <button className={styles.addToCartButton} onClick={() => onAddToCart(product, quantity)}>
+                <button className={styles.addToCartButton} onClick={handleAddToCartWithStockCheck}>
                     AGREGAR AL CARRITO
                 </button>
             </div>
