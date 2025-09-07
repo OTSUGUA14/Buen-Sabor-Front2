@@ -36,15 +36,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product, o
     };
 
     const handleAddToCartWithStockCheck = () => {
-        if (product.productType === 'supply') {
-            // Safe type assertion via unknown
-            const supply = product as unknown as IArticle;
-            const stockActual = supply.currentStock ?? 0;
-            if (stockActual < quantity) {
-                alert('No hay suficiente stock del insumo seleccionado para la cantidad elegida.');
-                return;
-            }
-        } else if (!product.isPromo) {
+        // Solo validar stock en platos y promos
+        if (!product.isPromo) {
             // Validación de platos (ya implementada)
             const faltantes = product.manufacturedArticleDetail?.filter(detail => {
                 const cantidadNecesaria = detail.quantity * quantity;
@@ -77,7 +70,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product, o
                 return;
             }
         }
-        // Si todo OK, agrega al carrito
+        // No validar stock en insumos/artículos
         onAddToCart(product, quantity);
     };
 
