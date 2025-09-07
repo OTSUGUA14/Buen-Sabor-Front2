@@ -82,6 +82,12 @@ export const ProductsPage: React.FC = () => {
         { id: 'idmanufacturedArticle', label: '#', numeric: true },
         { id: 'name', label: 'Nombre' },
         {
+            id: 'price',
+            label: 'Precio',
+            numeric: true,
+            render: (item) => `$${item.price?.toFixed(2) ?? '0.00'}`
+        },
+        {
             id: 'manufacturedArticleDetail',
             label: 'Ingredientes',
             render: (item) =>
@@ -95,25 +101,22 @@ export const ProductsPage: React.FC = () => {
             label: 'Categoría',
             render: (item) => item.category?.name ?? 'Sin categoría'
         },
-
-        // {
-        //     id: 'price',
-        //     label: 'Precio Venta',
-        //     numeric: true,
-        //     render: (item) =>
-        //         typeof item.price === 'number'
-        //             ? `$${item.price.toFixed(2)}`
-        //             : 'Sin precio'
-        // },
         {
             id: 'isAvailable',
             label: 'Estado',
-            render: (item) => item.isAvailable ? 'Activo' : 'Desactivado'
+            render: (item) => (
+                <span style={{
+                    fontWeight: 'bold',
+                    color: item.isAvailable ? '#2ecc40' : '#e74c3c'
+                }}>
+                    {item.isAvailable ? 'Activo' : 'Inactivo'}
+                </span>
+            )
         },
-        { id: 'estimatedTimeMinutes', label: 'Tiempo estimado', render: (item) => item.estimatedTimeMinutes },
+        { id: 'estimatedTimeMinutes', label: 'Tiempo (minutos)', render: (item) => item.estimatedTimeMinutes },
         ...(isAdmin
             ? [{
-                id: "acciones" as const, // <-- así TypeScript lo acepta
+                id: "acciones" as const,
                 label: 'Acciones',
                 render: (item: IProduct) => (
                     <div className="table-actions">
@@ -121,7 +124,6 @@ export const ProductsPage: React.FC = () => {
                             <img src="../../../public/icons/pencil.png" alt="Editar" className="pencil icon"
                                 style={{ width:'18px', height:'18px',filter: 'invert(25%) sepia(83%) saturate(7466%) hue-rotate(196deg) brightness(95%) contrast(104%)' }} />
                         </Button>
-                        {/* CAMBIO: este botón ahora abre modal de vista */}
                         <Button variant="actions" onClick={() => handleView(item)}>
                             <img src="../../../public/icons/eye-on.svg" alt="Ver" className="pencil icon"
                                 style={{width:'18px', height:'18px',  filter: 'invert(52%) sepia(94%) saturate(636%) hue-rotate(1deg) brightness(103%) contrast(102%)' }} />
@@ -154,7 +156,7 @@ export const ProductsPage: React.FC = () => {
         // },
         {
             name: 'estimatedTimeMinutes',
-            label: 'Tiempo Estimado (minutos)',
+            label: 'Tiempo (minutos)',
             type: 'number',
             validation: { required: true, min: 1 },
             placeholder: 'Ej: 15'
@@ -476,9 +478,15 @@ export const ProductsPage: React.FC = () => {
                             value={productToView.description ?? ''}
                             disabled
                         />
-                        
                         <InputField
-                            label="Tiempo Estimado (minutos)"
+                            label="Precio"
+                            name="price"
+                            type="number"
+                            value={productToView.price?.toString() ?? ''}
+                            disabled
+                        />
+                        <InputField
+                            label="Tiempo (minutos)"
                             name="estimatedTimeMinutes"
                             type="number"
                             value={productToView.estimatedTimeMinutes?.toString() ?? ''}
