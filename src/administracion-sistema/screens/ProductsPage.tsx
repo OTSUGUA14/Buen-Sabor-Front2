@@ -516,16 +516,7 @@ export const ProductsPage: React.FC = () => {
                                 />
                             </div>
                         )}
-                        <div style={{ marginBottom: 16 }}>
-                            <label>Ingredientes:</label>
-                            <ul>
-                                {productToView.manufacturedArticleDetail.map((ing, index) => (
-                                    <li key={index}>
-                                        {ing.article?.denomination ?? ''} - Cantidad: {ing.quantity}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                        
                     </>
                 )}
             </FormModal>

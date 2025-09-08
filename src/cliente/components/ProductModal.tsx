@@ -36,8 +36,14 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product, o
     };
 
     const handleAddToCartWithStockCheck = () => {
-        // Solo validar stock en platos y promos
-        if (!product.isPromo) {
+        if (product.productType === 'supply') {
+            // Validación para insumos/bebidas
+            console.log('Stock actual de bebida:', product.currentStock, 'Cantidad solicitada:', quantity);
+            if (typeof product.currentStock === 'number' && product.currentStock < quantity) {
+                alert('No hay suficiente stock para agregar la cantidad seleccionada al carrito.');
+                return;
+            }
+        } else if (!product.isPromo) {
             // Validación de platos (ya implementada)
             const faltantes = product.manufacturedArticleDetail?.filter(detail => {
                 const cantidadNecesaria = detail.quantity * quantity;
@@ -45,7 +51,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product, o
                 return stockActual < cantidadNecesaria;
             });
             if (faltantes && faltantes.length > 0) {
-                alert(`Este plato no se encuentra disponible por falta de stock de ingredientes. Disculpe las molestias.`);
+                alert(`No hay suficiente stock para agregar la cantidad seleccionada al carrito.`);
                 return;
             }
         } else {
@@ -57,7 +63,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product, o
                     return stockActual < cantidadNecesaria;
                 }
                 if (detail.manufacturedArticle && Array.isArray(detail.manufacturedArticle.manufacturedArticleDetail)) {
-                    return detail.manufacturedArticle.manufacturedArticleDetail.some(ing => {
+                    return detail.manufacturedArticle.manufacturedArticleDetail.some((ing: any) => {
                         const cantidadNecesaria = ing.quantity * detail.quantity * quantity;
                         const stockActual = ing.article?.currentStock ?? 0;
                         return stockActual < cantidadNecesaria;
@@ -70,7 +76,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product, o
                 return;
             }
         }
-        // No validar stock en insumos/artículos
+        // Si todo OK, agrega al carrito
         onAddToCart(product, quantity);
     };
 
@@ -115,22 +121,16 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, product, o
                     </div>
                 )}
 
-                <p className={styles.modalIngredients}>
-                    <span className={styles.ingredientsTitle}>Ingredientes:</span>{' '}
-                    {product.isPromo && product.saleDetails ? (
-                        // Para promociones, mostrar ingredientes de saleDetails
-                        product.saleDetails
-                            .map(detail => detail.article?.denomination ?? '')
-                            .filter(denomination => denomination)
-                            .join(', ')
-                    ) : (
-                        // Para productos normales, usar manufacturedArticleDetail
-                        product.manufacturedArticleDetail
+                {!product.isPromo && product.productType !== 'supply' && (
+                    <p className={styles.modalIngredients}>
+                        <span className={styles.ingredientsTitle}>Ingredientes:</span>{' '}
+                        {product.manufacturedArticleDetail
                             ?.map(ing => ing.article?.denomination ?? '')
                             .filter(denomination => denomination)
                             .join(', ')
-                    )}
-                </p>
+                        }
+                    </p>
+                )}
 
                 <div className={styles.modalPriceSection}>
                     <span className={styles.modalPriceLabel}>Precio:</span>

@@ -1,5 +1,4 @@
 import type { IArticle } from "../../administracion-sistema/api/types/IArticle";
-import type { ISaleDetail } from "../../administracion-sistema/api/types/ISale";
 
 export interface IProductClient {
     id: number;
@@ -8,13 +7,14 @@ export interface IProductClient {
     description: string;
     price: number;
     estimatedTimeMinutes: number;
-    manufacturedArticleDetail: ManufacturedArticleDetail[];
-    category: Category;
-    manufacInventoryImage: InventoryImage;
+    manufacturedArticleDetail: any[];
+    category: any;
+    manufacInventoryImage: { imageData: string };
     isAvailable: boolean;
-    productType?: 'manufactured' | 'supply' | 'promo';
     isPromo?: boolean;
-    saleDetails?: ISaleDetail[];
+    saleDetails?: any[];
+    productType?: string;
+    currentStock?: number;
 }
 
 export interface ManufacturedArticleDetail {

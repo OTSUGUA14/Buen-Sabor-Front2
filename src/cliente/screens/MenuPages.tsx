@@ -9,7 +9,7 @@ import type { IProductClient } from '../types/IProductClient';
 import { PayMethod, type OrderDetailDTO, type OrderRequestDTO, type UserPreferenceRequest } from '../types/IOrderData';
 import { createOrder, createPreferenceMP } from '../services/Api';
 import { supplyApi } from '../../administracion-sistema/api/supply';
-import { saleApi } from '../../administracion-sistema/api/sale'; // Importa la API de promociones
+import { saleApi } from '../../administracion-sistema/api/sale'; 
 
 export default function MenuPages() {
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
@@ -78,6 +78,7 @@ export default function MenuPages() {
                     idmanufacturedArticle: s.idarticle!,
                     name: s.denomination,
                     price: s.buyingPrice,
+                    currentStock: s.currentStock, 
                     category: { 
                         name: s.category?.name || "Insumos",
                         idcategory: s.category?.idcategory || 0,
@@ -237,9 +238,9 @@ export default function MenuPages() {
         });
     };
     const orderDetails: OrderDetailDTO[] = cart
-    .filter(item => item.productType === 'manufactured')
+    .filter(item => item.productType === 'manufactured' && typeof item.idmanufacturedArticle === 'number')
     .map(item => ({
-        manufacturedArticleId: item.idmanufacturedArticle,
+        manufacturedArticleId: item.idmanufacturedArticle as number,
         quantity: item.quantity,
         subTotal: item.price * item.quantity
     }));
@@ -269,17 +270,25 @@ export default function MenuPages() {
                                     <p>{item.name}</p>
                                     <div className={styles.quantityControls}>
                                         <button
-                                            onClick={() => handleDecrement(item.idmanufacturedArticle
-                                            )}
+                                            onClick={() => {
+                                                if (typeof item.idmanufacturedArticle === 'number') {
+                                                    handleDecrement(item.idmanufacturedArticle);
+                                                }
+                                            }}
                                             className={styles.decrementButton}
+                                            disabled={typeof item.idmanufacturedArticle !== 'number'}
                                         >
                                             -
                                         </button>
                                         <span>{item.quantity}</span>
                                         <button
-                                            onClick={() => handleIncrement(item.idmanufacturedArticle
-                                            )}
+                                            onClick={() => {
+                                                if (typeof item.idmanufacturedArticle === 'number') {
+                                                    handleIncrement(item.idmanufacturedArticle);
+                                                }
+                                            }}
                                             className={styles.incrementButton}
+                                            disabled={typeof item.idmanufacturedArticle !== 'number'}
                                         >
                                             +
                                         </button>
