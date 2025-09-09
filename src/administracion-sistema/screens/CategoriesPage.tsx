@@ -244,19 +244,31 @@ export const CategoriesPage: React.FC = () => {
                         value={formValues.name ?? ''}
                         onChange={handleInputChange}
                     />
-                    <InputField
+                    <SelectField
                         label="¿Para venta?"
                         name="forSale"
-                        type="checkbox"
-                        value={formValues.forSale ?? false}
-                        onChange={handleInputChange}
+                        options={[
+                            { value: 'true', label: 'Sí' },
+                            { value: 'false', label: 'No' }
+                        ]}
+                        value={String(formValues.forSale ?? 'false')}
+                        onChange={e => setFormValues(prev => ({
+                            ...prev,
+                            forSale: e.target.value === 'true'
+                        }))}
                     />
-                    <InputField
-                        label="¿Habilitada?"
+                    <SelectField
+                        label="Estado"
                         name="isEnabled"
-                        type="checkbox"
-                        value={formValues.isEnabled ?? true}
-                        onChange={handleInputChange}
+                        options={[
+                            { value: 'true', label: 'Activa' },
+                            { value: 'false', label: 'Inactiva' }
+                        ]}
+                        value={String(formValues.isEnabled ?? 'true')}
+                        onChange={e => setFormValues(prev => ({
+                            ...prev,
+                            isEnabled: e.target.value === 'true'
+                        }))}
                     />
                     <Button 
                         type="submit" 
