@@ -245,7 +245,48 @@ export default function MenuPages() {
         subTotal: item.price * item.quantity
     }));
 
+    const verificarStockCarrito = () => {
+        // Verifica platos
+        const faltantesPlatos = cart.filter(item =>
+            item.productType === 'manufactured' &&
+            item.manufacturedArticleDetail?.some((detail: any) => {
+                const cantidadNecesaria = detail.quantity * item.quantity;
+                const stockActual = detail.article?.currentStock ?? 0;
+                return stockActual < cantidadNecesaria;
+            })
+        );
+        // Verifica promos
+        const faltantesPromos = cart.filter(item =>
+            item.productType === 'promo' &&
+            item.saleDetails?.some((detail: any) => {
+                if (detail.article) {
+                    const cantidadNecesaria = detail.quantity * item.quantity;
+                    const stockActual = detail.article.currentStock ?? 0;
+                    return stockActual < cantidadNecesaria;
+                }
+                if (detail.manufacturedArticle && Array.isArray(detail.manufacturedArticle.manufacturedArticleDetail)) {
+                    return detail.manufacturedArticle.manufacturedArticleDetail.some((ing: any) => {
+                        const cantidadNecesaria = ing.quantity * detail.quantity * item.quantity;
+                        const stockActual = ing.article?.currentStock ?? 0;
+                        return stockActual < cantidadNecesaria;
+                    });
+                }
+                return false;
+            })
+        );
+        // Verifica insumos/bebidas
+        const faltantesInsumos = cart.filter(item =>
+            item.productType === 'supply' &&
+            typeof item.currentStock === 'number' &&
+            item.currentStock < item.quantity
+        );
 
+        if (faltantesPlatos.length > 0 || faltantesPromos.length > 0 || faltantesInsumos.length > 0) {
+            alert('No hay suficiente stock para uno o más productos del carrito. Por favor revise su pedido.');
+            return false;
+        }
+        return true;
+    };
 
     return (
         <main className={styles.menuContainer}>
@@ -304,10 +345,14 @@ export default function MenuPages() {
                         </p>
                         <button
                             className={styles.openCartButton}
-                            onClick={() => setIsCartModalOpen(true)}
-                        >
-                            Ir a pagar
-                        </button>
+                            onClick={() => {
+                                if (verificarStockCarrito()) {
+                                    setIsCartModalOpen(true);
+                            }
+                        }}
+                    >
+                        Ir a pagar
+                    </button>
 
                     </div>
                 )}
