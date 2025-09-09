@@ -97,7 +97,7 @@ export default function MenuPages() {
             // Promociones
             const allPromos = await saleApi.getAll();
             const promosForMenu = allPromos
-                .filter(promo => promo.idsale)
+                .filter(promo => promo.idsale && promo.active === true) 
                 .map(promo => ({
                     id: promo.idsale!,
                     idmanufacturedArticle: promo.idsale!,
@@ -112,7 +112,7 @@ export default function MenuPages() {
                     isPromo: true,
                     description: promo.saleDescription,
                     estimatedTimeMinutes: 0,
-                    manufacturedArticleDetail: [], // Simplificado por ahora
+                    manufacturedArticleDetail: [],
                     saleDetails: promo.saleDetails || [],
                 }));
 
