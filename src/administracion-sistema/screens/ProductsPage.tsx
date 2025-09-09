@@ -166,7 +166,7 @@ export const ProductsPage: React.FC = () => {
             label: 'Estado',
             type: 'select',
             options: [
-                { value: '', label: 'Seleccionar una categoría...' },
+                { value: '', label: 'Seleccionar un Estado' },
                 { value: 'Activo', label: 'Activo' },
                 { value: 'Inactivo', label: 'Inactivo' },
             ],
@@ -183,11 +183,13 @@ export const ProductsPage: React.FC = () => {
             label: 'Categoría',
             type: 'select',
             options: [
-                { value: '', label: 'Seleccionar una categoría...' },
-                ...categories.map(cat => ({
-                    value: cat.idcategory,
-                    label: cat.name
-                }))
+                { value: '', label: 'Seleccionar una categoría' },
+                ...categories
+                    .filter(cat => cat.forSale && cat.enabled) 
+                    .map(cat => ({
+                        value: cat.idcategory,
+                        label: cat.name
+                    }))
             ],
             validation: { required: true },
         }
