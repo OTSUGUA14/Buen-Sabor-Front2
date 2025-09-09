@@ -59,7 +59,7 @@ export const CartModal: React.FC<CartModalProps> = ({
     const articleDetails: ArticleDetailDTO[] = cart
         .filter(item => item.productType === 'supply')
         .map(item => ({
-            articleId: item.idmanufacturedArticle,
+            articleId: item.id ?? item.idarticle, // <-- usa el id correcto
             quantity: item.quantity,
             subTotal: item.price * item.quantity
         }));
