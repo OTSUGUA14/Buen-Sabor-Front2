@@ -57,7 +57,8 @@ export const supplyApi = {
             measuringUnit: Number(item.measuringUnit?.idmeasuringUnit),
             category: Number(item.category?.idcategory),
             isForSale: item.forSale ?? false,
-            inventoryImageDTO, // NUNCA null, siempre un objeto
+            isEnabled: item.enabled ?? true, 
+            inventoryImageDTO,
         };
 
         console.log('Payload enviado al backend:', payload);
@@ -108,7 +109,8 @@ export const supplyApi = {
             measuringUnit: Number(updatedItem.measuringUnit?.idmeasuringUnit),
             category: Number(updatedItem.category?.idcategory),
             isForSale: updatedItem.forSale ?? false,
-            inventoryImageDTO, // NUNCA null, siempre un objeto
+            isEnabled: updatedItem.enabled ?? true, // Nuevo campo enviado al backend
+            inventoryImageDTO,
         };
 
         const res = await fetch(`${BASE_URL}/update/${updatedItem.idarticle}`, {

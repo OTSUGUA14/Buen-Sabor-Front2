@@ -17,6 +17,7 @@ export interface IArticle {
         IDInventoryImage: number;
         imageData: string;
     } | null;
-    quantity?:number
-    forSale: boolean; // Opcional, si no se maneja en el frontend
+    quantity?: number;
+    forSale: boolean;
+    enabled: boolean; 
 }

@@ -144,6 +144,11 @@ export const SuppliesPage: React.FC = () => {
             label: 'Para venta',
             render: i => i.forSale ? 'Sí' : 'No'
         },
+        {
+            id: 'enabled',
+            label: 'Activo',
+            render: i => i.enabled ? 'Sí' : 'No'
+        },
         ...(isAdmin
             ? [{
                 id: 'acciones' as const, // <-- así TypeScript lo acepta
@@ -306,6 +311,7 @@ export const SuppliesPage: React.FC = () => {
                     },
                     forSale,
                     inventoryImage,
+                    enabled: formValues.enabled ?? true,
                 };
                 await updateItem(submitData);
             } else {
@@ -325,6 +331,7 @@ export const SuppliesPage: React.FC = () => {
                     },
                     forSale,
                     inventoryImage,
+                    enabled: formValues.enabled ?? true, 
                 };
                 await createItem(submitData);
             }
@@ -456,6 +463,18 @@ export const SuppliesPage: React.FC = () => {
                         options={[{ value: '', label: 'Seleccionar categoría' }, ...categoryOptions.filter(opt => opt.value !== 'TODOS')]
                         }
                         value={formValues.category ?? ''}
+                        onChange={handleInputChange}
+                    />
+
+                    {/* NUEVO CAMPO: Activo/Inactivo */}
+                    <SelectField
+                        label="Estado"
+                        name="enabled"
+                        options={[
+                            { value: 'true', label: 'Activo' },
+                            { value: 'false', label: 'Inactivo' }
+                        ]}
+                        value={formValues.enabled ?? 'true'}
                         onChange={handleInputChange}
                     />
                     
