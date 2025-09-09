@@ -1,7 +1,4 @@
 import { useState } from "react";
-// Justo después de importar React y hooks
-import { useEffect } from "react";
-import { fetchAndStoreOAuthUser } from "../services/Api";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "../styles/Login.module.css";
 import type { UserLogin } from "../types/UserLogin";
@@ -73,17 +70,6 @@ export default function Login() {
 
                     <button type="submit" className={styles.loginButton}>
                         INICIAR SESION
-                    </button>
-
-                    <p className={styles.orSeparator}>O INGRESA CON</p>
-
-                    <button
-                        type="button"
-                        className={styles.googleLoginButton}
-                        onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/google"}
-                    >
-                        <img src="../public/icons/icons8-logo-de-google-48.svg" alt="Google" className={styles.googleIcon} />
-                        Entrar con Google
                     </button>
 
                     <p className={styles.signUpText}>

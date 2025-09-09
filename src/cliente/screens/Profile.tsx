@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '../../cliente/components/UserContext';
-import { getLocations } from '../services/Api'; // ✅ Importar getLocations
+import { getLocations } from '../services/Api';
 import '../styles/Profile.css';
 
 interface Location {
@@ -18,11 +18,11 @@ interface Location {
 
 const Profile = () => {
     const [showPassword, setShowPassword] = useState(false);
-    const [locations, setLocations] = useState<Location[]>([]); // ✅ Estado para locations
-
+    const [locations, setLocations] = useState<Location[]>([]);
     const { profile, updateProfile } = useUser();
     const [isEditing, setIsEditing] = useState(false);
 
+    // Estado del formulario
     const [form, setForm] = useState({
         name: profile?.name || '',
         lastName: profile?.lastName || '',
@@ -33,11 +33,10 @@ const Profile = () => {
         street: profile?.domiciles?.[0]?.street || '',
         number: profile?.domiciles?.[0]?.number?.toString() || '',
         zipcode: profile?.domiciles?.[0]?.zipCode || '',
-        locationId: profile?.domiciles?.[0]?.location?.idlocation || 1, // ✅ ID de location
+        locationId: profile?.domiciles?.[0]?.location?.idlocation || 1, 
         locationName: profile?.domiciles?.[0]?.location?.name || '',
     });
 
-    // ✅ Cargar locations al montar el componente
     useEffect(() => {
         getLocations().then((data) => setLocations(data));
     }, []);
@@ -54,7 +53,7 @@ const Profile = () => {
                 street: profile.domiciles?.[0]?.street || '',
                 number: profile.domiciles?.[0]?.number?.toString() || '',
                 zipcode: profile.domiciles?.[0]?.zipCode || '',
-                locationId: profile.domiciles?.[0]?.location?.idlocation || 1, // ✅ ID de location
+                locationId: profile.domiciles?.[0]?.location?.idlocation || 1,
                 locationName: profile?.domiciles?.[0]?.location?.name || '',
             });
         }
@@ -64,12 +63,9 @@ const Profile = () => {
         return <div className="profile-container">Cargando perfil...</div>;
     }
 
-    const avatarUrl = profile.userImage || "https://images.steamusercontent.com/ugc/18200902477657540315/C8CBD823EF42E1F4E8368E5D56A9FC289B18DA32/?imw=512&&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false";
-
+    // Maneja cambios en los inputs y el select de localidad
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        
-        // ✅ Manejar cambio de location
         if (name === 'locationId') {
             const selectedId = Number(value);
             const selectedLocation = locations.find(loc => loc.idlocation === selectedId);
@@ -102,6 +98,7 @@ const Profile = () => {
         });
     };
 
+    // Guarda los cambios del perfil
     const handleSave = async () => {
         try {
             await updateProfile(form);
@@ -117,11 +114,6 @@ const Profile = () => {
         <div className="profile-container">
             <h1 className="profile-title">MIS DATOS PERSONALES</h1>
             <div className="profile-content">
-                <div className="profile-avatar-section">
-                    <div className="profile-avatar-circle">
-                        <img src={avatarUrl} alt="Avatar de Usuario" className="profile-avatar-image" />
-                    </div>
-                </div>
                 <div className="profile-details-section">
                     <div className="profile-detail-item">
                         <label className="profile-label">Nombre</label>
@@ -136,7 +128,6 @@ const Profile = () => {
                             <p className="profile-value">{profile.name}</p>
                         )}
                     </div>
-
                     <div className="profile-detail-item">
                         <label className="profile-label">Apellido</label>
                         {isEditing ? (
@@ -150,7 +141,6 @@ const Profile = () => {
                             <p className="profile-value">{profile.lastName}</p>
                         )}
                     </div>
-
                     <div className="profile-detail-item">
                         <label className="profile-label">Nombre de usuario</label>
                         {isEditing ? (
@@ -164,7 +154,6 @@ const Profile = () => {
                             <p className="profile-value">{profile.username}</p>
                         )}
                     </div>
-
                     <div className="profile-detail-item">
                         <label className="profile-label">Teléfono</label>
                         {isEditing ? (
@@ -202,7 +191,6 @@ const Profile = () => {
                                     onChange={handleChange}
                                     className='password-input'
                                 />
-
                                 <span onClick={() => setShowPassword(prev => !prev)} style={{ cursor: 'pointer' }}>
                                     <img
                                         src={showPassword ? 'public/icons/eye-on.svg' : 'public/icons/eye-off.svg'}
@@ -223,7 +211,6 @@ const Profile = () => {
                             </p>
                         )}
                     </div>
-
                     <div className="profile-detail-item">
                         <label className="profile-label">Nombre calle</label>
                         {isEditing ? (
@@ -237,7 +224,6 @@ const Profile = () => {
                             <p className="profile-value">{profile.domiciles?.[0]?.street || "No registrado"}</p>
                         )}
                     </div>
-
                     <div className="profile-detail-item">
                         <label className="profile-label">Numero de casa</label>
                         {isEditing ? (
@@ -251,8 +237,7 @@ const Profile = () => {
                             <p className="profile-value">{profile.domiciles?.[0]?.number || ""}</p>
                         )}
                     </div>
-
-                    {/* ✅ Localidad con selector */}
+                    {/* Selector de localidad */}
                     <div className="profile-detail-item">
                         <label className="profile-label">Localidad</label>
                         {isEditing ? (
@@ -273,7 +258,6 @@ const Profile = () => {
                             <p className="profile-value">{profile.domiciles?.[0]?.location?.name || "No registrado"}</p>
                         )}
                     </div>
-
                     <div className="profile-detail-item">
                         <label className="profile-label">Codigo postal</label>
                         {isEditing ? (

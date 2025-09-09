@@ -397,13 +397,6 @@ export default function RegisterPage() {
 
                     <button type="submit" className={styles.loginButton}>REGISTRARSE</button>
 
-                    <p className={styles.orSeparator}>O INGRESA CON</p>
-
-                    <button type="button" className={styles.googleLoginButton}>
-                        <img src="../public/icons/icons8-logo-de-google-48.svg" alt="Google" className={styles.googleIcon} />
-                        Entrar con Google
-                    </button>
-
                     <p className={styles.signUpText}>
                         Ya tenes cuenta?{" "}
                         <Link to="/login" className={styles.signUpLink}>
