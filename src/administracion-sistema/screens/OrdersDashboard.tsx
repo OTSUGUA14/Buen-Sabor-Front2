@@ -390,6 +390,7 @@ export const OrderDashboard: React.FC = () => {
                                     value={editState}
                                     onChange={e => setEditState(e.target.value)}
                                     style={{ minWidth: 160, padding: '6px', borderRadius: 6, border: '1px solid #ccc' }}
+                                    disabled={["CANCELED", "REJECTED", "ARRIVED"].includes(selectedOrder.orderState)}
                                 >
                                     {getStateOptionsForRole().map(opt => (
                                         <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -399,7 +400,11 @@ export const OrderDashboard: React.FC = () => {
                         </div>
 
                         <div className="order-actions" style={{ marginTop: 24 }}>
-                            <Button variant="primary" type="submit">
+                            <Button
+                                variant="primary"
+                                type="submit"
+                                disabled={["CANCELED", "REJECTED", "ARRIVED"].includes(selectedOrder.orderState)}
+                            >
                                 Guardar
                             </Button>
                             <Button variant="secondary" type="button" onClick={() => setIsModalOpen(false)}>

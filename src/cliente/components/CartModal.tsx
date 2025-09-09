@@ -163,17 +163,7 @@ export const CartModal: React.FC<CartModalProps> = ({
                     </div>
                 )}
 
-                {/* Aclaraciones */}
-                <div className={styles.section}>
-                    <label>Aclaraciones</label>
-                    <input
-                        type="text"
-                        placeholder="Agregar aclaraciones"
-                        value={clarifications}
-                        onChange={(e) => setClarifications(e.target.value)}
-                    />
-                </div>
-
+                
                 <hr className={styles.separator} />
 
                 {/* Resumen de la orden */}
