@@ -43,7 +43,7 @@ export const CartModal: React.FC<CartModalProps> = ({
     const orderDetails: OrderDetailDTO[] = cart
         .filter(item => item.productType === 'manufactured')
         .map(item => ({
-            manufacturedArticleId: item.idmanufacturedArticle,
+            manufacturedArticleId: item.idmanufacturedArticle ?? item.id, // usa el id correcto
             quantity: item.quantity,
             subTotal: item.price * item.quantity
         }));
@@ -51,7 +51,7 @@ export const CartModal: React.FC<CartModalProps> = ({
     const salesDetails: SalesDTO[] = cart
         .filter(item => item.productType === 'promo')
         .map(item => ({
-            saleID: item.idmanufacturedArticle,
+            saleID: item.idmanufacturedArticle ?? item.id, // usa el id correcto
             quantity: item.quantity,
             subTotal: item.price * item.quantity
         }));
@@ -59,7 +59,7 @@ export const CartModal: React.FC<CartModalProps> = ({
     const articleDetails: ArticleDetailDTO[] = cart
         .filter(item => item.productType === 'supply')
         .map(item => ({
-            articleId: item.id ?? item.idarticle, // <-- usa el id correcto
+            articleId: item.id ?? item.idarticle ?? item.idmanufacturedArticle, // usa el id correcto
             quantity: item.quantity,
             subTotal: item.price * item.quantity
         }));
