@@ -89,6 +89,11 @@ export const EmployeesPage: React.FC = () => {
         { id: 'phoneNumber', label: 'Teléfono' },
         { id: 'employeeRole', label: 'Rol' },
         { id: 'shift', label: 'Turno' },
+        {
+            id: 'enabled',
+            label: 'Estado',
+            render: (item: IEmployee) => item.enabled ? 'Activo' : 'Inactivo'
+        },
         ...(isAdmin
             ? [{
                 id: 'acciones' as const,
@@ -205,6 +210,7 @@ export const EmployeesPage: React.FC = () => {
                     salary: parseFloat(formValues.salary),
                     username: formValues.username,
                     password: formValues.password && formValues.password.length > 0 ? formValues.password : employeeToEdit.password,
+                    enabled: String(formValues.enabled) === 'true', // <-- Asegura booleano
                 };
                 await employeeApi.update(updateData);
             } else {
@@ -221,6 +227,7 @@ export const EmployeesPage: React.FC = () => {
                     username: formValues.username,
                     password: formValues.password,
                     domiciles: [],
+                    enabled: String(formValues.enabled) === 'true',
                 } as Omit<IEmployee, 'id'>;
                 
                 await employeeApi.create(createData);
@@ -343,6 +350,19 @@ export const EmployeesPage: React.FC = () => {
                         onChange={handleInputChange}
                         placeholder={employeeToEdit ? "Dejar vacío para mantener actual" : ""}
                     />
+                    <SelectField
+                        label="Estado"
+                        name="enabled"
+                        options={[
+                            { value: 'true', label: 'Activo' },
+                            { value: 'false', label: 'Inactivo' }
+                        ]}
+                        value={String(formValues.enabled ?? 'true')}
+                        onChange={e => setFormValues(prev => ({
+                            ...prev,
+                            enabled: e.target.value === 'true'
+                        }))}
+                    />
                     <Button 
                         type="submit" 
                         variant="primary"
@@ -380,6 +400,13 @@ export const EmployeesPage: React.FC = () => {
                             type="text" 
                             value={formatDate(employeeToView.birthDate)} 
                             disabled 
+                        />
+                        <InputField
+                            label="Estado"
+                            name="enabled"
+                            type="text"
+                            value={employeeToView.enabled ? 'Activo' : 'Inactivo'}
+                            disabled
                         />
                     </>
                 )}

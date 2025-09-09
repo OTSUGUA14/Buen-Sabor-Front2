@@ -15,32 +15,6 @@ export interface IEmployee {
     shift: Shift;
     username: string;
     password: string;
-    domiciles: any[]; 
+    domiciles: any[];
+    enabled: boolean; 
 }
-
-// public enum Role {
-//     ADMIN, CASHIER, CHEF, DRIVER
-// }
-
-// public class Employee extends Person {
-
-//     @Id
-//     @GeneratedValue(strategy = GenerationType.IDENTITY)
-//     private Long id;
-
-//     @Enumerated(EnumType.STRING)
-//     private Role employeeRole;
-
-//     private Double salary;
-
-//     @Enumerated(EnumType.STRING)
-//     private Shift shift;
-
-//     private String username;
-//     private String password;
-
-        
-//     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
-//     private List<Domicile> domiciles;
-// }
-

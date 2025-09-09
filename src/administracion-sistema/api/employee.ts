@@ -6,29 +6,29 @@ export const employeeApi = {
     getAll: async (): Promise<IEmployee[]> => {
         const res = await fetch('http://localhost:8080/employee/getAll');
         if (!res.ok) throw new Error('Error al obtener empleados');
-        return res.json();
+        return res.json(); // El backend ya devuelve enabled
     },
 
     getById: async (id: number): Promise<IEmployee> => {
         const res = await fetch(`http://localhost:8080/employee/get/${id}`);
         if (!res.ok) throw new Error(`Error al obtener empleado con ID ${id}`);
-        return res.json();
+        return res.json(); // El backend ya devuelve enabled
     },
 
     create: async (employee: Omit<IEmployee, 'id'>): Promise<IEmployee> => {
-        // Mapear campos del frontend al DTO del backend
         const employeeToSend = {
-            firstName: employee.name,        // name -> firstName
+            firstName: employee.name,
             lastName: employee.lastName,
             phoneNumber: employee.phoneNumber,
             email: employee.email,
-            birthDate: new Date(employee.birthDate).toISOString(), // Convertir a ISO string
-            domiciles: [],                   // Array vacío como requiere el DTO
+            birthDate: new Date(employee.birthDate).toISOString(),
+            domiciles: [],
             username: employee.username,
             password: employee.password,
-            role: employee.employeeRole,     // employeeRole -> role
+            role: employee.employeeRole,
             salary: employee.salary,
             shift: employee.shift,
+            enabled: employee.enabled ?? true, // <-- Nuevo campo
         };
 
         const res = await fetch('http://localhost:8080/employee/register', {
@@ -46,8 +46,6 @@ export const employeeApi = {
 
     update: async (employee: IEmployee): Promise<IEmployee> => {
         const { id, ...rest } = employee;
-        
-        // Mapear campos para la actualización si es necesario
         const updateData = {
             firstName: rest.name,
             lastName: rest.lastName,
@@ -59,6 +57,7 @@ export const employeeApi = {
             role: rest.employeeRole,
             salary: rest.salary,
             shift: rest.shift,
+            enabled: rest.enabled ?? true, // <-- Nuevo campo
         };
 
         const res = await fetch(`http://localhost:8080/employee/update/${id}`, {
