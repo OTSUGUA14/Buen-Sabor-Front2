@@ -60,8 +60,12 @@ export const ProductsPage: React.FC = () => {
         setProductsCount(products.length);
         const fetchIngredientes = async () => {
             const ingredientes = await getIngredientesAll();
-            // Filtrar solo ingredientes que NO son para venta (forSale = false)
-            setIngredientesAll(ingredientes.filter((ingrediente: IArticle) => ingrediente.forSale === false));
+            // Solo ingredientes que NO son para venta y están habilitados
+            setIngredientesAll(
+                ingredientes.filter(
+                    (ingrediente: IArticle) => ingrediente.forSale === false && ingrediente.enabled === true
+                )
+            );
         };
         fetchIngredientes();
     }, [products]);
