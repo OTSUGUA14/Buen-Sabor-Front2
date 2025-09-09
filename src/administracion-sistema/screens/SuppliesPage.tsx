@@ -37,8 +37,8 @@ export const SuppliesPage: React.FC = () => {
     const [supplyToView, setSupplyToView] = useState<IArticle | null>(null);
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState<'TODOS' | 'Activo' | 'Inactivo'>('TODOS');
-    const [categoryFilter, setCategoryFilter] = useState<'TODOS' | string>('TODOS');
+    const [statusFilter, setStatusFilter] = useState<'TODOS' | 'Activo' | 'Inactivo' | 'Venta' | 'NoVenta'>('TODOS');
+    const [categoryFilter] = useState<'TODOS' | string>('TODOS');
     const [categories, setCategories] = useState<Category[]>([]);
     const [measuringUnits, setMeasuringUnits] = useState<{ unit: string; idmeasuringUnit: number }[]>([]);
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
@@ -58,6 +58,8 @@ export const SuppliesPage: React.FC = () => {
         { value: 'TODOS', label: 'TODOS' },
         { value: 'Activo', label: 'Activo' },
         { value: 'Inactivo', label: 'Inactivo' },
+        { value: 'Venta', label: 'Para venta' },
+        { value: 'NoVenta', label: 'Para ingrediente' },
     ];
 
 
@@ -100,7 +102,19 @@ export const SuppliesPage: React.FC = () => {
                 categoryFilter === 'TODOS' ||
                 categoria === categoryFilter.toLowerCase();
 
-            return matchesSearch && matchesCategory;
+            // Nuevo filtro para venta
+            let matchesStatus = true;
+            if (statusFilter === 'Activo') {
+                matchesStatus = item.currentStock > 0;
+            } else if (statusFilter === 'Inactivo') {
+                matchesStatus = item.currentStock === 0;
+            } else if (statusFilter === 'Venta') {
+                matchesStatus = item.forSale === true;
+            } else if (statusFilter === 'NoVenta') {
+                matchesStatus = item.forSale === false;
+            }
+
+            return matchesSearch && matchesCategory && matchesStatus;
         });
     }, [ingredientesAll, searchTerm, statusFilter, categoryFilter]);
 
@@ -354,9 +368,7 @@ export const SuppliesPage: React.FC = () => {
 
     return (
         <div className="crud-page-container">
-            {/* <div className="page-header">
-                <h2>INSUMOS</h2>
-            </div> */}
+            
 
             <div className="filter-controls">
                 {isAdmin && (
@@ -374,7 +386,7 @@ export const SuppliesPage: React.FC = () => {
                     name="statusFilter"
                     options={statusOptions}
                     value={statusFilter}
-                    onChange={e => setStatusFilter(e.target.value as 'TODOS' | 'Activo' | 'Inactivo')}
+                    onChange={e => setStatusFilter(e.target.value as typeof statusFilter)}
                     className="status-select"
                 />
             </div>
