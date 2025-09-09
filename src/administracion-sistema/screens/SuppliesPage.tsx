@@ -572,6 +572,13 @@ export const SuppliesPage: React.FC = () => {
                             value={supplyToView.forSale ? 'Sí' : 'No'}
                             disabled
                         />
+                        <InputField
+                            label="Estado"
+                            name="enabled"
+                            type="text"
+                            value={supplyToView.enabled ? 'Activo' : 'Inactivo'}
+                            disabled
+                        />
                         {supplyToView.forSale && supplyToView.inventoryImage?.imageData && (
                             <div style={{ marginBottom: 16 }}>
                                 <label>Imagen:</label>

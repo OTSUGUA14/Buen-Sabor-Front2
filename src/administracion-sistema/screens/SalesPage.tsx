@@ -657,6 +657,13 @@ export const SalesPage: React.FC = () => {
                             value={saleToView.endTime ?? ''}
                             disabled
                         />
+                        <InputField
+                            label="Estado"
+                            name="active"
+                            type="text"
+                            value={saleToView.active ? 'Activa' : 'Inactiva'}
+                            disabled
+                        />
                         {saleToView.inventoryImage?.imageData && (
                             <div style={{ marginBottom: 16 }}>
                                 <label>Imagen de la promoción:</label>

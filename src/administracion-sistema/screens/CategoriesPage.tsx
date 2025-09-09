@@ -301,6 +301,13 @@ export const CategoriesPage: React.FC = () => {
                             value={categoryToView.forSale ? 'Sí' : 'No'}
                             disabled
                         />
+                        <InputField
+                            label="Estado"
+                            name="enabled"
+                            type="text"
+                            value={categoryToView.enabled ? 'Activa' : 'Inactiva'}
+                            disabled
+                        />
                     </>
                 )}
             </FormModal>
