@@ -18,7 +18,6 @@ export default function LoginEmployee() {
 
         try {
             const response = await loginEmploye(employeeToLogin);
-            // response es un string como "Login OK, Rol: CASHIER"
             const match = response.match(/Rol:\s*(\w+)/i);
             if (match) {
                 const role = match[1];
@@ -31,7 +30,7 @@ export default function LoginEmployee() {
                     navigate("/admin/orders");
                 }
             } else {
-                alert("No se pudo obtener el rol del empleado.");
+                alert("Usuario invalido o inactivo.");
             }
         } catch (error) {
             alert("Error al iniciar sesión.");
