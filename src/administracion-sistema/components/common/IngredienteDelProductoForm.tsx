@@ -54,7 +54,7 @@ const IngredienteDelProductoForm: React.FC<Props> = ({
     // Calcular precio sugerido (costo + 15%)
     const calcularPrecioSugerido = () => {
         const costoBase = calcularPrecioTotal();
-        return costoBase * 1.15;
+        return costoBase * 1.25;
     };
 
     // Manejar cambio en el precio personalizado
@@ -126,7 +126,7 @@ const IngredienteDelProductoForm: React.FC<Props> = ({
                     }}
                 />
                 <small style={{ color: '#666', fontSize: '12px' }}>
-                    Precio sugerido (costo + 15%)
+                    Precio sugerido (costo %)
                 </small>
             </div>
         </div>
