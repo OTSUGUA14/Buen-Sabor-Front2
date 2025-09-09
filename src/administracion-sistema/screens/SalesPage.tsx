@@ -56,7 +56,8 @@ export const SalesPage: React.FC = () => {
     useEffect(() => {
         getProductsAll().then(setProducts);
         getIngredientesAll().then(data => {
-            setArticles(data.filter((a: IArticle) => a.forSale));
+            // Solo insumos para venta y habilitados
+            setArticles(data.filter((a: IArticle) => a.forSale === true && a.enabled === true));
         });
     }, []);
 
@@ -122,6 +123,11 @@ export const SalesPage: React.FC = () => {
                         .filter(Boolean)
                         .join(', ')
                     : '',
+        },
+        {
+            id: 'active',
+            label: 'Activa',
+            render: (item) => item.active ? 'Sí' : 'No'
         },
         ...(isAdmin
             ? [{
@@ -357,7 +363,7 @@ export const SalesPage: React.FC = () => {
                 endDate: formValues.endDate,
                 startTime: formValues.startTime,
                 endTime: formValues.endTime,
-                isActive: true,
+                isActive: formValues.active ?? true, 
                 saleDiscount: discount,
                 salePrice: finalPrice,
                 inventoryImage,
@@ -559,6 +565,26 @@ export const SalesPage: React.FC = () => {
                     <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#2196F3' }}>
                         <strong>Precio Final: ${finalPrice.toFixed(2)}</strong>
                     </div>
+                </div>
+
+                {/* Campo para estado activa/inactiva */}
+                <div style={{ marginBottom: 16 }}>
+                    <label>Estado de la promoción:</label>
+                    <select
+                        name="active"
+                        value={formValues.active ?? true}
+                        onChange={e => {
+                            const value = e.target.value === "true";
+                            setFormValues(prev => ({
+                                ...prev,
+                                active: value
+                            }));
+                        }}
+                        style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+                    >
+                        <option value="true">Activa</option>
+                        <option value="false">Inactiva</option>
+                    </select>
                 </div>
 
                 <Button variant="primary" type="submit">

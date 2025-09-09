@@ -26,7 +26,7 @@ export interface ISale {
     saleDescription: string;
     salePrice: number;
     saleType: SaleType;
-    isActive: boolean;
+    active: boolean;
     saleDiscount: number; 
     inventoryImage: InventoryImage;
     saleDetails: ISaleDetail[];
