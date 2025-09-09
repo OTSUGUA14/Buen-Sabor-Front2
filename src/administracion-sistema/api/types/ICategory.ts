@@ -3,5 +3,6 @@ export interface ICategory {
     IDCategory: number;
     name: string;
     forSale: boolean;
+    enabled: boolean; 
 }
 

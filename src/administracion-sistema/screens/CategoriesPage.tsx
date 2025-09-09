@@ -84,6 +84,11 @@ export const CategoriesPage: React.FC = () => {
             label: 'Para venta?',
             render: item => item.forSale ? 'Sí' : 'No',
         },
+        {
+            id: 'enabled',
+            label: 'Habilitada?',
+            render: item => item.enabled ? 'Sí' : 'No',
+        },
         // Solo mostrar acciones si el usuario es administrador
         ...(isAdmin
             ? [{
@@ -132,7 +137,8 @@ export const CategoriesPage: React.FC = () => {
         setCategoryToEdit(item);
         setFormValues({
             name: item.name,
-            forSale: item.forSale
+            forSale: item.forSale,
+            isEnabled: item.enabled, // <-- agregado
         });
         setIsModalOpen(true);
     };
@@ -162,6 +168,7 @@ export const CategoriesPage: React.FC = () => {
                 IDCategory: categoryToEdit.IDCategory,
                 name: formValues.name,
                 forSale: formValues.forSale ?? false,
+                enabled: formValues.isEnabled ?? true, // <-- usar isEnabled
             };
             await updateItem(updateData);
         } else {
@@ -170,6 +177,7 @@ export const CategoriesPage: React.FC = () => {
                 IDCategory: 0,
                 name: formValues.name,
                 forSale: formValues.forSale ?? false,
+                enabled: formValues.isEnabled ?? true, // <-- usar isEnabled
             };
             
             try {
@@ -241,6 +249,13 @@ export const CategoriesPage: React.FC = () => {
                         name="forSale"
                         type="checkbox"
                         value={formValues.forSale ?? false}
+                        onChange={handleInputChange}
+                    />
+                    <InputField
+                        label="¿Habilitada?"
+                        name="isEnabled"
+                        type="checkbox"
+                        value={formValues.isEnabled ?? true}
                         onChange={handleInputChange}
                     />
                     <Button 

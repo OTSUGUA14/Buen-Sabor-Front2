@@ -36,6 +36,7 @@ export const categoryApi = {
         const body = {
             name: newItem.name,
             isForsale: newItem.forSale,
+            isEnabled: newItem.enabled, // <-- agregado
         };
         
         console.log('Body a enviar al backend:', body);
@@ -71,7 +72,8 @@ export const categoryApi = {
     update: async (updatedItem: ICategory): Promise<ICategory> => {
         const body = {
             name: updatedItem.name,
-            isForsale: updatedItem.forSale, // Cambio aquí también
+            isForsale: updatedItem.forSale,
+            isEnabled: updatedItem.enabled, // <-- agregado
         };
         const res = await fetch(`${BASE_URL}/update/${updatedItem.IDCategory}`, {
             method: 'PATCH',
@@ -94,26 +96,3 @@ export const categoryApi = {
         }
     },
 };
-
-// @RestController
-// @CrossOrigin(origins = "*")
-// @RequestMapping("/category")
-// public class CategoryController {
-//     @Autowired
-//     private CategoryServiceImpl categoryServiceImpl;
-
-//     @GetMapping("/getAll")
-//     public List<Category> findAll(){
-//         return categoryServiceImpl.getAllCategories();
-//     }
-
-//     @PostMapping("/add")
-//     public ResponseEntity<Category> addCategory(@RequestBody CategoryDTO categoryDTO){
-//         return ResponseEntity.status(HttpStatus.OK).body(categoryServiceImpl.addCategory(categoryDTO));
-//     }
-
-//     @PatchMapping("/update/{ID}")
-//     public ResponseEntity<Category> updateCategory(@PathVariable("ID") Long ID, @RequestBody CategoryDTO categoryDTO){
-//         return ResponseEntity.status(HttpStatus.OK).body(categoryServiceImpl.updateCategory(ID, categoryDTO));
-//     }
-// }
