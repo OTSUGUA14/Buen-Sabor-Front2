@@ -72,7 +72,7 @@ export default function MenuPages() {
             // Insumos para venta
             const allSupplies = await supplyApi.getAll();
             const suppliesForSale = allSupplies
-                .filter(s => s.forSale && s.idarticle)
+                .filter(s => s.forSale && s.enabled && s.idarticle) 
                 .map(s => ({
                     id: s.idarticle!,
                     idmanufacturedArticle: s.idarticle!,
