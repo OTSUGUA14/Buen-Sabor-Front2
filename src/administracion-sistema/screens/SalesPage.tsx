@@ -105,10 +105,6 @@ export const SalesPage: React.FC = () => {
             label: 'Tipo',
             render: (item) => saleTypeLabels[item.saleType] ?? item.saleType
         },
-        { id: 'startDate', label: 'Fecha Inicio' },
-        { id: 'endDate', label: 'Fecha Fin' },
-        { id: 'startTime', label: 'Hora Inicio' },
-        { id: 'endTime', label: 'Hora Fin' },
         {
             id: 'saleDetails',
             label: 'Productos',
@@ -171,30 +167,6 @@ export const SalesPage: React.FC = () => {
             validation: { required: true }
         },
         {
-            name: 'startDate',
-            label: 'Fecha Inicio',
-            type: 'date',
-            validation: { required: true }
-        },
-        {
-            name: 'endDate',
-            label: 'Fecha Fin',
-            type: 'date',
-            validation: { required: true }
-        },
-        {
-            name: 'startTime',
-            label: 'Hora Inicio',
-            type: 'time',
-            validation: { required: true }
-        },
-        {
-            name: 'endTime',
-            label: 'Hora Fin',
-            type: 'time',
-            validation: { required: true }
-        },
-        {
             name: 'inventoryImage',
             label: 'Imagen',
             type: 'file',
@@ -247,11 +219,9 @@ export const SalesPage: React.FC = () => {
             saleDescription: sale.saleDescription,
             salePrice: sale.salePrice,
             saleType: sale.saleType,
-            startDate: sale.startDate,
-            endDate: sale.endDate,
-            startTime: sale.startTime,
-            endTime: sale.endTime,
             inventoryImage: null,
+            active: sale.active,
+            saleDiscount: sale.saleDiscount,
         });
         setSelectedProducts(manufacturedProducts as {product: IProduct, quantity: number}[]);
         setSelectedArticles(promoArticles as {article: IArticle, quantity: number}[]);
@@ -317,8 +287,7 @@ export const SalesPage: React.FC = () => {
     const handleFormSubmit = async () => {
         // Validaciones básicas
         const requiredFields = [
-            'denomination', 'saleDescription', 'saleType',
-            'startDate', 'endDate', 'startTime', 'endTime'
+            'denomination', 'saleDescription', 'saleType'
         ];
         for (const field of requiredFields) {
             if (!formValues[field] || (typeof formValues[field] === 'string' && formValues[field].trim() === '')) {
@@ -359,13 +328,8 @@ export const SalesPage: React.FC = () => {
                 denomination: formValues.denomination,
                 saleDescription: formValues.saleDescription,
                 saleType: formValues.saleType,
-                startDate: formValues.startDate,
-                endDate: formValues.endDate,
-                startTime: formValues.startTime,
-                endTime: formValues.endTime,
-                isActive: formValues.active ?? true, 
+                isActive: formValues.active ?? true,
                 saleDiscount: discount,
-                salePrice: finalPrice,
                 inventoryImage,
                 saleDetails,
             };
@@ -627,34 +591,6 @@ export const SalesPage: React.FC = () => {
                             name="saleType"
                             type="text"
                             value={saleTypeLabels[saleToView.saleType] ?? saleToView.saleType}
-                            disabled
-                        />
-                        <InputField
-                            label="Fecha Inicio"
-                            name="startDate"
-                            type="date"
-                            value={saleToView.startDate ?? ''}
-                            disabled
-                        />
-                        <InputField
-                            label="Fecha Fin"
-                            name="endDate"
-                            type="date"
-                            value={saleToView.endDate ?? ''}
-                            disabled
-                        />
-                        <InputField
-                            label="Hora Inicio"
-                            name="startTime"
-                            type="time"
-                            value={saleToView.startTime ?? ''}
-                            disabled
-                        />
-                        <InputField
-                            label="Hora Fin"
-                            name="endTime"
-                            type="time"
-                            value={saleToView.endTime ?? ''}
                             disabled
                         />
                         <InputField
