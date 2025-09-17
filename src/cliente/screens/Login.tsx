@@ -72,6 +72,17 @@ export default function Login() {
                         INICIAR SESION
                     </button>
 
+                    <p className={styles.orSeparator}>O INGRESA CON</p>
+
+                    <button
+                        type="button"
+                        className={styles.googleLoginButton}
+                        onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/google"}
+                    >
+                        <img src="../public/icons/icons8-logo-de-google-48.svg" alt="Google" className={styles.googleIcon} />
+                        Entrar con Google
+                    </button>
+
                     <p className={styles.signUpText}>
                         No tienes cuenta?{" "}
                         <Link to="/registro" className={styles.signUpLink}>

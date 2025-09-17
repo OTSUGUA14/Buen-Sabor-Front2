@@ -89,17 +89,17 @@ export default function RegisterPage() {
                 ...prev,
                 location: selectedLoc
                     ? {
-                          name: selectedLoc.name,
-                          idlocation: selectedLoc.idlocation,
-                          province: {
-                              name: selectedLoc.province.name,
-                              idprovince: selectedLoc.province.idprovince,
-                              country: {
-                                  name: selectedLoc.province.country.name,
-                                  idcountry: selectedLoc.province.country.idcountry,
-                              },
-                          },
-                      }
+                        name: selectedLoc.name,
+                        idlocation: selectedLoc.idlocation,
+                        province: {
+                            name: selectedLoc.province.name,
+                            idprovince: selectedLoc.province.idprovince,
+                            country: {
+                                name: selectedLoc.province.country.name,
+                                idcountry: selectedLoc.province.country.idcountry,
+                            },
+                        },
+                    }
                     : prev.location,
             }));
         } else {
@@ -131,29 +131,29 @@ export default function RegisterPage() {
             number: 0,
             location: locations[0]
                 ? {
-                      name: locations[0].name,
-                      idlocation: locations[0].idlocation,
-                      province: {
-                          name: locations[0].province.name,
-                          idprovince: locations[0].province.idprovince,
-                          country: {
-                              name: locations[0].province.country.name,
-                              idcountry: locations[0].province.country.idcountry,
-                          },
-                      },
-                  }
+                    name: locations[0].name,
+                    idlocation: locations[0].idlocation,
+                    province: {
+                        name: locations[0].province.name,
+                        idprovince: locations[0].province.idprovince,
+                        country: {
+                            name: locations[0].province.country.name,
+                            idcountry: locations[0].province.country.idcountry,
+                        },
+                    },
+                }
                 : {
-                      name: "",
-                      idlocation: 1,
-                      province: {
-                          name: "",
-                          idprovince: 1,
-                          country: {
-                              name: "",
-                              idcountry: 1,
-                          },
-                      },
-                  },
+                    name: "",
+                    idlocation: 1,
+                    province: {
+                        name: "",
+                        idprovince: 1,
+                        country: {
+                            name: "",
+                            idcountry: 1,
+                        },
+                    },
+                },
             iddomicile: 0,
         });
     };
@@ -393,6 +393,17 @@ export default function RegisterPage() {
                         onClick={handleSaveDomicile}
                     >
                         Guardar Domicilio
+                    </button>
+
+                    <p className={styles.orSeparator}>O INGRESA CON</p>
+
+                    <button
+                        type="button"
+                        className={styles.googleLoginButton}
+                        onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/google"}
+                    >
+                        <img src="../public/icons/icons8-logo-de-google-48.svg" alt="Google" className={styles.googleIcon} />
+                        Entrar con Google
                     </button>
 
                     <button type="submit" className={styles.loginButton}>REGISTRARSE</button>
